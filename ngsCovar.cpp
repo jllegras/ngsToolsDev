@@ -87,7 +87,7 @@ int main (int argc, char *argv[]) {
   }
 
   // if block_size longer than nsites
-  if (block_size>nsites) block_size=nsites;
+  if (block_size>(nsites-offset)) block_size=(nsites-offset);
 
   // prepare output files
   foutest = append(outfiles, "");
@@ -96,7 +96,7 @@ int main (int argc, char *argv[]) {
   fprintf(stderr,"\t->Using args: -nind %d -nsites %d -probfile %s -sfsfile %s -outfile %s -verbose %d -norm %d -minmaf %f -block_size %d -call %d -offset %d\n", nind, nsites, estfile, sfsfile, foutest, debug, norm, minmaf, block_size, call, offset); 
  
   // BLOCKS
-  int nwin = (nsites/block_size);
+  int nwin = ((nsites-offset)/block_size);
   /// GET POSITIONS OF BLOCKS
   array<int> start; array<int> end;
   start=getStart(nsites, offset, block_size);
