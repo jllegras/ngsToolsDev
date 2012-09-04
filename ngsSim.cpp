@@ -409,7 +409,7 @@ int main(int argc, char *argv[]) { // read input parameters
 	nind3 = atoi(argv[argPos+3]);
 	nind = nind1+nind2+nind3;
       } else {
-	printf("\n-npop must be 1 or 2. Terminate.\n");
+	printf("\n-npop must be 1 or 2 or 3. Terminate.\n");
 	return 0;
       } // end if npop
     }
@@ -426,6 +426,7 @@ int main(int argc, char *argv[]) { // read input parameters
 	F1 = atof(argv[argPos+1]); // this is FST first split
 	F2 = atof(argv[argPos+2]); // FST second split
 	F = 0.0; // no inbreeding"
+        increment = increment -1;
       } // end if npop
 
     }
