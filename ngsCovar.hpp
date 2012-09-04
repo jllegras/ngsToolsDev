@@ -169,10 +169,10 @@ matrix<double> readFileSub(char *fname, int nInd, int start, int end, int isfold
 }
 
 // read genotype posterior probabilities from angsd (-dogeno 64), but only for a specific subsets of positions (0-based notation)
-matrix<double> readEstiSub(char *fname, int nInd, int nSites, int start, int end) {
+matrix<double> readEstiSub(char *fname, int nInd, int start, int end) {
   FILE *fp = getFILE(fname,"rb");
   size_t filesize =fsize(fname);
-  if((filesize %(sizeof(double)*(3*nInd*nSites)) )) {
+  if((filesize %(sizeof(double)*(3*nInd)) )) {
     fprintf(stderr,"\n\t-> Possible error,binaryfiles might be broken\n");
     exit(-1);
   }

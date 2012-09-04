@@ -4,9 +4,9 @@
 #include <cstring>
 #include <vector>
 #include <math.h>
-#include "ngsCoVar_supreme.hpp"
+#include "ngsCovar.hpp"
 
-// to compile: g++ -Wall -O0 -g ngsCoVar_supreme.cpp -o ngsCoVar_supreme
+// to compile: g++ -Wall -O0 -g ngsCovar.cpp -o ngsCovar
 
 // implement offset
 
@@ -99,8 +99,8 @@ int main (int argc, char *argv[]) {
   int nwin = (nsites/block_size);
   /// GET POSITIONS OF BLOCKS
   array<int> start; array<int> end;
-  start=getStart(nsites, 0, block_size);
-  end=getEnd(nsites, 0, block_size);
+  start=getStart(nsites, offset, block_size);
+  end=getEnd(nsites, offset, block_size);
   int maxlen=end.data[0]-start.data[0]+1; // len for each win, it will never be greater than this
  
   // prepare out
@@ -142,7 +142,7 @@ int main (int argc, char *argv[]) {
 
     // compute esti
     if (debug==1) fprintf(stderr, "\nGetting esti...");
-    esti = readEstiSub(estfile, nind, nsites, start.data[n], end.data[n]);
+    esti = readEstiSub(estfile, nind, start.data[n], end.data[n]);
     if (debug==2) writematrix(esti, stderr);
     if (debug==1) fprintf(stderr, ": %d %d , %f %f", esti.x, esti.y, esti.data[0][0], esti.data[1][1]);  
 
