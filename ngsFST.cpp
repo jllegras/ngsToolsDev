@@ -1,50 +1,30 @@
 
 // this is the final program that accepts both single priors and 2D-SFS and does correction or not
 
-// mavaf : computes expected FST from a and b and correct for the ratio of a and b; it works in blocks of sites so it is memory efficient, recieves in input a file of previous iteration of fst and compute the exponential weithing function and correct the post probs
+// it computes expected FST from a and b and correct for the ratio of a and b; it works in blocks of sites so it is memory efficient, it may receive in input a file of previous iteration of fst and compute the exponential weithing function and correct the post probs
 
-// ultimate version: receives in input sfstools (already normalized)
+/// NOTE
 
-#include <cstdio> //for stderr,stdout
-#include <cstdlib> //for atoi
-#include <sys/stat.h> //for getting file attributes
-#include <cstring> //for str operations
+// if you give as input a prior2Dfile then postfile are from -realSFS 1
+// if you give no priorfile I assume you have run sfstools and you do not want to use weighting correcting function
+// if you give 2 priorfiles I assume you want to use weighting correcting function
+
+// in ouput a text file, each row is a site and columsn are tab separated: a, a+b, FACT, theta, pvar
+
+#include <cstdio>
+#include <cstdlib>
+#include <sys/stat.h>
+#include <cstring>
 #include <vector> 
-#include <math.h> // for exponential and log
-// include templates, functions
+#include <math.h>
+
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_min.h>
 #include <gsl/gsl_errno.h>
-#include "mavaf_ultimate_fast.hpp"
-
-// fast version is the one optimizing only one time for equal values of firts guess of fst
-
-// it receives in input only post probs files
-    
-  // input:
-  //	files with posterior probabilities for each site for each population
-  //	name of output file
-  //	nr of indiv for each pop
-  //	nr of sites // how many sites you want to analyze
-  //    verbose level ?
-  //    number of sums of moments ? use 1
-  //    is output a text or binary? // to do...
-  //	block_size : how many sites per block?
-  //	an optional file of first guess of fst (from mavaf itself)
-  //	firstbase: offset , start reading from that base
-  //	isfold: is data folded?
-
-  // output:
-  //	a, ab, correction factor, fst valus, pvar [all for each site]
-  // (temporarly the output file is a text file)
+#include "ngsFST.hpp"
  
-  // then a locus-estimate could be simply Reynolds-style so: sum(a)/sum(a+b) without correction
-
- // to compile: g++ mavaf_ultimate_fast.cpp -Wall -o mavaf_ultimate_fast -lgsl -lgslcblas -lm -lz -O0 -g
-
- // usage
- // e.g ./mavaf -postfiles POPS1.sfs POPS2.sfs -nind 10 20 -nsites 20000 -outfile out -verbose 0 -nsums 1 -block_size 1000 -firstbase 0 -fstfile myfst.txt
+// to compile: g++ ngsFST.cpp -Wall -o ngsFST -lgsl -lgslcblas -lm -lz -O0 -g
 
 int main (int argc, char *argv[]) {
   
@@ -58,8 +38,9 @@ int main (int argc, char *argv[]) {
   char *sfsfile1=NULL; // posterior probabilities
   char *sfsfile2=NULL;
   char *fstfile=NULL; // first guess of fst
-  char *priorfile1=NULL; // posterior probabilities
+  char *priorfile1=NULL; // priors (needed for weighting function only)
   char *priorfile2=NULL;
+  char *priorfile12=NULL; // joint prior, it is 2D-SFS
 
   FILE *outpost;
   char *outfile=NULL;
@@ -78,6 +59,9 @@ int main (int argc, char *argv[]) {
     }
     else if(strcmp(argv[argPos],"-fstfile")==0) {
       fstfile = argv[argPos+1];
+    }
+    else if(strcmp(argv[argPos],"-priorfile")==0) {
+      priorfile12 = argv[argPos+1];
     }
     else if(strcmp(argv[argPos],"-priorfiles")==0) {
       priorfile1 = argv[argPos+1];
@@ -118,20 +102,37 @@ int main (int argc, char *argv[]) {
     return 0;
   }
   if((priorfile1 == NULL) & (fstfile==NULL) & (K==0)) {
-    fprintf(stderr,"\nPerhaps you forgot to supply -priofiles when using an automatic setting of lambda?\n");
+    fprintf(stderr,"\nPerhaps you forgot to supply -priofiles and -fstfile when using an automatic setting of lambda?\n");
+    info();
+    return 0;
+  }
+  if((priorfile1 != NULL) & (priorfile12!=NULL)) {
+    fprintf(stderr,"\nYou should give either -priorfiles or -priorfile, otherwise I don't know if you want to use a 2D-SFS or the corrected product of marginal spectra as prior\n");
+    info();
+    return 0;
+  }
+  if((fstfile != NULL) & (priorfile12!=NULL)) {
+    fprintf(stderr,"\nIf you give -fstfile I assume you want to use the correction for marginal spectra. So why are you giving -priorfile too? You should only give -priorfiles eventually if K=0.\n");
+    info();
+    return 0;
+  }
+  if((isfold) & (priorfile12!=NULL)) {
+    fprintf(stderr,"\nSorry. Handling the folded 2D-SFS has not been implemented yet. Please contribute or push a request. Currently -ifold 1 and -priorfile12 !NULL are not compatible.\n");
     info();
     return 0;
   }
 
+
   /// OUTPUT
-  // print input arguments
-  fprintf(stderr,"\t->Using args: -nind %d -nind1 %d -nind2 %d -nsites %d -postfiles %s %s -outfile %s -verbose %d -nsums %d \n", nind, nind1, nind2, nsites, sfsfile1, sfsfile2, foutpost, verbose, nsums);
-  // prepare output file (temporarly is a text file)
-  foutpost = append(outfile, ".txt");
+  // print input arguments // UPDATE THIS !!!
+  fprintf(stderr,"\t->Using some of these args: -nind %d -nind1 %d -nind2 %d -nsites %d -postfiles %s %s -outfile %s -verbose %d -nsums %d \n", nind, nind1, nind2, nsites, sfsfile1, sfsfile2, foutpost, verbose, nsums);
+  // prepare output file (a text file)
+  foutpost = append(outfile, "");
   fprintf(stderr,"\t->Dumping file: %s\n", foutpost);
   outpost = getFILE(foutpost, "w");
 
   // READ PRIORS (if provided)
+  // marginal spectra
   array<double> prior1;
   array<double> prior2;
   if (priorfile1 != NULL) {
@@ -145,8 +146,25 @@ int main (int argc, char *argv[]) {
       if(prior2.data[i]<0.000001) prior2.data[i]=0.000001;
     }
   }
+  // 2D-SFS
+  matrix<double> prior12;
+  if ((priorfile12==NULL)==0) {
+    if (verbose==1) fprintf(stderr, "\nAdding 2D prior...");
+    prior12 = readPrior12(priorfile12, nind1*2+1, nind2*2+1);
+    if (verbose==2) {
+      fprintf(stderr, "\nPrior 2d:\n");
+      writematrix(prior12, stderr);
+    }
+    // the difference with this prior is that I don't add the prior, but I add the prior directly at computeFST step
+    for (int i=0; i<prior12.x; i++) {
+      for (int j=0; j<prior12.y; j++) {
+        if(prior12.data[i][j]<0.000001) prior12.data[i][j]=0.000001;
+      }
+    }
+  }
 
   /// GET POSITIONS OF BLOCKS
+  if (block_size>(nsites-firstbase)) block_size=(nsites-firstbase);
   array<int> start; array<int> end; 
   start=getStart(nsites, firstbase, block_size);
   end=getEnd(nsites, firstbase, block_size);
@@ -165,47 +183,31 @@ int main (int argc, char *argv[]) {
 
     // IF NOT FST FILE PROVIDED
     if ((fstfile == NULL)) {
-
-      // COMPUTE FST
-      if (verbose==1) fprintf(stderr,"Computing FST and no first guess provided.\n");
-
-       if (isfold) {
-         computeVarReyFold(post1, post2, verbose, outpost, nsums);
+       if (verbose==1) fprintf(stderr,"Computing FST and no first guess provided.\n");
+       if (priorfile12==NULL) {
+         if (isfold) {
+           computeVarReyFold(post1, post2, verbose, outpost, nsums);
+         } else {
+           computeVarRey(post1, post2, verbose, outpost, nsums);
+         }
        } else {
-         computeVarRey(post1, post2, verbose, outpost, nsums);
+         if (verbose==1) fprintf(stderr,"Using 2D-SFS as prior. You didn't run sfstools, right??? Use only -realSFS 1.\n");
+         computeVarRey12New(post1, post2, verbose, outpost, nsums, prior12);
        }
-
      } else {
      // IF FST FILE IS INDEED PROVIDED
      if (verbose==1) fprintf(stderr,"Computing FST and first guess provided.\n");
-
-       // read file
        array<double> firstfst;
-//       fprintf(stderr, "\n read fst file...");
        firstfst=readFSTsub(fstfile, nsites, start.data[n], end.data[n]);
- //      fprintf(stderr, "...done!");
-
-       // COMPUTE LAMBDAS for only this subset of sites (and norm for post probs! not prior, a change here).
-
-//       fprintf(stderr, "\n first fst: %d %f %f\n", firstfst.x, firstfst.data[0], firstfst.data[99]);
- //      writearray(firstfst, stderr);
- //      printf("\n");  
-
        array <double> sublam;
        sublam = getLambdas(firstfst, prior1, prior2, K, verbose, isfold);
-
-       //if (verbose==1) fprintf(stderr, "\n end get lambdas %d: %f %f %f %f\n", sublam.x, sublam.data[0], sublam.data[1], sublam.data[2], sublam.data[sublam.x-1]);
-       //writearray(sublam, stderr);
-
        if (isfold) {
          computeVarRey2Fold(post1, post2, verbose, outpost, nsums, sublam);
        } else {
          computeVarRey2(post1, post2, verbose, outpost, nsums, sublam);
        }
- 
        delete [] firstfst.data;
        delete [] sublam.data;
-
     }    
 
     cleanup(post1);
@@ -215,6 +217,8 @@ int main (int argc, char *argv[]) {
 
   delete [] prior1.data;
   delete [] prior2.data;
+  
+  cleanup(prior12);
 
   delete [] start.data;
   delete [] end.data;

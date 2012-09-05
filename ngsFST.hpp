@@ -4,7 +4,6 @@
 #include <gsl/gsl_min.h>
 #include <gsl/gsl_errno.h>
 
-//#include <unistd.h> // for sleep
 
 /// TEMPLATES
 
@@ -167,6 +166,42 @@ array<double> readArray(const char *fname, int nInd, int isfold) {
    }
   return ret;
 }
+
+matrix<double> readPrior12(const char *fname, int nrow, int ncol) {
+  FILE *fp = getFILE(fname,"r");
+  size_t filesize =fsize(fname);
+  if(filesize==0){
+    fprintf(stderr,"file:%s looks empty\n",fname);
+    exit(0);
+  }
+  double *tmp = new double[nrow*ncol];
+  char *buf = new char[filesize];
+  fread(buf,sizeof(char),filesize,fp);
+  tmp[0] = atof(strtok(buf,"\t \n"));
+  for(int i=1;i<(nrow*ncol);i++)
+    tmp[i] = atof(strtok(NULL,"\t \n"));
+  fclose(fp);
+  array<double> allvalues;
+  allvalues.x = nrow*ncol;
+  allvalues.data = tmp;
+  int index=0;
+  double **data = new double*[nrow];
+  for(int i=0;i<nrow;i++){
+    double *tmp2 = new double[ncol];
+    for(int k=0;k<ncol;k++) {
+      tmp2[k]=allvalues.data[index];
+      index=index+1;
+    }
+    data[i]= tmp2;
+  }
+  matrix<double> ret;
+  ret.x=nrow;
+  ret.y=ncol;
+  ret.data=data;
+  delete [] allvalues.data;
+  return ret;
+}
+
 
 // read a file of posterior probabilities into a matrix but only for a specific subsets of positions (0-based notation)
 matrix<double> readFileSub(char *fname, int nInd, int start, int end, int isfold) {
@@ -938,4 +973,126 @@ void computeVarRey2Fold(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
     cleanup(wpp);
   } // end for s in nsites
 } // end
+
+// compute a and ab estimate for all possible combinations of sample size, then weight by their prob12 computed from post1, pos12 and prior12 (normalize it)
+void computeVarRey12New(matrix<double> &m1, matrix<double> &m2, int verbose, FILE *fname, int nsums, matrix<double> &p12) {
+
+  int n1 = 0, n2 = 0; // sample sizes
+  int nsites = 0; // nsites
+
+  // estimates nsites and pop sizes from matrices
+  n1 = (m1.y-1)/2; // nind1
+  n2 = (m2.y-1)/2; // nind2
+  nsites = m1.x; // nsites from file
+
+  double VAR = 0.0, COVAR = 0.0, FACT = 0.0;
+
+  for (int s=0; s<nsites; s++) {
+
+    // m1 and m2 are post probs, p12 is the 2d sfs
+    matrix<double> m12;
+    m12.x=m1.y;
+    m12.y=m2.y;
+    double **ddata = new double*[m12.x];
+      for(int i=0;i<m12.x;i++){
+        double *dtmp = new double[m12.y];
+        for(int k=0;k<m12.y;k++) {
+          dtmp[k]=0.0;
+        }
+        ddata[i]= dtmp;
+      }
+    m12.data=ddata;
+
+    // multiply
+    for (int j=0; j<m12.x; j++) {
+      for (int i=0;i<m12.y; i++) {
+        m12.data[j][i] = m1.data[s][j]*m2.data[s][i]*p12.data[j][i];
+      }
+    }
+    
+    // for each possible value of freq 1 and freq 2 compute the FST, so compute A, AB, VAR, COVAR (see Price paper for its meaning)
+    matrix<double> A;
+    matrix<double> AB;
+
+    A.x=AB.x=(n1*2)+1;
+    A.y=AB.y=(n2*2)+1;
+
+    // FIRST CYCLE: get expected A and AB and retain matrices of A and AB
+    double **dataA = new double*[(n1*2)+1];
+    double **dataAB = new double*[(n1*2)+1];
+
+    // get also the probability of site being variable
+    double pvar = 0.0;
+    pvar = 1 - m12.data[0][0] - m12.data[2*n1][2*n2];
+
+    if (verbose==2) fprintf(stderr, "\t first cycle");
+
+    double EA = 0.0, EAB = 0.0;
+
+    for (int i=0; i<(2*n1+1); i++) {
+
+      if (verbose==2) fprintf(stderr, "\ti%d",i);
+
+      double *bufA = new double[(n2*2)+1];
+      double *bufAB = new double[(n2*2)+1];
+
+      for (int j=0; j<(2*n2+1); j++) {
+
+        array<double> temp;
+        temp = calcAB(i, j, n1, n2, 0);
+        bufA[j]=temp.data[0];
+        bufAB[j]=temp.data[1];
+
+        EA = EA + temp.data[0]*m12.data[i][j];
+        EAB = EAB + temp.data[1]*m12.data[i][j];
+
+        delete [] temp.data;
+
+      } // end for in j
+
+      dataA[i]=bufA;
+      dataAB[i]=bufAB;
+
+    } // end for in i
+
+    A.data=dataA;
+    AB.data=dataAB;
+
+    // SECOND CYCLE: get VAR and COVAR, and then the correcting FACTor, according to number of sums to retain
+    VAR = 0.0, COVAR = 0.0, FACT = 0.0;
+
+    if ((verbose==4) & (s==0)) fprintf(stderr, "\t second cycle %d", nsums);
+
+    for (int q=1; q<=nsums; q++) {
+
+      VAR = 0.0; COVAR = 0.0;
+      for (int i=0; i<(2*n1+1); i++) {
+        for (int j=0; j<(2*n2+1); j++) {
+
+          VAR = VAR + pow((AB.data[i][j]-EAB), static_cast <double> (q) )*m12.data[i][j];
+
+          COVAR = COVAR + pow((AB.data[i][j]-EAB)*(A.data[i][j]-EA), static_cast <double> (q) ) *m12.data[i][j];
+
+        } // end for in j
+      } // end for in i
+
+      FACT = FACT + pow( (-1.0), static_cast <double> (q)) *( (EA*VAR + COVAR) / pow(EAB, static_cast <double> (q+1)));
+
+      if ((verbose==4) & (s==0)) fprintf(stderr, "\n q %d v %f c %f f %f",q,VAR,COVAR,FACT);
+
+    } // end for in nsums
+
+    // print results
+    fprintf(fname, "%f\t%f\t%f\t%f\t%f\n", EA, EAB, FACT, (EA/EAB)+FACT, pvar);
+
+    cleanup(A);
+    cleanup(AB);
+    cleanup(m12);
+
+  } // end for s in nsites
+
+
+
+} // end
+
 
