@@ -138,7 +138,7 @@ int main (int argc, char *argv[]) {
     matrix<double> esti;
     array<double> pp;
 
-    fprintf(stderr, "Block %d out of %d from %d to %d\n", n, (nwin-1), start.data[n], end.data[n]);
+    fprintf(stderr, "\nBlock %d out of %d from %d to %d\n", n, (nwin-1), start.data[n], end.data[n]);
 
     // compute esti
     if (debug==1) fprintf(stderr, "\nGetting esti...");
@@ -148,11 +148,26 @@ int main (int argc, char *argv[]) {
 
     // IF CALL GENOTYPES, set max prob to 1
     if (call) {
+ 
       if (debug==1) fprintf(stderr, "\nCalling genotypes...");
-      for (int i=0; i<esti.x; i++) {
-        maxgeno=maxposarr(esti, i);
-        for (int j=0; j<3; j++) esti.data[i][j]=0.0;
-        esti.data[i][maxgeno]=1.0;
+      for (int i=0; i<esti.x; i++) { // for each site/row
+
+        for (int h=0; h<esti.y; h=h+3) { // for each individual
+
+          //fprintf(stderr, "\nindiv: %d",h);
+
+          maxgeno=maxposarr(esti, i, h);
+
+          //fprintf(stderr, "\nindiv %d and maxgeno %d", h, maxgeno);
+
+          //fprintf(stderr, "\nGen likes:%f %f %f", esti.data[i][h],esti.data[i][h+1],esti.data[i][h+2]);
+
+          for (int j=h; j<(h+3); j++) esti.data[i][j]=0.0;
+          esti.data[i][maxgeno]=1.0;
+
+          //fprintf(stderr, "\nNew likes:%f %f %f", esti.data[i][h],esti.data[i][h+1],esti.data[i][h+2]);
+
+        }
       }
     }
 

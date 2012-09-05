@@ -192,12 +192,12 @@ matrix<double> readEstiSub(char *fname, int nInd, int start, int end) {
   return ret;
 }
 
-// return max value position of a row from a matrix
-int maxposarr(matrix<double> &m, int row) {
-  int i=0, res = 0;
+// return max value position of a row from a matrix of geno likes or post probs for a specific individual
+int maxposarr(matrix<double> &m, int row, int ind) {
+  int i=0, res = ind;
   double val;
-  val = m.data[row][0];
-  for (i = 1; i < m.y; i++) {
+  val = m.data[row][ind];
+  for (i = ind; i < (ind+3); i++) {
     if (m.data[row][i] > val) {
       res = i;
       val = m.data[row][i];
