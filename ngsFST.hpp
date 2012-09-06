@@ -974,6 +974,33 @@ void computeVarRey2Fold(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
   } // end for s in nsites
 } // end
 
+// normalize SFS and exp it if log (if from -realSFS 1)
+void normSFS(matrix<double> &sfs, int islog) {
+  int nsites = sfs.x;
+  int ncol = sfs.y;
+  double somma = 0.0;
+  for (int j=0; j<nsites; j++) {
+    // get the sum of values (do exp if they are in log scale)
+    somma = 0;
+    for(int i=0; i<ncol; i++) {
+      if (islog) {
+        somma = somma + exp(sfs.data[j][i]);
+        } else {
+        somma = somma + sfs.data[j][i];
+      }
+    }
+    // divide each value for the sum
+    for(int i=0; i<ncol; i++) {
+      if (islog) {
+        sfs.data[j][i] = exp(sfs.data[j][i]) / somma;
+      } else {
+        sfs.data[j][i] = sfs.data[j][i] / somma;
+      }
+    }
+   }
+}
+
+
 // compute a and ab estimate for all possible combinations of sample size, then weight by their prob12 computed from post1, pos12 and prior12 (normalize it)
 void computeVarRey12New(matrix<double> &m1, matrix<double> &m2, int verbose, FILE *fname, int nsums, matrix<double> &p12) {
 
@@ -1009,7 +1036,35 @@ void computeVarRey12New(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
         m12.data[j][i] = m1.data[s][j]*m2.data[s][i]*p12.data[j][i];
       }
     }
+
+    if (s==0) {
+    fprintf(stderr, "\npost1: %f %f %f", m1.data[0][0], m1.data[0][1], m1.data[0][2]);
+    fprintf(stderr, "\npost2: %f %f %f", m2.data[0][0], m2.data[0][1], m2.data[0][2]);
+    fprintf(stderr, "\nNot\n");
+    writematrix(m12, stderr);
+    }
+
+    // get the sum
+    double somma=0.0;
+      for (int j=0; j<m12.x; j++) {
+        for (int i=0;i<m12.y; i++) {
+          somma=somma+m12.data[j][i];
+      }
+    }
+
+    // divide
+    for (int j=0; j<m12.x; j++) {
+      for (int i=0;i<m12.y; i++) {
+        m12.data[j][i] = m12.data[j][i]/somma;
+      }
+    }
+
     
+    if (s==0) {
+    fprintf(stderr, "\nNorm\n");
+    writematrix(m12, stderr);
+    }
+
     // for each possible value of freq 1 and freq 2 compute the FST, so compute A, AB, VAR, COVAR (see Price paper for its meaning)
     matrix<double> A;
     matrix<double> AB;

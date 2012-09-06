@@ -24,7 +24,7 @@
 #include <gsl/gsl_errno.h>
 #include "ngsFST.hpp"
  
-// to compile: g++ ngsFST.cpp -Wall -o ngsFST -lgsl -lgslcblas -lm -lz -O0 -g
+// to compile: g++ ngsFST.cpp -Wall -o bin/ngsFST -lgsl -lgslcblas -lm -lz -O0 -g
 
 int main (int argc, char *argv[]) {
   
@@ -103,8 +103,6 @@ int main (int argc, char *argv[]) {
   }
   if((priorfile1 == NULL) & (fstfile==NULL) & (K==0)) {
     fprintf(stderr,"\nPerhaps you forgot to supply -priofiles and -fstfile when using an automatic setting of lambda?\n");
-    info();
-    return 0;
   }
   if((priorfile1 != NULL) & (priorfile12!=NULL)) {
     fprintf(stderr,"\nYou should give either -priorfiles or -priorfile, otherwise I don't know if you want to use a 2D-SFS or the corrected product of marginal spectra as prior\n");
@@ -122,14 +120,13 @@ int main (int argc, char *argv[]) {
     return 0;
   }
 
-
   /// OUTPUT
-  // print input arguments // UPDATE THIS !!!
-  fprintf(stderr,"\t->Using some of these args: -nind %d -nind1 %d -nind2 %d -nsites %d -postfiles %s %s -outfile %s -verbose %d -nsums %d \n", nind, nind1, nind2, nsites, sfsfile1, sfsfile2, foutpost, verbose, nsums);
-  // prepare output file (a text file)
   foutpost = append(outfile, "");
   fprintf(stderr,"\t->Dumping file: %s\n", foutpost);
   outpost = getFILE(foutpost, "w");
+
+  // print input arguments // UPDATE THIS !!!
+  fprintf(stderr,"\t->Using some of these args: -nind %d -nind1 %d -nind2 %d -nsites %d -postfiles %s %s -priorfiles %s %s -priorfile %s -fstfile %s -outfile %s -verbose %d -nsums %d -offset %d -K %d\n", nind, nind1, nind2, nsites, sfsfile1, sfsfile2, priorfile1, priorfile2, priorfile12, fstfile, foutpost, verbose, nsums, firstbase, K);
 
   // READ PRIORS (if provided)
   // marginal spectra
@@ -139,12 +136,6 @@ int main (int argc, char *argv[]) {
     if (verbose==1) fprintf(stderr, "\nAdding priors...");
     prior1 = readArray(priorfile1, nind1, isfold);
     prior2 = readArray(priorfile2, nind2, isfold);
-    for (int i=0; i<prior1.x; i++) { 
-      if(prior1.data[i]<0.000001) prior1.data[i]=0.000001;
-    }
-    for (int i=0; i<prior2.x; i++) { 
-      if(prior2.data[i]<0.000001) prior2.data[i]=0.000001;
-    }
   }
   // 2D-SFS
   matrix<double> prior12;
@@ -155,12 +146,7 @@ int main (int argc, char *argv[]) {
       fprintf(stderr, "\nPrior 2d:\n");
       writematrix(prior12, stderr);
     }
-    // the difference with this prior is that I don't add the prior, but I add the prior directly at computeFST step
-    for (int i=0; i<prior12.x; i++) {
-      for (int j=0; j<prior12.y; j++) {
-        if(prior12.data[i][j]<0.000001) prior12.data[i][j]=0.000001;
-      }
-    }
+    //// the difference with this prior is that I don't add the prior, but I add the prior directly at computeFST step
   }
 
   /// GET POSITIONS OF BLOCKS
@@ -180,6 +166,12 @@ int main (int argc, char *argv[]) {
     matrix<double> post2;
     post1 = readFileSub(sfsfile1, nind1, start.data[n], end.data[n], isfold);
     post2 = readFileSub(sfsfile2, nind2, start.data[n], end.data[n], isfold);
+
+    if (priorfile12!=NULL) {
+      // if from -realSFS 1 they are -log
+      normSFS(post1, 1); // 2nd argument is islog
+      normSFS(post2, 1);
+    }
 
     // IF NOT FST FILE PROVIDED
     if ((fstfile == NULL)) {
@@ -214,12 +206,7 @@ int main (int argc, char *argv[]) {
     cleanup(post2);
     
   } // end blocks iterations
-
-  delete [] prior1.data;
-  delete [] prior2.data;
-  
-  cleanup(prior12);
-
+ 
   delete [] start.data;
   delete [] end.data;
 
