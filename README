@@ -5,7 +5,7 @@ Set of programs/scripts to analyze NGS data for population genetics analyses.
 
 ngsFST
 
-compile:
+compile: g++ ...
 
 Program to estimate FST from NGS data. It computes expected genetic variance components and estimate FST from those.
 In input it receives posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) for each population. It may receive also a 2D-SFS as a prior and in this case in gets in input posterior probabilities with uniform prior (angsd with -realSFS 1 only). Additionally it can use a corrected product of marginal spectra as prior. In this case it receives in input posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) and also marginal SFS.
