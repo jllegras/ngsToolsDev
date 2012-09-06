@@ -1,0 +1,21 @@
+
+WISH LIST
+
+Major:
+
+- Matteo+?: generalize input from SAMtools or Beagle?
+
+Minor:
+
+- Matteo: nicer comments and checks for input files
+
+- Matteo: implement gimmeFST in ngsFST; basically this computes FST from KNOWN genotypes after running ngsSim (it is very specific but it could be useful);
+
+- Matteo: add perl/python/bash script to compute multisite FST into a file that it will be taken as first guess of FST (so far only R script);
+
+- Filipe: add R script to plot PCA from covariance matrix;
+
+
+
+
+
