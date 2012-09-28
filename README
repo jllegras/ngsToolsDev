@@ -49,3 +49,5 @@ getMultiFST.R
 This script converts the output of ngsFST and compute multiple-site FST and rewrite the file with this new values of FST (to be used as -firstfile)
 
 
+
+
