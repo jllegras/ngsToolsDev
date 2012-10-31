@@ -605,7 +605,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
 
     }
 
-    sleep(2);
+    //sleep(2);
 
     } // end for every sites
 
