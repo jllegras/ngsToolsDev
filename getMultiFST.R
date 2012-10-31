@@ -3,7 +3,7 @@ getMultiFST<-function(filein, fileout, from_known=FALSE) {
   # this script converts the output of ngsFST and compute multiple-site FST and rewrite the file with this new values of FST (to be used as -firstfile) 
 
   val=c()
-  if (known_known) { # this is for compatibility with gimmeFST
+  if (from_known) { # this is for compatibility with gimmeFST
     rt=read.table(filein,head=T)
     val=sum(rt[,8])/sum(rt[,9])
   } else {
