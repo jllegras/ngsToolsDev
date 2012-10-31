@@ -193,6 +193,7 @@ int main (int argc, char *argv[]) {
        firstfst=readFSTsub(fstfile, nsites, start.data[n], end.data[n]);
        array <double> sublam;
        sublam = getLambdas(firstfst, prior1, prior2, K, verbose, isfold);
+       if (verbose==1) fprintf(stderr,"Computed lambdas.\n");
        if (isfold) {
          computeVarRey2Fold(post1, post2, verbose, outpost, nsums, sublam);
        } else {
