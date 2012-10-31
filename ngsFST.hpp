@@ -477,13 +477,13 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
     
     int nind1 = 0, nind2 =0;
 
-    if (isfold==0) {
+    //if (isfold==0) {
       nind1 = (prob1.x-1)/2;
       nind2 = (prob2.x-1)/2;
-    } else {
-      nind1 = (prob1.x-1);
-      nind2 = (prob2.x-1);
-    }
+    //} else {
+    //  nind1 = (prob1.x-1);
+    //  nind2 = (prob2.x-1);
+    //}
 
     // initialize values for optimization
     int status;
