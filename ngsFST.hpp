@@ -507,7 +507,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
       for (int i=0; i<myfst.x; i++) {
 
         alreadydone=-1;
-        fprintf(stderr, "\n site %d : %d", i, alreadydone);
+        //fprintf(stderr, "\n site %d : %d", i, alreadydone);
         if(i>0) {
           for (int j=0; j<i; j++) {
             if (myfst.data[i]==myfst.data[j]) {
@@ -520,7 +520,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
 
         if (alreadydone==(-1)) {
 
-      fprintf(stderr, "\n!!! site %d out of %d with fst %f", i, myfst.x, myfst.data[i]);
+      //fprintf(stderr, "\n!!! site %d out of %d with fst %f", i, myfst.x, myfst.data[i]);
 
         // re-init
         a=0.0001;
@@ -552,7 +552,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
            iminu=j;
          }
        }
-       printf("\n %f:%d", minu, iminu);
+       //printf("\n %f:%d", minu, iminu);
        // reset a,b,m
        m = grid[iminu]; // starting values
        // if it is one of the bounds then set miniumu as 0.0001 or 30
@@ -582,8 +582,8 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
           status = gsl_min_fminimizer_iterate (s);
 
           if (status == GSL_SUCCESS) {
-            printf ("Converged:\n");
-            printf ("\t %5d [%.7f, %.7f] %.7f %.7f\n", iter, a, b, m, b - a);
+            //printf ("Converged:\n");
+            //printf ("\t %5d [%.7f, %.7f] %.7f %.7f\n", iter, a, b, m, b - a);
           }
         } // end do
         while (status == GSL_CONTINUE && iter < max_iter);
@@ -596,12 +596,12 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
 
     lambdas.data[i]=m;
 
-    if (i==0) fprintf(stderr, "\n ended at: %f and ltmp is %f",m, lambdas.data[i]);
+    //if (i==0) fprintf(stderr, "\n ended at: %f and ltmp is %f",m, lambdas.data[i]);
 
     } else { // end if not already done
 
     lambdas.data[i]=lambdas.data[alreadydone];
-    fprintf(stderr, ".. lam %f is %f", lambdas.data[i], lambdas.data[alreadydone]);
+    //fprintf(stderr, ".. lam %f is %f", lambdas.data[i], lambdas.data[alreadydone]);
 
     }
 
@@ -915,8 +915,8 @@ void computeVarRey2Fold(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
   int n1 = 0, n2 = 0; // sample sizes
   int nsites = 0; // nsites
   // estimates nsites and pop sizes from matrices
-  n1 = (m1.y)/2; // nind1
-  n2 = (m2.y)/2; // nind2
+  n1 = (m1.y-1); // nind1
+  n2 = (m2.y-1); // nind2
   nsites = m1.x; // nsites from file
   double VAR = 0.0, COVAR = 0.0, FACT = 0.0;
   matrix<double> A;
@@ -936,7 +936,7 @@ void computeVarRey2Fold(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
     wpp = getWeightsFold(n1, n2, m1, m2, s, lambdas.data[s]);
     // get also the probability of site being variable
     double pvar = 0.0;
-    pvar = 1 - m1.data[s][0]*m2.data[s][0]*wpp.data[0][0] - m1.data[s][2*n1]*m2.data[s][2*n2]*wpp.data[2*n1][2*n2];
+    pvar = 1 - m1.data[s][0]*m2.data[s][0]*wpp.data[0][0]; //- m1.data[s][2*n1]*m2.data[s][2*n2]*wpp.data[2*n1][2*n2];
     if (verbose==20) fprintf(stderr, "\t first cycle");
     double EA = 0.0, EAB = 0.0;
     for (int i=0; i<(n1+1); i++) {
