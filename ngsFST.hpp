@@ -392,8 +392,8 @@ double myfunc_gsl (double lambda, void * params) {
 // optimizing function if folded gsl version
 double myfuncFold_gsl (double lambda, void * params) {
   my_f_params * p = (my_f_params*) params;
-  double k = (p->k);
-  double z = (p->z);
+  double k = (p->k)/2;
+  double z = (p->z)/2;
   double F = (p->F);
   array<double> p1 = (p->p1);
   array<double> p2 = (p->p2);
@@ -564,11 +564,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
         // do brent
         a=grid[iminu-1];
         b=grid[iminu+1];
-	if (isfold) {
-		my_f_params params = { nind1, nind2, myfst.data[i], prob1, prob2};
-	} else {
-        	my_f_params params = { nind1*2, nind2*2, myfst.data[i], prob1, prob2};
-	}
+	my_f_params params = { nind1*2, nind2*2, myfst.data[i], prob1, prob2};
         gsl_function F;
         if (isfold) {
           F.function = &myfuncFold_gsl;
