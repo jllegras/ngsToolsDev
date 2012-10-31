@@ -564,7 +564,11 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
         // do brent
         a=grid[iminu-1];
         b=grid[iminu+1];
-        my_f_params params = { nind1*2, nind2*2, myfst.data[i], prob1, prob2};
+	if (isfold) {
+		my_f_params params = { nind1, nind2, myfst.data[i], prob1, prob2};
+	} else {
+        	my_f_params params = { nind1*2, nind2*2, myfst.data[i], prob1, prob2};
+	}
         gsl_function F;
         if (isfold) {
           F.function = &myfuncFold_gsl;
