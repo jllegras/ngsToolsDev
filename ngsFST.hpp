@@ -392,8 +392,8 @@ double myfunc_gsl (double lambda, void * params) {
 // optimizing function if folded gsl version
 double myfuncFold_gsl (double lambda, void * params) {
   my_f_params * p = (my_f_params*) params;
-  double k = (p->k)/2;
-  double z = (p->z)/2;
+  double k = (p->k);
+  double z = (p->z);
   double F = (p->F);
   array<double> p1 = (p->p1);
   array<double> p2 = (p->p2);
