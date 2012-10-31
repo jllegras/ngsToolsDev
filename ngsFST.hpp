@@ -475,12 +475,14 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
     }
     lambdas.data=ltmp;
     
+    int nind1 = 0, nind2 =0;
+
     if (isfold) {
-      int nind1 = (prob1.x-1)/2;
-      int nind2 = (prob2.x-1)/2;
+      nind1 = (prob1.x-1)/2;
+      nind2 = (prob2.x-1)/2;
     } else {
-      int nind1 = (prob1.x-1);
-      int nind2 = (prob2.x-1);
+      nind1 = (prob1.x-1);
+      nind2 = (prob2.x-1);
     }
 
     // initialize values for optimization
