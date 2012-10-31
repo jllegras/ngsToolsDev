@@ -458,7 +458,7 @@ double myfuncFold(double lambda, int k, int z, double F, array<double> p1, array
 // compute lambdas
 array<double> getLambdas(array<double> myfst, array<double> prob1, array<double> prob2, int K, int verbose, int isfold) {
 
-//    fprintf(stderr, "\ninside get lamb; fst are %d \n", myfst.x);
+    fprintf(stderr, "\ninside get lamb; fst are %d \n", myfst.x);
 //    writearray(myfst, stdout);
 
 //    fprintf(stderr, "\nprob1");
@@ -507,7 +507,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
       for (int i=0; i<myfst.x; i++) {
 
         alreadydone=-1;
-        //fprintf(stderr, "\n site %d : %d", i, alreadydone);
+        fprintf(stderr, "\n site %d : %d", i, alreadydone);
         if(i>0) {
           for (int j=0; j<i; j++) {
             if (myfst.data[i]==myfst.data[j]) {
@@ -520,7 +520,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
 
         if (alreadydone==(-1)) {
 
-//      fprintf(stderr, "\n!!! site %d out of %d with fst %f", i, myfst.x, myfst.data[i]);
+      fprintf(stderr, "\n!!! site %d out of %d with fst %f", i, myfst.x, myfst.data[i]);
 
         // re-init
         a=0.0001;
@@ -552,7 +552,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
            iminu=j;
          }
        }
-//       printf("\n %f:%d", minu, iminu);
+       printf("\n %f:%d", minu, iminu);
        // reset a,b,m
        m = grid[iminu]; // starting values
        // if it is one of the bounds then set miniumu as 0.0001 or 30
@@ -582,8 +582,8 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
           status = gsl_min_fminimizer_iterate (s);
 
           if (status == GSL_SUCCESS) {
-//            printf ("Converged:\n");
-//            printf ("\t %5d [%.7f, %.7f] %.7f %.7f\n", iter, a, b, m, b - a);
+            printf ("Converged:\n");
+            printf ("\t %5d [%.7f, %.7f] %.7f %.7f\n", iter, a, b, m, b - a);
           }
         } // end do
         while (status == GSL_CONTINUE && iter < max_iter);
@@ -596,16 +596,16 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
 
     lambdas.data[i]=m;
 
-    //if (i==0) fprintf(stderr, "\n ended at: %f and ltmp is %f",m, lambdas.data[i]);
+    if (i==0) fprintf(stderr, "\n ended at: %f and ltmp is %f",m, lambdas.data[i]);
 
     } else { // end if not already done
 
     lambdas.data[i]=lambdas.data[alreadydone];
-    //fprintf(stderr, ".. lam %f is %f", lambdas.data[i], lambdas.data[alreadydone]);
+    fprintf(stderr, ".. lam %f is %f", lambdas.data[i], lambdas.data[alreadydone]);
 
     }
 
-    //sleep(2);
+    sleep(2);
 
     } // end for every sites
 
