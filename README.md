@@ -12,7 +12,7 @@ These programs receive in input files produces by the software ANGSD.
 A typical pipeline can be the following, assuming we have genotype likelihoods data for one pop in 'sim' format(e.g. from nsgSim). We assume 40 individuals.
 
 This computes genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
-angsd0.204/angsd.g++ -sim1 pop.glf.gz -nInd 40 -doGeno 64 -doMaf 2 -outfiles all -doMajorMinor 1 -doGlf 3
+```angsd0.204/angsd.g++ -sim1 pop.glf.gz -nInd 40 -doGeno 64 -doMaf 2 -outfiles all -doMajorMinor 1 -doGlf 3```
 
 This computes sample allele frequency posterior probabilities assuming no prior (.sfs):
 angsd0.204/angsd.g++ -outfiles pop -realSFS 1 -sim1 pop.glf.gz -nInd 40
