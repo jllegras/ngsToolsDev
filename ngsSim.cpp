@@ -342,6 +342,7 @@ void info() {
   fprintf(stderr,"\t\t-simpleRand\tboolean [1]\n");
   fprintf(stderr,"\t\t-seed\trandom number [0]\n");
   fprintf(stderr,"\t\t-base_freq\tBackground allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]\n");
+  fprintf(stderr,"\t\t-multi_depth\tSimulate uneven covered individuals. -multi_depth 6 10: first 10 individuals have 6X while the rest is as -depth.[0 0]\n");
 }
 
 ///		///
@@ -357,7 +358,7 @@ int main(int argc, char *argv[]) { // read input parameters
 
   /// define and initialize the variables (with default values)
   
-  int i=0, j=0, k=0, b1=0, b2=0, var=0, nsites = 500000, nind = 10, npop=1, model=1, nind1=0, nind2=0, nind3=0, increment=0, seed=0;
+  int i=0, j=0, k=0, b1=0, b2=0, var=0, nsites = 500000, nind = 10, npop=1, model=1, nind1=0, nind2=0, nind3=0, increment=0, seed=0, multi_depth_coverage=0, multi_depth_nind=0;
   static int genotype[2], genotype1[2], genotype2[2], genotype3[2]; // array /matrix of genotypes for all pops
   double pfreq=0.0, pfreq1=0.0, pfreq2=0.0, pfreq3=0.0, pfreqB=0.0, pvar= 0.015, meandepth = 5, errate = 0.0075, F=0.0, F1=0.0, F2=0.0, minfreq=0.0001;
   double basefreq[4] = {0.25, 0.25, 0.25, 0.25}; // background frequencies
@@ -441,6 +442,11 @@ int main(int argc, char *argv[]) { // read input parameters
     else if(strcmp(argv[argPos],"-outfiles")==0) outfiles  = (argv[argPos+1]);
     else if(strcmp(argv[argPos],"-nsites")==0)  nsites  = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-seed")==0)  seed  = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-multi_depth")==0) {
+      multi_depth_coverage  = atoi(argv[argPos+1]);
+      multi_depth_nind  = atoi(argv[argPos+2]);
+      increment = increment + 1;
+    }
     else if(strcmp(argv[argPos],"-model")==0)  model  = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-simpleRand")==0) simpleRand  = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-base_freq")==0) {
@@ -465,6 +471,18 @@ int main(int argc, char *argv[]) { // read input parameters
     fprintf(stderr,"\nMust supply -outfiles. Terminate\n");
     return 0;
   }
+
+  // check if multi_depth_nind is higher than nind and if you have multiple populations
+  if(multi_depth_nind>nind) {
+    fprintf(stderr,"\nmulti_depth individuals must be lower than total number of individuals -npop. Terminate\n");
+    return 0;
+  }
+  if(multi_depth_nind>0 && npop>1) {
+    fprintf(stderr,"\nmulti_depth supported only if simulating 1 population. Terminate\n");
+    return 0;
+  }
+
+
 
   // to adjust the exponential function according to the lowest allele frequency detectable
   myConst = -log(minfreq);
@@ -573,7 +591,7 @@ int main(int argc, char *argv[]) { // read input parameters
   
 
   // write args file
-  fprintf(argfile,"\t->Using args: -npop %d -nind %d -nind1 %d -nind2 %d -errate %f -depth %f -pvar %f -mfreq %f -nsites %d -F %f -F1 %f -F2 %f -model %d -simpleRand %d -seed %d -base_freq %f %f %f %f\n", npop, nind, nind1, nind2, errate, meandepth, pvar, minfreq, nsites, F, F1, F2, model, simpleRand, seed, basefreq[0], basefreq[1], basefreq[2], basefreq[3]); 
+  fprintf(argfile,"\t->Using args: -npop %d -nind %d -nind1 %d -nind2 %d -errate %f -depth %f -pvar %f -mfreq %f -nsites %d -F %f -F1 %f -F2 %f -model %d -simpleRand %d -seed %d -base_freq %f %f %f %f -multi_depth %d %d\n", npop, nind, nind1, nind2, errate, meandepth, pvar, minfreq, nsites, F, F1, F2, model, simpleRand, seed, basefreq[0], basefreq[1], basefreq[2], basefreq[3], multi_depth_coverage, multi_depth_nind); 
 
   /// COMPUTE
   
@@ -674,11 +692,19 @@ int main(int argc, char *argv[]) { // read input parameters
       int has_reads =0;
       // compute and print likelihoods
       if (debug) fprintf(stderr,"\nStart writing reads for whole sample; indiv %d", j);      
-      if (model==0)
-	has_reads=print_ind_site(errate, meandepth, genotype, resultfile, glffile, ireadsfile);
-      else
+      if (model==0) {
+        if (multi_depth_coverage>0 && j<multi_depth_nind) {
+          has_reads=print_ind_site(errate, multi_depth_coverage, genotype, resultfile, glffile, ireadsfile);
+        } else {        
+	  has_reads=print_ind_site(errate, meandepth, genotype, resultfile, glffile, ireadsfile);
+        }
+      } else {
+        if (multi_depth_coverage>0 && j<multi_depth_nind) {
+          has_reads=print_ind_site(2*errate*uniform(seed), multi_depth_coverage, genotype, resultfile, glffile, ireadsfile);
+        } else {
 	has_reads=print_ind_site(2*errate*uniform(seed), meandepth, genotype, resultfile, glffile, ireadsfile);
-      
+        }
+      }
       fprintf(genofile,"%d %d\t",genotype[0],genotype[1]);      
       
       if (debug) fprintf(stderr,"\nEnd writing reads for whole sample");      
