@@ -1,4 +1,6 @@
 
+mkdir bin
+
 CC=g++
 CFLAGS=-lm -lz -O3 -Wall
 
