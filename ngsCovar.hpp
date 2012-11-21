@@ -362,6 +362,7 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
 	    } else if (norm==1) {
    	      subsomma = subsomma / sqrt(2*a.data[s]*(1-a.data[s])); 
 	    }
+            somma = somma + subsomma;
       }
       tmp[j] = somma;
     }
