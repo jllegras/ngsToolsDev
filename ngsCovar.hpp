@@ -350,19 +350,18 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
     for (int j=0; j<(i+1); j++) {
       somma = 0.0;
       for (int s=0; s<nsites; s++) {
-	  subsomma = 0.0;
-	  for (int C1=0; C1<3; C1++) {
-            for (int C2=0; C2<3; C2++) {
-	      subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
-            }
-	  }
-          subsomma=subsomma*pvar.data[s];
-          if (norm==0) {
-	    subsomma = subsomma / (2*a.data[s]*(1-a.data[s])); 
-	  } else if (norm==1) {
-   	    subsomma = subsomma / sqrt(2*a.data[s]*(1-a.data[s])); 
-	  } 
-	somma = somma + subsomma;
+	    subsomma = 0.0;
+	    for (int C1=0; C1<3; C1++) {
+              for (int C2=0; C2<3; C2++) {
+	        subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
+              }
+	    }
+            subsomma=subsomma*pvar.data[s];
+            if (norm==0) {
+	      subsomma = subsomma / sqrt(a.data[s]*(1-a.data[s])); 
+	    } else if (norm==1) {
+   	      subsomma = subsomma / sqrt(2*a.data[s]*(1-a.data[s])); 
+	    }
       }
       tmp[j] = somma;
     }
@@ -374,8 +373,8 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
   ret.data = data;
   for (int i=0;i<covar.x;i++) {
     for (int j=0;j<(i+1);j++) {
-      covar.data[i][j]=covar.data[i][j]+ret.data[i][j];
-      covar.data[j][i]=covar.data[j][i]+ret.data[i][j];
+      covar.data[i][j]=covar.data[i][j]+(ret.data[i][j]);
+      covar.data[j][i]=covar.data[j][i]+(ret.data[i][j]);
     }
   }
   cleanup(ret);
