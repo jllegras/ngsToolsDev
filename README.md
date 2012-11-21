@@ -29,6 +29,8 @@ This compute sample allele frequency posterior probabilities (.sfs.ml.norm):
 Program to estimate FST from NGS data. It computes expected genetic variance components and estimate FST from those.
 In input it receives posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) for each population. It may receive also a 2D-SFS as a prior and in this case in gets in input posterior probabilities with uniform prior (angsd with -realSFS 1 only). Additionally it can use a corrected product of marginal spectra as prior. In this case it receives in input posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) and also marginal SFS.
 
+Output is a tab-separated text file. Each row is a site. Columns are: EA, EAB, FACT, (EA/EAB)+FACT, pvar; where EA is the expectation of genetic variance between populations, EAB is the expectation of the total genetic variance, FACT is the correcting factor for the ratio of expectations, (EA/EAB)+FACT is the per-site FST value, pvar is the probability for the site of being variable.
+
 Run with no arguments for help.
 
 Examples:
