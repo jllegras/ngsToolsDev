@@ -308,7 +308,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
             }
 	  }
           if (norm==0) {
-	    subsomma = subsomma / (2*a.data[s]*(1-a.data[s])); 
+	    subsomma = subsomma / sqrt(a.data[s]*(1-a.data[s])); 
 	  } else if (norm==1) {
    	    subsomma = subsomma / sqrt(2*a.data[s]*(1-a.data[s])); 
 	  } 
