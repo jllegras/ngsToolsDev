@@ -1,4 +1,3 @@
-
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_min.h>
@@ -475,7 +474,7 @@ array<double> getLambdas(array<double> myfst, array<double> prob1, array<double>
     }
     lambdas.data=ltmp;
     
-    int nind1 = 0, nind2 =0;
+    double nind1 = 0.0, nind2 =0.0;
 
     //if (isfold==0) {
       nind1 = (prob1.x-1)/2;
