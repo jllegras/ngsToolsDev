@@ -2,8 +2,14 @@ sudo apt-get install git-core gitk
 
 git clone https://github.com/mfumagalli/ngsTools.git ngsTools # this creates a folder ngsTools/;  note that the ending .git is only for the bare repo in github
 
+cd ngsTools
+
 git pull
 
 mkdir bin
+
+make clean
+
+make
 
 
