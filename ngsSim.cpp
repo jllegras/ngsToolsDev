@@ -1,4 +1,3 @@
-
 // program to simulate NGS data for up 3 populations
 
 // author Rasmus Nielsen with contributions from Thorfinn Kornelliussen and Matteo Fumagalli
@@ -248,7 +247,7 @@ int print_ind_site(double errate, double meandepth, int genotype[2], gzFile resu
       max_pos=i;
   }
   for (i=0; i<10; i++) like[i] = like[i]-max_val;
-  lik[max_pos]=0;
+  like[max_pos]=0;
 
   fprintf(fname, "%d\t%d\t%d\t%d\n", ireads[0], ireads[1], ireads[2], ireads[3]);
 
