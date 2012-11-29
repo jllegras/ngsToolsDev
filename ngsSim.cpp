@@ -239,6 +239,14 @@ int print_ind_site(double errate, double meandepth, int genotype[2], gzFile resu
     calclike(b, errate, like); // compute likelihood
   }
 
+  // set maximum likelihoos to 0 and scale the rest
+  float max_val = -99.0;
+  for (i=0; i<10; i++) {
+    if (like[i]>max_val) max_val=like[i];
+  }
+  for (i=0; i<10; i++) like[i] = like[i]-max_val;
+
+
   fprintf(fname, "%d\t%d\t%d\t%d\n", ireads[0], ireads[1], ireads[2], ireads[3]);
 
   // write into files
