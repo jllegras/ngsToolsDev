@@ -2,7 +2,10 @@
 CC=g++
 CFLAGS=-lm -lz -O3 -Wall
 
-all: ngsCovar ngsSim ngs2dSFS ngsFST
+all: mkdir ngsCovar ngsSim ngs2dSFS ngsFST
+
+mkdir:
+	mkdir -p bin
 
 ngsCovar: ngsCovar.cpp
 	    $(CC) $(CFLAGS) ngsCovar.cpp -o bin/ngsCovar
