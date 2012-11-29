@@ -2,7 +2,7 @@ Set of programs/scripts to analyze NGS data for multi-population genetics analys
 
 ### INSTALL
 
-After you linked the git repository, enter the folder. You can use pre-compiled binaries provided in the bin/ folder (linux 64 bit) or, better, compile your own binaries. To do so, type 'make clean' and then 'make'. You need GSL library.
+After you linked the git repository (see INSTALL), enter the folder. You can use pre-compiled binaries provided in the bin/ folder (linux 64 bit) or, better, compile your own binaries. To do so, type 'make clean' and then 'make'. You need GSL library.
 
 ### INPUT FILES
 
