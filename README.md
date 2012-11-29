@@ -1,9 +1,9 @@
-
 Set of programs/scripts to analyze NGS data for multi-population genetics analyses.
 
 ### INSTALL
 
-After you linked the git repository enter the folder and type 'make'. You need GSL library.
+After you linked the git repository enter the folder, creater the directory bin/ and type 'make'. You need GSL library.
+It is important that you creat the bin/ folder, or you can modify the Makefile.
 
 ### INPUT FILES
 
