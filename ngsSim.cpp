@@ -245,6 +245,7 @@ int print_ind_site(double errate, double meandepth, int genotype[2], gzFile resu
     if (like[i]>max_val) {
       max_val=like[i];
       max_pos=i;
+    }
   }
   for (i=0; i<10; i++) like[i] = like[i]-max_val;
   like[max_pos]=0;
