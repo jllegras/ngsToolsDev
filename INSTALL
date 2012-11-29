@@ -6,8 +6,7 @@ cd ngsTools
 
 git pull
 
-mkdir bin
-
+# if you want to compile your own binaries:
 make clean
 
 make
