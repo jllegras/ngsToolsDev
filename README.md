@@ -39,17 +39,29 @@ Examples:
 ```ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -priorfiles pop1.sfs.ml pop2.sfs.ml -nind 20 20 -nsites 100000 -outfile pops.corrected.fst -fstfile fst.global.fst -K 0```
 
 Parameters:
+
 -postfiles: .sfs files with posterior probabilities of sample allele frequencies for each population
+
 -fstfile: file with first guesses of FST for each site obtained running the program once, check getMultiFST.R
+
 -priorfile: 2D-SFS to be used as a prior
+
 -outfile: name of the output file
+
 -nind: number of individuals for each population
+
 -nsites: total number of sites; in case you want to analyze a subset of sites this is the upper limit
+
 -K: if set to 0: automatic setting of weighting function, otherwise lambda=1/(K*FST)
+
 -verbose: level of verbosity, if 0 suppress all messages
+
 -block_size: to be memory efficient, set this number as the number of sites you want to analyze at each chunk
+
 -nsums: how many terms for the correction of the expectation of the ratio; set to 1
+
 -firstbase: in case you want to analyze a subset of your sites this is the lower limit
+
 -isfold: boolean, is your data folded or not?
 
 ### ngsCovar
