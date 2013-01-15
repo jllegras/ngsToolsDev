@@ -6,9 +6,9 @@ See INSTALL file on how to link to repository and compile all programs. Note tha
 
 ### INPUT FILES
 
-These programs receive in input files produces by the software ANGSD.
+These programs receive in input files produced by the software ANGSD.
 
-A typical pipeline can be the following, assuming we have genotype likelihoods data for one pop in 'sim' format(e.g. from nsgSim). We assume 40 individuals.
+A typical pipeline can be the following, assuming we have genotype likelihoods data for one pop in 'sim' format (e.g. from nsgSim). We assume 40 individuals.
 
 This computes genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
 ```angsd0.204/angsd.g++ -sim1 pop.glf.gz -nInd 40 -doGeno 64 -doMaf 2 -outfiles all -doMajorMinor 1 -doGlf 3```
@@ -38,6 +38,19 @@ Examples:
 ```Rscript --vanilla --slave -e 'source("ngsTools/getMultiFST.R"); getMultiFST(filein="pops.first.fst", fileout="pops.global.fst", from_known=FALSE)'``` # this will compute a global fst and used it as a first guess for all sites; .R script is easily changeable for other purposes (e.g. same fst for regions fo 10-20-50Kbp)
 ```ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -priorfiles pop1.sfs.ml pop2.sfs.ml -nind 20 20 -nsites 100000 -outfile pops.corrected.fst -fstfile fst.global.fst -K 0```
 
+Parameters:
+-postfiles: .sfs files with posterior probabilities of sample allele frequencies for each population
+-fstfile: file with first guesses of FST for each site obtained running the program once, check getMultiFST.R
+-priorfile: 2D-SFS to be used as a prior
+-outfile: name of the output file
+-nind: number of individuals for each population
+-nsites: total number of sites; in case you want to analyze a subset of sites this is the upper limit
+-K: if set to 0: automatic setting of weighting function, otherwise lambda=1/(K*FST)
+-verbose: level of verbosity, if 0 suppress all messages
+-block_size: to be memory efficient, set this number as the number of sites you want to analyze at each chunk
+-nsums: how many terms for the correction of the expectation of the ratio; set to 1
+-firstbase: in case you want to analyze a subset of your sites this is the lower limit
+-isfold: boolean, is your data folded or not?
 
 ### ngsCovar
 
@@ -46,9 +59,22 @@ Program to compute the expected sample covariance matrix from genotype posterior
 Run with no arguments for help.
 
 Examples:
-```ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 0 -sfsfile pop.sfs.ml.norm
-ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 1
-ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 1 -minmaf 0.05```
+```ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 0 -sfsfile pop.sfs.ml.norm```
+```ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 1```
+```ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 1 -minmaf 0.05```
+
+Parameters:
+-probfile: file with genotype posterior probabilities
+-sfsfile: file with sample allele frequency posterior probabilities, to be used to compute probability of sites of being variable
+-nind: how many individuals
+-nsites: how many sites are in the data or the upper limit in case you want to analyze a subset
+-outfile: name of the output file
+-norm: if 0 covariance is normalized by sqrt(p(1-p)), if 1 by sqrt(2p(1-p))
+-minmaf: ignore sites below this threhsold of minor allele frequency
+-block_size: memory efficiency, number of sites for each chunk
+-offset: lower limit of sites in case you want to analyze a subset
+-call: call genotypes based on the maximum posterior probability
+-verbose: level of verbosity
 
 ### nsgSim
 
@@ -59,6 +85,22 @@ Run with no arguments for help.
 Example:
 ```ngsTools/bin/ngsSim -outfiles pop -npop 2 -nind 20 20 -nsites 100000 -depth 4 -pvar 0.10 -F 0.3 0.3```
 
+Parameters:
+-outfiles: prefix for output files
+-npop: number of populations
+-nind: number of individuals for each population
+-nsites: number of sites
+-errate: sequencing error rate
+-depth: mean sequencing depth
+-pvar: probability to each site is variable in the population
+-mfreq: minimum population frequency
+-F: FST value(s) in case of 2/3 populations, inbreeding coefficient in case of 1 population
+-model: set to for 0=fixed errate or 1=variable errate
+-simpleRand: boolean, set to 1 for quick random number generator
+-seed: random number
+-base_freq: background allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]
+-multi_depth: Simulate uneven covered individuals. -multi_depth 6 10: first 10 individuals have 6X while the rest is as -depth
+
 ### ngs2dSFS
 
 Program to estimate 2D-SFS from posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools).
@@ -67,6 +109,15 @@ Run with no arguments for help.
 
 Example:
 ```ngsTools/bin/get2DSFS -postfiles pop.sfs.ml.norm pop.sfs.ml.norm -outfile spectrum.txt -relative 1 -nind 20 20 -nsites 100000 -block_size 20000```
+
+Parameters:
+-postfiles: file with sample allele frequency posterior probabilities for each population
+-outfile: name of output file
+-nind: number of individuals per population
+-nsites: number of sites, or upper limit in case of analyzing a subset
+-block_size: memory efficiency, number of sites for each chunk
+-offset: lower limit in case of analyzing a subset
+-relative: boolean, do you want relative numbers (0-1) or absolute frequencies?
 
 ### Misc utilities
 
