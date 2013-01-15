@@ -76,16 +76,27 @@ Examples:
 ```ngsTools/bin/ngsCovar -probfile pop.geno -outfile pop.covar -nind 40 -nsites 100000 -block_size 20000 -call 1 -minmaf 0.05```
 
 Parameters:
+
 -probfile: file with genotype posterior probabilities
+
 -sfsfile: file with sample allele frequency posterior probabilities, to be used to compute probability of sites of being variable
+
 -nind: how many individuals
+
 -nsites: how many sites are in the data or the upper limit in case you want to analyze a subset
+
 -outfile: name of the output file
+
 -norm: if 0 covariance is normalized by sqrt(p(1-p)), if 1 by sqrt(2p(1-p))
+
 -minmaf: ignore sites below this threhsold of minor allele frequency
+
 -block_size: memory efficiency, number of sites for each chunk
+
 -offset: lower limit of sites in case you want to analyze a subset
+
 -call: call genotypes based on the maximum posterior probability
+
 -verbose: level of verbosity
 
 ### nsgSim
@@ -98,19 +109,33 @@ Example:
 ```ngsTools/bin/ngsSim -outfiles pop -npop 2 -nind 20 20 -nsites 100000 -depth 4 -pvar 0.10 -F 0.3 0.3```
 
 Parameters:
+
 -outfiles: prefix for output files
+
 -npop: number of populations
+
 -nind: number of individuals for each population
+
 -nsites: number of sites
+
 -errate: sequencing error rate
+
 -depth: mean sequencing depth
+
 -pvar: probability to each site is variable in the population
+
 -mfreq: minimum population frequency
+
 -F: FST value(s) in case of 2/3 populations, inbreeding coefficient in case of 1 population
+
 -model: set to for 0=fixed errate or 1=variable errate
+
 -simpleRand: boolean, set to 1 for quick random number generator
+
 -seed: random number
+
 -base_freq: background allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]
+
 -multi_depth: Simulate uneven covered individuals. -multi_depth 6 10: first 10 individuals have 6X while the rest is as -depth
 
 ### ngs2dSFS
@@ -123,12 +148,19 @@ Example:
 ```ngsTools/bin/get2DSFS -postfiles pop.sfs.ml.norm pop.sfs.ml.norm -outfile spectrum.txt -relative 1 -nind 20 20 -nsites 100000 -block_size 20000```
 
 Parameters:
+
 -postfiles: file with sample allele frequency posterior probabilities for each population
+
 -outfile: name of output file
+
 -nind: number of individuals per population
+
 -nsites: number of sites, or upper limit in case of analyzing a subset
+
 -block_size: memory efficiency, number of sites for each chunk
+
 -offset: lower limit in case of analyzing a subset
+
 -relative: boolean, do you want relative numbers (0-1) or absolute frequencies?
 
 ### Misc utilities
