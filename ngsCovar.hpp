@@ -192,6 +192,28 @@ matrix<double> readEstiSub(char *fname, int nInd, int start, int end) {
   return ret;
 }
 
+// read genotype quality (boolean), analysis only on sites to be kept (1) and discard the rest (0)
+array<int> readGenoQuality(const char *fname, int nsites) {
+  // nsites is how many sites you want
+  FILE *fp = getFILE(fname,"r");
+  size_t filesize =fsize(fname);
+  if(filesize==0){
+    fprintf(stderr,"file:%s looks empty\n",fname);
+    exit(0);
+  }
+  int *tmp = new int[nsites];
+  char *buf = new char[filesize];
+  fread(buf,sizeof(char),filesize,fp);
+  tmp[0] = atoi(strtok(buf,"\t \n"));
+  for(int i=1;i<(nsites);i++)
+    tmp[i] = atoi(strtok(NULL,"\t \n"));
+  fclose(fp);
+  array<int> allvalues;
+  allvalues.x = nsites;
+  allvalues.data = tmp;
+  return allvalues;
+}
+
 // return max value position of a row from a matrix of geno likes or post probs for a specific individual
 int maxposarr(matrix<double> &m, int row, int ind) {
   int i=0, res = ind;
@@ -280,7 +302,7 @@ array<double> getAlleFreq (matrix<double> &m) {
 }
 
 // get the covariance for a pair of individual; output is the effective number of sites (expected or passed the filter)
-double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double> &covar, double minmaf) {
+double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double> &covar, double minmaf, array<int> good, int start) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
@@ -304,7 +326,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
         if ((a.data[s]>minmaf) && (a.data[s]<(1-minmaf))) {
 	  for (int C1=0; C1<3; C1++) {
             for (int C2=0; C2<3; C2++) {
-             subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
+             subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2]*good.data[start+s];
             }
 	  }
           if (norm==0) {
@@ -336,7 +358,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
 
 
 // get the covariance for a pair of individual by weighting by
-void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<double> &covar, array<double> pvar) {
+void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<double> &covar, array<double> pvar, array<int> good, int start) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
@@ -353,7 +375,7 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
 	    subsomma = 0.0;
 	    for (int C1=0; C1<3; C1++) {
               for (int C2=0; C2<3; C2++) {
-	        subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
+	        subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2]*good.data[start+s];
               }
 	    }
             subsomma=subsomma*pvar.data[s];

@@ -23,6 +23,7 @@ int main (int argc, char *argv[]) {
   // possible inputs
   char *estfile=NULL; // estimated genotypes with probs (from angsd -doGeno 64)
   char *sfsfile=NULL; // sfs probs (-realSFS 1 + optimSFS = sfstools [already normalized and not log]); this is a major change 
+  char *genoquality=NULL; // list of boolean, whether to keep or not each site
   
   FILE *outest;
   char *outfiles=NULL;
@@ -55,6 +56,8 @@ int main (int argc, char *argv[]) {
       offset = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-call")==0)
       call = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-genoquality")==0)
+      genoquality = argv[argPos+1];
     else if(strcmp(argv[argPos],"-verbose")==0) 
       debug = atoi(argv[argPos+1]);
     else { // input is not a valid one 
@@ -131,6 +134,17 @@ int main (int argc, char *argv[]) {
   pvar.x=maxlen;
   pvar.data=temp2;
 
+  // SITES to be retained
+  array<int> good;
+  if (genoquality!=NULL) {
+    good = readGenoQuality(genoquality, nsites);
+  } else {
+    good.x=nsites;
+    int *good_tmp = new int [nsites];
+    for (int i=0; i<nsites; i++) good_tmp[i]=1;
+    good.data=good_tmp;
+  }
+
   // ITERATING for each block
   for (int n=0; n<nwin; n++) {
 
@@ -194,7 +208,7 @@ int main (int argc, char *argv[]) {
       if (debug==1) fprintf(stderr, ": %d , %f %f", pvar.x, pvar.data[0], pvar.data[10]);
       cleanup(sfs);
       if (debug==1) fprintf(stderr, "\nUpdating covar...");
-      calcCovarUpProb(esti, pp, norm, covar, pvar);
+      calcCovarUpProb(esti, pp, norm, covar, pvar, good, start.data[n]);
       if (debug==1) fprintf(stderr, "\nUpdating esite...");
       // divide by expected nr of segr sites -1 in case of pvar
       for (int i=0;i<pvar.x;i++) esites = esites + pvar.data[i];
@@ -202,7 +216,7 @@ int main (int argc, char *argv[]) {
     } else {
       if (debug==1) fprintf(stderr, "\n I am using this minmaf %f ", minmaf);
       fprintf(stderr, "...no weighting..."); 
-      double tmp_eff_nsites=calcCovarUp(esti, pp, norm, covar, minmaf);
+      double tmp_eff_nsites=calcCovarUp(esti, pp, norm, covar, minmaf, good, start.data[n]);
       esites=esites+tmp_eff_nsites;
     }
        
