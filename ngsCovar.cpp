@@ -233,7 +233,7 @@ int main (int argc, char *argv[]) {
   // divide
   for (int i=0;i<nind;i++) {
     for (int j=0;j<nind;j++) {
-        covar.data[i][j]=covar.data[i][j]/(esites-1);
+        covar.data[i][j]=covar.data[i][j]/(esites);
     }
   }
 
