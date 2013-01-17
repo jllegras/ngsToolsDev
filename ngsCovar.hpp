@@ -329,10 +329,8 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
              subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2]*good.data[start+s];
             }
 	  }
-          if (norm==0) {
+          if (norm) {
 	    subsomma = subsomma / sqrt(a.data[s]*(1-a.data[s])); 
-	  } else if (norm==1) {
-   	    subsomma = subsomma / sqrt(2*a.data[s]*(1-a.data[s])); 
 	  } 
         }
 	somma = somma + subsomma;
@@ -379,10 +377,8 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
               }
 	    }
             subsomma=subsomma*pvar.data[s];
-            if (norm==0) {
+            if (norm) {
 	      subsomma = subsomma / sqrt(a.data[s]*(1-a.data[s])); 
-	    } else if (norm==1) {
-   	      subsomma = subsomma / sqrt(2*a.data[s]*(1-a.data[s])); 
 	    }
             somma = somma + subsomma;
       }
