@@ -30,7 +30,7 @@ In input it receives posterior probabilities of sample allele frequencies (from 
 
 Output is a tab-separated text file. Each row is a site. Columns are: EA, EAB, FACT, (EA/EAB)+FACT, pvar; where EA is the expectation of genetic variance between populations, EAB is the expectation of the total genetic variance, FACT is the correcting factor for the ratio of expectations, (EA/EAB)+FACT is the per-site FST value, pvar is the probability for the site of being variable.
 
-Run with no arguments for help.
+Run with no arguments for help. Please note that populations must have the exact same number of sites.
 
 Examples:
 ```ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst``` # using a 2D-SFS as prior, estimated using ngs2dSFS
@@ -44,7 +44,7 @@ Parameters:
 
 -fstfile: file with first guesses of FST for each site obtained running the program once, check getMultiFST.R
 
--priorfile: 2D-SFS to be used as a prior
+-priorfile: 2D-SFS to be used as a prior; you can use ngs2DSFS with parameter -relative set to 1
 
 -outfile: name of the output file
 
@@ -87,7 +87,7 @@ Parameters:
 
 -outfile: name of the output file
 
--norm: if 0 covariance is normalized by sqrt(p(1-p)), if 1 by sqrt(2p(1-p))
+-norm: if 1 matrix is normalized by sqrt(p(1-p)) as in Patterson et al 2006
 
 -minmaf: ignore sites below this threhsold of minor allele frequency
 
@@ -142,7 +142,7 @@ Parameters:
 
 Program to estimate 2D-SFS from posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools).
 
-Run with no arguments for help.
+Run with no arguments for help. Please note that populations must have the exact same number of sites.
 
 Example:
 ```ngsTools/bin/get2DSFS -postfiles pop.sfs.ml.norm pop.sfs.ml.norm -outfile spectrum.txt -relative 1 -nind 20 20 -nsites 100000 -block_size 20000```
@@ -161,7 +161,7 @@ Parameters:
 
 -offset: lower limit in case of analyzing a subset
 
--relative: boolean, do you want relative numbers (0-1) or absolute frequencies?
+-relative: boolean, if 1 number are relative frequencies from 0 to 1 which sum up 1; if 0 numbers are absolute counts of sites having a specific joint allele frequency
 
 ### Misc utilities
 
