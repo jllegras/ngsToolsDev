@@ -511,7 +511,7 @@ int main(int argc, char *argv[]) { // read input parameters
   fGeno = append(outfiles,".geno");
   fparfile = append(outfiles, ".par");
   // print a message
-  fprintf(stderr,"\t->Dumping files: sequencefile: %s\tglffile: %s\ttruefreq: %s args:%s geno:%s reads:%s\n",fSeq,fGlf,fFreq,fArg,fGeno,fireads);
+  fprintf(stderr,"\t->Dumping files: sequencefile: %s\tglffile: %s\ttruefreq: %s args:%s geno:%s reads:%s par:%s\n",fSeq,fGlf,fFreq,fArg,fGeno,fireads,fparfile);
 
   // get files
   argfile=getFile(fArg,"w");
