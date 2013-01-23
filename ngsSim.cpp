@@ -1187,6 +1187,7 @@ int main(int argc, char *argv[]) { // read input parameters
   free(fFreq);
   free(fSeq);
   free(fArg);
+  free(fparfile);
 
   gzclose(resultfile); //fclose flushed automaticly
   gzclose(glffile);
@@ -1194,6 +1195,7 @@ int main(int argc, char *argv[]) { // read input parameters
   fclose(argfile);
   fclose(freqfile);
   fclose(genofile);
+  fclose(parfile);
 
   if (npop>1) {
 
