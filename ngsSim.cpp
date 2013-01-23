@@ -655,7 +655,7 @@ int main(int argc, char *argv[]) { // read input parameters
 	basecheck3[genotype3[0]] = 2*nind3; // all individuals are monomorphic
       }      
 
-      fprintf(parfile, "%f\t%f\n", 0.0, F);
+      fprintf(parfile, "%f\t%f\n", 0.0, F, F1, F2);
 
     } else { // if it IS variable
       
@@ -671,7 +671,7 @@ int main(int argc, char *argv[]) { // read input parameters
       // simulate population allele frequency (or ancestral if 2/3 subpops)
       pfreq=simfreq(); // if site is not variable, you don't need to compute pfreq
       
-      fprintf(parfile, "%f\t%f\n", pfreq, F);
+      fprintf(parfile, "%f\t%f\n", pfreq, F, F1, F2);
 
     } // end test if it is variable or not (pvar)
     
