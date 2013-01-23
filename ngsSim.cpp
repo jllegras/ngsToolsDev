@@ -387,13 +387,14 @@ int main(int argc, char *argv[]) { // read input parameters
   //  gzFile glffile, resultfile, glffile1, glffile2, resultfile1, resultfile2, ireadsfile, ireadsfile1, ireadsfile2;
 
   gzFile glffile, resultfile, glffile1, glffile2, glffile3, resultfile1, resultfile2, resultfile3;
-  FILE  *freqfile, *argfile, *genofile, *freqfile1, *freqfile2, *freqfile3, *genofile1, *genofile2, *genofile3, *freqfile12, *ireadsfile, *ireadsfile1, *ireadsfile2, *ireadsfile3;
+  FILE  *freqfile, *argfile, *genofile, *freqfile1, *freqfile2, *freqfile3, *genofile1, *genofile2, *genofile3, *freqfile12, *ireadsfile, *ireadsfile1, *ireadsfile2, *ireadsfile3, *parfile;
   char *fGlf=NULL,*fFreq=NULL,*fSeq=NULL,*fArg=NULL,*fGeno=NULL,*fireads=NULL;
   char *fGlf1=NULL,*fFreq1=NULL,*fSeq1=NULL,*fGeno1=NULL,*fireads1=NULL;
   char *fGlf2=NULL,*fFreq2=NULL,*fSeq2=NULL,*fGeno2=NULL,*fireads2=NULL;
   char *fGlf3=NULL,*fFreq3=NULL,*fSeq3=NULL,*fGeno3=NULL,*fireads3=NULL;
   char *fFreq12=NULL;
   char *outfiles=NULL;
+  char *fparfile=NULL;
   
   // read input parameters and assign to values variables (if defined)
   int argPos=1; // we checked before if there were no inputs
@@ -508,6 +509,7 @@ int main(int argc, char *argv[]) { // read input parameters
   fFreq = append(outfiles,".frq");
   fSeq = append(outfiles,".seq.gz");
   fGeno = append(outfiles,".geno");
+  fparfile = append(outfiles, ".par");
   // print a message
   fprintf(stderr,"\t->Dumping files: sequencefile: %s\tglffile: %s\ttruefreq: %s args:%s geno:%s reads:%s\n",fSeq,fGlf,fFreq,fArg,fGeno,fireads);
 
@@ -518,6 +520,7 @@ int main(int argc, char *argv[]) { // read input parameters
   ireadsfile = getFile(fireads,"w");
   freqfile= getFile(fFreq,"w"); 
   genofile =getFile(fGeno,"w");
+  parfile = getFile(fparfile, "w");
 
   // eventually if 2 pops, prepare other files and print messages
   if (npop==2) {
@@ -652,6 +655,7 @@ int main(int argc, char *argv[]) { // read input parameters
 	basecheck3[genotype3[0]] = 2*nind3; // all individuals are monomorphic
       }      
 
+      fprintf(parfile, "%f\t%f\n", 0.0, F);
 
     } else { // if it IS variable
       
@@ -667,6 +671,8 @@ int main(int argc, char *argv[]) { // read input parameters
       // simulate population allele frequency (or ancestral if 2/3 subpops)
       pfreq=simfreq(); // if site is not variable, you don't need to compute pfreq
       
+      fprintf(parfile, "%f\t%f\n", pfreq, F);
+
     } // end test if it is variable or not (pvar)
     
     /// WHOLE POPULATIONS (or the only one if -npop=1)
