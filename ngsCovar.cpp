@@ -29,7 +29,7 @@ int main (int argc, char *argv[]) {
   char *outfiles=NULL;
   char *foutest=NULL;
   
-  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, norm = 0, block_size = 10000, call=0, offset=0, maxgeno=0;
+  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, norm = 0, block_size = 10000, call=0, offset=0, maxgeno=0, isfold=0;
   double esites = 0.0, minmaf = 0.0;
  
   /// READ AND ASSIGN INPUT PARAMETERS
@@ -58,6 +58,8 @@ int main (int argc, char *argv[]) {
       call = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-genoquality")==0)
       genoquality = argv[argPos+1];
+    else if(strcmp(argv[argPos],"-isfold")==0) // whether the .sfs. is folded or not 
+      isfold = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-verbose")==0) 
       debug = atoi(argv[argPos+1]);
     else { // input is not a valid one 
@@ -204,7 +206,7 @@ int main (int argc, char *argv[]) {
       sfs = readFileSub(sfsfile, nind, start.data[n], end.data[n], 0);
       if (debug==1) fprintf(stderr, "\nGot  sfs: %d %d, e.g. %f %f", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
       if (debug==1) fprintf(stderr, "\nGetting pvar...");
-      getPvar(sfs, pvar);
+      getPvar(sfs, pvar, isfold);
       if (debug==1) fprintf(stderr, ": %d , %f %f", pvar.x, pvar.data[0], pvar.data[10]);
       cleanup(sfs);
       if (debug==1) fprintf(stderr, "\nUpdating covar...");

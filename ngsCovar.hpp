@@ -229,9 +229,14 @@ int maxposarr(matrix<double> &m, int row, int ind) {
 }
 
 // get probability of being variable from posterior probabilities of sample allele frequencies
-void getPvar(matrix<double> &sfs, array<double> pvar) {
-  for (int i=0; i<sfs.x; i++)
-    pvar.data[i]=1-sfs.data[i][0]-sfs.data[i][2*(sfs.y-1)];
+void getPvar(matrix<double> &sfs, array<double> pvar, int isfold) {
+  if (isfold==0) {
+    for (int i=0; i<sfs.x; i++)
+      pvar.data[i]=1-sfs.data[i][0]-sfs.data[i][2*(sfs.y-1)];
+  } else {
+    for (int i=0; i<sfs.x; i++)
+      pvar.data[i]=1-sfs.data[i][0];
+  }
 }
 
 // write an array into a file
