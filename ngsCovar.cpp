@@ -203,7 +203,7 @@ int main (int argc, char *argv[]) {
     if (sfsfile!=NULL) {
       // read sfs
       fprintf(stderr, "...weighting...");
-      sfs = readFileSub(sfsfile, nind, start.data[n], end.data[n], 0);
+      sfs = readFileSub(sfsfile, nind, start.data[n], end.data[n], isfold);
       if (debug==1) fprintf(stderr, "\nGot  sfs: %d %d, e.g. %f %f", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
       if (debug==1) fprintf(stderr, "\nGetting pvar...");
       getPvar(sfs, pvar, isfold);
