@@ -107,7 +107,8 @@ int main (int argc, char *argv[]) {
   start=getStart(nsites, offset, block_size);
   end=getEnd(nsites, offset, block_size);
   int maxlen=end.data[0]-start.data[0]+1; // len for each win, it will never be greater than this
- 
+  double temp_sum=0.0; // check at each iteration not NA, for debug 
+
   // prepare out
   fprintf(stderr,"\t->Dumping file: %s\n", foutest);
   outest = getFILE(foutest, "w");
@@ -225,7 +226,17 @@ int main (int argc, char *argv[]) {
     cleanup(esti);
 
     delete [] pp.data;
-  
+ 
+    if (debug==2) {
+      temp_sum=0.0;
+      for (int i=0;i<nind;i++) {
+       for (int j=0;j<nind;j++) {
+        temp_sum=temp_sum+covar.data[i][j];
+       }
+      }
+      fprintf(stderr, "\t Sum:%f", temp_sum);
+    }
+
   } // end for n in nwin block
 
   fprintf(stderr, "\n(Exp/eff) nr sites: %f\n", esites);
