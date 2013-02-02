@@ -183,9 +183,9 @@ int main (int argc, char *argv[]) {
   fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
 
   matrix<double> new_sfs;
-  double **cdata = new double*[nind];
-  for(int i=0;i<nind;i++){
-    double *ctmp = new double[nind];
+  double **cdata = new double*[sfs.y];
+  for(int i=0;i<sfs.x;i++){
+    double *ctmp = new double[sfs.y];
     cdata[i]= ctmp;
   }
   new_sfs.x=pos.x;
