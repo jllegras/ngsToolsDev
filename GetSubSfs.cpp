@@ -192,19 +192,17 @@ int main (int argc, char *argv[]) {
   new_sfs.y=sfs.y;
   new_sfs.data = cdata;
   fprintf(stderr, "Dim output %d , %d", new_sfs.x, new_sfs.y);
-  for (int i=0; i<new_sfs.x; i++) {
-    for (int j=0; i<new_sfs.y; j++) {
-      new_sfs.data[i][j]=0.0;
-    }
-  }
+  //for (int i=0; i<new_sfs.x; i++) {
+  //  for (int j=0; i<new_sfs.y; j++) {
+  //    new_sfs.data[i][j]=0.0;
+  //  }
+  //}
   fprintf(stderr, "Dim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   for (int i=0; i<pos.x; i++) {
-    for (int i=0; i<new_sfs.x; i++) {
       for (int j=0; i<new_sfs.y; j++) {
         new_sfs.data[i][j]=sfs.data[pos.data[i]][j];
       }
-    }
   }
 
   FILE *fp = fopen(outfile,"wb");
