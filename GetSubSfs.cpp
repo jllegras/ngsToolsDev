@@ -105,7 +105,7 @@ matrix<double> readFileSub(char *fname, int nInd, int start, int end, int isfold
       exit(-1);
     }
   }
-  int nsites = end-start+1;
+  int nsites = end-start;
   double **data = new double*[nsites];
   if (isfold) {
           fseek(fp, sizeof(double)*(nInd+1)*start, SEEK_SET);
@@ -176,11 +176,11 @@ int main (int argc, char *argv[]) {
 
   matrix<double> sfs;
   sfs = readFileSub(infile, nind, 0, nsites, isfold);
-  fprintf(stderr, "Dim input %d , %d", sfs.x, sfs.y);
+  fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
 
   array<int> pos;
   pos = readArray(posfile, len);
-  fprintf(stderr, "Dim pos %d", pos.x);
+  fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
 
   matrix<double> new_sfs;
   double **cdata = new double*[nind];
@@ -197,7 +197,7 @@ int main (int argc, char *argv[]) {
       new_sfs.data[i][j]=0.0;
     }
   }
-  fprintf(stderr, "Dim output %d , %d", new_sfs.x, new_sfs.y);
+  fprintf(stderr, "Dim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   for (int i=0; i<pos.x; i++) {
     for (int i=0; i<new_sfs.x; i++) {

@@ -20,7 +20,7 @@ ngsFST: ngsFST.cpp
 	  $(CC) ngsFST.cpp -o bin/ngsFST -lgsl -lgslcblas $(CFLAGS)
 
 GetSubSfs: GetSubSfs.cpp
-	     $(CC) GetSubSfs.cpp -o bin/GetSubSfs.cpp
+	     $(CC) GetSubSfs.cpp -o bin/GetSubSfs
 
 clean:
 	rm -rf *o bin/ngsFST bin/ngsCovar bin/ngsSim bin/ngs2dSFS bin/GetSubSfs
