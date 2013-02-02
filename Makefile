@@ -2,7 +2,7 @@
 CC=g++
 CFLAGS=-lm -lz -O3 -Wall
 
-all: mkdir ngsCovar ngsSim ngs2dSFS ngsFST
+all: mkdir ngsCovar ngsSim ngs2dSFS ngsFST GetSubSfs
 
 mkdir:
 	mkdir -p bin
@@ -18,6 +18,9 @@ ngsSim: ngsSim.cpp rbeta.cpp
 
 ngsFST: ngsFST.cpp
 	  $(CC) ngsFST.cpp -o bin/ngsFST -lgsl -lgslcblas $(CFLAGS)
+
+GetSubSfs: GetSubSfs.cpp
+	     $(CC) GetSubSfs.cpp -o bin/GetSubSfs.cpp
 
 clean:
 	rm -rf *o bin/ngsFST bin/ngsCovar bin/ngsSim bin/ngs2dSFS
