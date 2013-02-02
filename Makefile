@@ -23,5 +23,5 @@ GetSubSfs: GetSubSfs.cpp
 	     $(CC) GetSubSfs.cpp -o bin/GetSubSfs.cpp
 
 clean:
-	rm -rf *o bin/ngsFST bin/ngsCovar bin/ngsSim bin/ngs2dSFS
+	rm -rf *o bin/ngsFST bin/ngsCovar bin/ngsSim bin/ngs2dSFS bin/GetSubSfs
 
