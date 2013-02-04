@@ -199,8 +199,8 @@ int main (int argc, char *argv[]) {
   //}
   fprintf(stderr, "Dim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
-  for (int i=0; i<pos.x; i++) {
-      for (int j=0; i<new_sfs.y; j++) {
+  for (int i=0; i<new_sfs.x; i++) {
+      for (int j=0; j<new_sfs.y; j++) {
         //fprintf(stderr, "%d %d\n", i, j);
         new_sfs.data[i][j]=sfs.data[pos.data[i]][j];
       }
