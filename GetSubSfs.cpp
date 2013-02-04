@@ -201,7 +201,7 @@ int main (int argc, char *argv[]) {
 
   for (int i=0; i<pos.x; i++) {
       for (int j=0; i<new_sfs.y; j++) {
-        fprintf(stderr, "%d %d\n", i, j);
+        //fprintf(stderr, "%d %d\n", i, j);
         new_sfs.data[i][j]=sfs.data[pos.data[i]][j];
       }
   }
