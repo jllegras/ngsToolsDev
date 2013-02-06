@@ -211,7 +211,7 @@ int main (int argc, char *argv[]) {
   FILE *fp = fopen(outfile,"wb");
 
   for (int i=0; i<new_sfs.x; i++)
-    fwrite(new_sfs.data[i], sizeof(double), new_sfs.x, fp);
+    fwrite(new_sfs.data[i], sizeof(double), new_sfs.y, fp);
 
   fclose(fp);
   //fclose(infile);
