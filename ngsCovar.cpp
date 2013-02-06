@@ -227,7 +227,7 @@ int main (int argc, char *argv[]) {
 
     delete [] pp.data;
  
-//    if (debug==2) {
+    if (debug==1) {
       temp_sum=0.0;
       for (int i=0;i<nind;i++) {
        for (int j=0;j<nind;j++) {
@@ -242,7 +242,7 @@ int main (int argc, char *argv[]) {
         //exit(0);
       //}
 
-  //  }
+    }
 
   } // end for n in nwin block
 
