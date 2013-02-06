@@ -231,7 +231,7 @@ int main (int argc, char *argv[]) {
       temp_sum=0.0;
       for (int i=0;i<nind;i++) {
        for (int j=0;j<nind;j++) {
-        fprintf(stderr, "\t %d %d %f", i, j, covar.data[i][j]);
+        //fprintf(stderr, "\t %d %d %f", i, j, covar.data[i][j]);
         temp_sum=temp_sum+covar.data[i][j];
        }
       }
