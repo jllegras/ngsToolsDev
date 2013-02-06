@@ -235,6 +235,12 @@ int main (int argc, char *argv[]) {
        }
       }
       fprintf(stderr, "\t Sum:%f", temp_sum);
+
+      if (temp_sum<0) {
+        for (int i=0; i<pvar.x; i++) fprintf(stderr, "\n %d %f", i, temp_sum);
+        exit(0);
+      }
+
   //  }
 
   } // end for n in nwin block
