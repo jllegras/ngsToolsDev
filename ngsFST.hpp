@@ -49,26 +49,20 @@ typedef struct {
 /// FUNCTIONS
 
 array<int> getStart(int nsites, int firstbase, int block_size) {
-  int nwin = ((nsites-firstbase)/block_size);
+  // note that firstbase and nsites are 1-based
+  int len = nsites-firstbase+1;
+  int nwin = len/block_size;
+  if ( (len % block_size)!=0) nwin=nwin+1;
   array<int> start;
-  if ( ((nsites-firstbase) % block_size)!=0) {
-    start.x=nwin+1;
-  } else {
-    start.x=nwin;
-  }
-  int *tStart= new int [nwin]; 
+  start.x=nwin;
+  int *tStart= new int [nwin];
   for (int i=0; i<nwin; i++) {
     tStart[i]=(i)*block_size;
   }
-  // if there is rest
-  if ( (nsites % block_size)!=0) {
-    tStart[nwin]=tStart[(nwin-1)]+block_size;
-    nwin=nwin+1;
-  }
   // if you dont start from beginning
-  if (firstbase>0) {
+  if (firstbase>1) {
     for (int i=0; i<nwin; i++) {
-      tStart[i]=tStart[i]+firstbase;
+      tStart[i]=tStart[i]+firstbase-1; // -1 because firstbase is 1-based
     }
   }
   start.data=tStart;
@@ -76,26 +70,21 @@ array<int> getStart(int nsites, int firstbase, int block_size) {
 }
 
 array<int> getEnd(int nsites, int firstbase, int block_size) {
-  int nwin = ((nsites-firstbase)/block_size);
+  // note that firstbase and nsites are 1-based
+  int len = nsites-firstbase+1;
+  int nwin = len/block_size;
+  if ( (len % block_size)!=0) nwin=nwin+1;
   array<int> end;
-  if ( ((nsites-firstbase) % block_size)!=0) {
-    end.x=nwin+1;
-  } else {
-    end.x=nwin;
+  end.x=nwin;
+  int *tEnd= new int [nwin];
+  for (int i=0; i<(nwin); i++) {
+    tEnd[i]=(i+1)*block_size-(i+1);
   }
-  int *tEnd= new int [nwin]; 
-  for (int i=0; i<nwin; i++) {
-    tEnd[i]=(i+1)*block_size-1;
-  }
-  // if there is rest
-  if ( (nsites % block_size)!=0) {
-    tEnd[nwin]=nsites-1;
-    nwin=nwin+1;
-  }
+  tEnd[nwin-1]=nsites-1; // nsites is 1 based
   // if you dont start from beginning
   if (firstbase>0) {
     for (int i=0; i<nwin; i++) {
-      tEnd[i]=tEnd[i]+firstbase;
+      tEnd[i]=tEnd[i]+firstbase-1;
     }
   }
   end.data=tEnd;
@@ -125,9 +114,10 @@ FILE *getFILE(const char*fname,const char* mode) {
     fprintf(stderr,"\t-> File exists: %s exiting...\n",fname);
     exit(0);
   }
-  FILE *fp;
-  if(NULL==(fp=fopen(fname,mode))){
+  FILE *fp = fopen(fname, mode);
+  if(fp==NULL){
     fprintf(stderr,"\t->Error opening FILE handle for file:%s exiting\n",fname);
+    fclose(fp);
     exit(0);
   }
   return fp;
@@ -141,28 +131,19 @@ array<double> readArray(const char *fname, int nInd, int isfold) {
     fprintf(stderr,"file:%s looks empty\n",fname);
     exit(0);
   }
+  int len = 2*nInd+1;
+  if (isfold) len = nInd+1;
+  char *buf = new char[filesize];
+  double *tmp = new double[len];
+  fread(buf,sizeof(char),filesize,fp);
+  tmp[0] = atof(strtok(buf,"\t \n"));
+  for(int i=1;i<(len);i++)
+      tmp[i] = atof(strtok(NULL,"\t \n"));
+  fclose(fp);
+  delete [] buf;
   array<double> ret;
-  if (isfold) {
-    double *tmp = new double[nInd+1];
-    char *buf = new char[filesize];
-    fread(buf,sizeof(char),filesize,fp);
-    tmp[0] = atof(strtok(buf,"\t \n"));
-    for(int i=1;i<(nInd+1);i++)
-      tmp[i] = atof(strtok(NULL,"\t \n"));
-    fclose(fp);
-    ret.x = nInd+1;
-    ret.data = tmp;
-   } else {
-    double *tmp = new double[2*nInd+1];
-    char *buf = new char[filesize];
-    fread(buf,sizeof(char),filesize,fp);
-    tmp[0] = atof(strtok(buf,"\t \n"));
-    for(int i=1;i<(2*nInd+1);i++)
-      tmp[i] = atof(strtok(NULL,"\t \n"));
-    fclose(fp);
-    ret.x = 2*nInd+1;
-    ret.data = tmp;  
-   }
+  ret.x = len;
+  ret.data = tmp;
   return ret;
 }
 
@@ -180,6 +161,7 @@ matrix<double> readPrior12(const char *fname, int nrow, int ncol) {
   for(int i=1;i<(nrow*ncol);i++)
     tmp[i] = atof(strtok(NULL,"\t \n"));
   fclose(fp);
+  delete [] buf;
   array<double> allvalues;
   allvalues.x = nrow*ncol;
   allvalues.data = tmp;
@@ -264,8 +246,8 @@ array<double> readFSTsub(const char *fname, int nsites, int start, int end) {
   tmp[0] = atof(strtok(buf,"\t \n"));
   for(int i=1;i<(nsites*5);i++)
     tmp[i] = atof(strtok(NULL,"\t \n"));
-
   fclose(fp);
+  delete [] buf;
   array<double> allvalues;
   allvalues.x = nsites*5;
   allvalues.data = tmp;
@@ -720,7 +702,7 @@ void computeVarReyFold(matrix<double> &m1, matrix<double> &m2, int verbose, FILE
     double **dataAB = new double*[(n1)+1];
     // get also the probability of site being variable
     double pvar = 0.0;
-    pvar = 1 - m1.data[s][0]*m2.data[s][0] - m1.data[s][2*n1]*m2.data[s][2*n2];
+    pvar = 1 - m1.data[s][0]*m2.data[s][0];
     if (verbose==2) fprintf(stderr, "\t first cycle");
     double EA = 0.0, EAB = 0.0;
     for (int i=0; i<(n1+1); i++) {

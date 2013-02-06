@@ -7,7 +7,7 @@
 
 // if you give as input a prior2Dfile then postfile are from -realSFS 1
 // if you give no priorfile I assume you have run sfstools and you do not want to use weighting correcting function
-// if you give 2 priorfiles I assume you want to use weighting correcting function
+// if you give 2 priorfiles I assume you want to use weighting correcting function and you have run sfstools
 
 // in ouput a text file, each row is a site and columsn are tab separated: a, a+b, FACT, theta, pvar
 
@@ -102,10 +102,10 @@ int main (int argc, char *argv[]) {
     return 0;
   }
   if((priorfile1 == NULL) & (fstfile==NULL) & (K==0)) {
-    fprintf(stderr,"\nPerhaps you forgot to supply -priofiles and -fstfile when using an automatic setting of lambda?\n");
+    fprintf(stderr,"\nIf you want to correct the marginal product then perhaps you forgot to supply -priofiles and -fstfile when using an automatic setting of lambda? Ignore this message if this is the first iteration assuming independence.\n");
   }
   if((priorfile1 != NULL) & (priorfile12!=NULL)) {
-    fprintf(stderr,"\nYou should give either -priorfiles or -priorfile, otherwise I don't know if you want to use a 2D-SFS or the corrected product of marginal spectra as prior\n");
+    fprintf(stderr,"\nYou should give either -priorfiles or -priorfile, otherwise I don't know if you want to use a 2D-SFS or the corrected product of marginal spectra as prior.\n");
     info();
     return 0;
   }
@@ -115,7 +115,7 @@ int main (int argc, char *argv[]) {
     return 0;
   }
   if((isfold) & (priorfile12!=NULL)) {
-    fprintf(stderr,"\nSorry. Handling the folded 2D-SFS has not been implemented yet. Please contribute or push a request. Currently -ifold 1 and -priorfile12 !NULL are not compatible.\n");
+    fprintf(stderr,"\nSorry. Handling the folded 2D-SFS has not been implemented yet. Please contribute or push a request. Currently -isfold 1 and -priorfile12 !NULL are not compatible.\n");
     info();
     return 0;
   }
@@ -150,14 +150,16 @@ int main (int argc, char *argv[]) {
   }
 
   /// GET POSITIONS OF BLOCKS
-  if (block_size>(nsites-firstbase)) block_size=(nsites-firstbase);
-  if (block_size==0) block_size=nsites-firstbase;
-  array<int> start; array<int> end; 
+  if (block_size>(nsites-firstbase+1)) block_size=(nsites-firstbase+1);
+  if (block_size==0) block_size=nsites-firstbase+1;
+  array<int> start; array<int> end;
   start=getStart(nsites, firstbase, block_size);
   end=getEnd(nsites, firstbase, block_size);
- 
-  /// ITERATE OVER EACH BLOCK
   int nwin = start.x;
+
+  if (verbose==1) fprintf(stderr, "\n num win %d win0 is %d %d", nwin, start.data[0], end.data[0]);
+
+  /// ITERATE OVER EACH BLOCK
   for (int n=0; n<nwin; n++) {
 
     fprintf(stderr, "Block %d out of %d from %d to %d\n", n, (nwin-1), start.data[n], end.data[n]);
@@ -212,8 +214,14 @@ int main (int argc, char *argv[]) {
   delete [] start.data;
   delete [] end.data;
 
+  if ((priorfile12==NULL)==0) cleanup(prior12);
+
+  if ((priorfile1==NULL)==0) delete [] prior1.data;
+  if ((priorfile2==NULL)==0) delete [] prior2.data;
+
+  fclose(outpost);
   free(foutpost);
-   
+  
   return 0;
 
 } // end main

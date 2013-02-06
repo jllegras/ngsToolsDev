@@ -92,8 +92,8 @@ int main (int argc, char *argv[]) {
   }
 
   // if block_size longer than nsites
-  if (block_size>(nsites-offset)) block_size=(nsites-offset);
-  if (block_size==0) block_size=nsites-offset;
+  if (block_size>(nsites-offset+1)) block_size=(nsites-offset+1);
+  if (block_size==0) block_size=nsites-offset+1;
 
   // prepare output files
   foutest = append(outfiles, "");
@@ -251,6 +251,11 @@ int main (int argc, char *argv[]) {
 
   delete [] pvar.data;
 
+  delete [] start.data;
+  delete [] end.data;
+
+  delete [] good.data;
+
   // divide
   for (int i=0;i<nind;i++) {
     for (int j=0;j<nind;j++) {
@@ -263,7 +268,8 @@ int main (int argc, char *argv[]) {
   // free
   cleanup(covar);
   free(foutest);
-    
+  fclose(outest);  
+
   return 0;
   
 } // end main

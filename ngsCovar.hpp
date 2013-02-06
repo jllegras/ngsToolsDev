@@ -36,26 +36,25 @@ void cleanup(matrix<T> &m){//using a reference to avoid copying the data
 /// FUNCTIONS
 
 array<int> getStart(int nsites, int firstbase, int block_size) {
-  int nwin = ((nsites-firstbase)/block_size);
+
+  // note that firstbase and nsites are 1-based
+  int len = nsites-firstbase+1;
+
+  int nwin = len/block_size;
+  if ( (len % block_size)!=0) nwin=nwin+1;
+
   array<int> start;
-  if ( ((nsites-firstbase) % block_size)!=0) {
-    start.x=nwin+1;
-  } else {
-    start.x=nwin;
-  }
+  start.x=nwin;
+  
   int *tStart= new int [nwin];
   for (int i=0; i<nwin; i++) {
     tStart[i]=(i)*block_size;
   }
-  // if there is rest
-  if ( (nsites % block_size)!=0) {
-    tStart[nwin]=tStart[(nwin-1)]+block_size;
-    nwin=nwin+1;
-  }
+
   // if you dont start from beginning
-  if (firstbase>0) {
+  if (firstbase>1) {
     for (int i=0; i<nwin; i++) {
-      tStart[i]=tStart[i]+firstbase;
+      tStart[i]=tStart[i]+firstbase-1; // -1 because firstbase is 1-based
     }
   }
   start.data=tStart;
@@ -63,28 +62,29 @@ array<int> getStart(int nsites, int firstbase, int block_size) {
 }
 
 array<int> getEnd(int nsites, int firstbase, int block_size) {
-  int nwin = ((nsites-firstbase)/block_size);
+
+  // note that firstbase and nsites are 1-based
+  int len = nsites-firstbase+1;
+
+  int nwin = len/block_size;
+  if ( (len % block_size)!=0) nwin=nwin+1;
+  
   array<int> end;
-  if ( ((nsites-firstbase) % block_size)!=0) {
-    end.x=nwin+1;
-  } else {
-    end.x=nwin;
-  }
+  end.x=nwin;
+
   int *tEnd= new int [nwin];
-  for (int i=0; i<nwin; i++) {
-    tEnd[i]=(i+1)*block_size-1;
+  for (int i=0; i<(nwin); i++) {
+    tEnd[i]=(i+1)*block_size-(i+1);
   }
-  // if there is rest
-  if ( (nsites % block_size)!=0) {
-    tEnd[nwin]=nsites-1;
-    nwin=nwin+1;
-  }
+  tEnd[nwin-1]=nsites-1; // nsites is 1 based
+ 
   // if you dont start from beginning
   if (firstbase>0) {
     for (int i=0; i<nwin; i++) {
-      tEnd[i]=tEnd[i]+firstbase;
+      tEnd[i]=tEnd[i]+firstbase-1;
     }
   }
+
   end.data=tEnd;
   return end;
 }

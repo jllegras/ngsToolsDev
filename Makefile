@@ -1,6 +1,6 @@
 
 CC=g++
-CFLAGS=-lm -lz -O3 -Wall
+CFLAGS=-lm -lz -O3 -Wall -g
 
 all: mkdir ngsCovar ngsSim ngs2dSFS ngsFST GetSubSfs
 
