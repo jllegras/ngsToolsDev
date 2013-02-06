@@ -236,7 +236,7 @@ int main (int argc, char *argv[]) {
       }
       fprintf(stderr, "\t Sum:%f", temp_sum);
 
-      if (temp_sum<0) {
+      if (temp_sum==-nan) {
         for (int i=0; i<pvar.x; i++) fprintf(stderr, "\n %d %f", i, temp_sum);
         exit(0);
       }
