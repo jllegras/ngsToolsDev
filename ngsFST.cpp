@@ -46,7 +46,7 @@ int main (int argc, char *argv[]) {
   char *outfile=NULL;
   char *foutpost=NULL;
   
-  int argPos = 1, increment = 0, nind = 0, nind1 = 0, nind2 = 0, nsites = 0, verbose = 0, nsums = 1, block_size = 10000, K=0, isfold=0, firstbase=0;
+  int argPos = 1, increment = 0, nind = 0, nind1 = 0, nind2 = 0, nsites = 0, verbose = 0, nsums = 1, block_size = 0, K=0, isfold=0, firstbase=0;
 
   /// READ AND ASSIGN INPUT PARAMETERS
   
@@ -151,6 +151,7 @@ int main (int argc, char *argv[]) {
 
   /// GET POSITIONS OF BLOCKS
   if (block_size>(nsites-firstbase)) block_size=(nsites-firstbase);
+  if (block_size==0) block_size=nsites-firstbase;
   array<int> start; array<int> end; 
   start=getStart(nsites, firstbase, block_size);
   end=getEnd(nsites, firstbase, block_size);

@@ -29,7 +29,7 @@ int main (int argc, char *argv[]) {
   char *outfiles=NULL;
   char *foutest=NULL;
   
-  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, norm = 0, block_size = 10000, call=0, offset=0, maxgeno=0, isfold=0;
+  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, norm = 0, block_size = 0, call=0, offset=0, maxgeno=0, isfold=0;
   double esites = 0.0, minmaf = 0.0;
  
   /// READ AND ASSIGN INPUT PARAMETERS
@@ -93,6 +93,7 @@ int main (int argc, char *argv[]) {
 
   // if block_size longer than nsites
   if (block_size>(nsites-offset)) block_size=(nsites-offset);
+  if (block_size==0) block_size=nsites-offset;
 
   // prepare output files
   foutest = append(outfiles, "");
@@ -101,13 +102,13 @@ int main (int argc, char *argv[]) {
   fprintf(stderr,"\t->Using args: -nind %d -nsites %d -probfile %s -sfsfile %s -outfile %s -verbose %d -norm %d -minmaf %f -block_size %d -call %d -offset %d\n", nind, nsites, estfile, sfsfile, foutest, debug, norm, minmaf, block_size, call, offset); 
  
   // BLOCKS
-  int nwin = ((nsites-offset)/block_size);
   /// GET POSITIONS OF BLOCKS
   array<int> start; array<int> end;
   start=getStart(nsites, offset, block_size);
   end=getEnd(nsites, offset, block_size);
   int maxlen=end.data[0]-start.data[0]+1; // len for each win, it will never be greater than this
   double temp_sum=0.0; // check at each iteration not NA, for debug 
+  int nwin = start.x;
 
   // prepare out
   fprintf(stderr,"\t->Dumping file: %s\n", foutest);
