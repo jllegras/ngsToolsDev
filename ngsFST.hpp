@@ -77,8 +77,8 @@ array<int> getEnd(int nsites, int firstbase, int block_size) {
   array<int> end;
   end.x=nwin;
   int *tEnd= new int [nwin];
-  for (int i=0; i<(nwin); i++) {
-    tEnd[i]=(i+1)*block_size-(i+1);
+  for (int i=0; i<nwin; i++) {
+    tEnd[i]=(i)*block_size+block_size-1;
   }
   tEnd[nwin-1]=nsites-1; // nsites is 1 based
   // if you dont start from beginning
@@ -439,7 +439,7 @@ double myfuncFold(double lambda, int k, int z, double F, array<double> p1, array
 // compute lambdas
 array<double> getLambdas(array<double> myfst, array<double> prob1, array<double> prob2, int K, int verbose, int isfold) {
 
-    fprintf(stderr, "\ninside get lamb; fst are %d \n", myfst.x);
+    if (verbose) fprintf(stderr, "\ninside get lamb; fst are %d \n", myfst.x);
 //    writearray(myfst, stdout);
 
 //    fprintf(stderr, "\nprob1");

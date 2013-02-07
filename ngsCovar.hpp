@@ -73,10 +73,11 @@ array<int> getEnd(int nsites, int firstbase, int block_size) {
   end.x=nwin;
 
   int *tEnd= new int [nwin];
-  for (int i=0; i<(nwin); i++) {
-    tEnd[i]=(i+1)*block_size-(i+1);
+  for (int i=0; i<nwin; i++) {
+    tEnd[i]=(i)*block_size+block_size-1;
   }
   tEnd[nwin-1]=nsites-1; // nsites is 1 based
+
  
   // if you dont start from beginning
   if (firstbase>0) {
