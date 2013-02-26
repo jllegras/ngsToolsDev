@@ -11,7 +11,7 @@
 
 // input is the output of sfstools
 
-// to compile: g++ -Wall -O0 -g get2DSFS.cpp -o get2DSFS
+// to compile: g++ -Wall -O0 -g ngs2dSFS.cpp -o ngs2dSFS
 
 int main (int argc, char *argv[]) {
   
@@ -35,6 +35,7 @@ int main (int argc, char *argv[]) {
   int block_size = 10000;
   int firstbase = 0;
   int relative = 1;
+  int maxlike=1;
 
   // READ AND ASSIGN INPUT PARAMETERS
   
@@ -54,6 +55,7 @@ int main (int argc, char *argv[]) {
     else if(strcmp(argv[argPos],"-nsites")==0) nsites = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-block_size")==0) block_size = atoi(argv[argPos+1]);    
     else if(strcmp(argv[argPos],"-offset")==0) firstbase = atoi(argv[argPos+1]); 
+    else if(strcmp(argv[argPos],"-maxlike")==0) maxlike = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-relative")==0) relative = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);
@@ -143,7 +145,7 @@ int main (int argc, char *argv[]) {
     post2 = readFileSub(sfsfile2, nind2, start.data[n], end.data[n], 0);
   
     // COMPUTE SFS
-    sumSpectrum(spec, post1, post2);
+    sumSpectrum(spec, post1, post2, maxlike);
 
     // clean
     cleanup(post1);

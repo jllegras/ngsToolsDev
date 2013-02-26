@@ -140,12 +140,12 @@ Parameters:
 
 ### ngs2dSFS
 
-Program to estimate 2D-SFS from posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools).
+Program to estimate 2D-SFS from posterior probabilities of sample allele frequencies (from angsd0.505 and sfstools).
 
 Run with no arguments for help. Please note that populations must have the exact same number of sites.
 
 Example:
-```ngsTools/bin/get2DSFS -postfiles pop.sfs.ml.norm pop.sfs.ml.norm -outfile spectrum.txt -relative 1 -nind 20 20 -nsites 100000 -block_size 20000```
+```ngsTools/bin/ngs2dSFS -postfiles pop.sfs.ml.norm pop.sfs.ml.norm -outfile spectrum.txt -relative 1 -nind 20 20 -nsites 100000 -block_size 20000```
 
 Parameters:
 
@@ -160,6 +160,8 @@ Parameters:
 -block_size: memory efficiency, number of sites for each chunk
 
 -offset: lower limit in case of analyzing a subset
+
+-maxlike: if 1 compute the MLE of joint allele frequency and sum across sites, if 0 it computes the sum of the products of likelihoods
 
 -relative: boolean, if 1 number are relative frequencies from 0 to 1 which sum up 1; if 0 numbers are absolute counts of sites having a specific joint allele frequency
 
