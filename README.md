@@ -6,37 +6,39 @@ See INSTALL file on how to link to repository and compile all programs. Note tha
 
 ### INPUT FILES
 
-These programs receive in input files produced by the software ANGSD.
+The programs receive in input files produced by the software ANGSD.
 
-A typical pipeline can be the following, assuming we have genotype likelihoods data for one pop in 'sim' format (e.g. from nsgSim). We assume 40 individuals.
+A typical pipeline can be the following, assuming we have genotype likelihoods data for one pop in 'sim1' format (e.g. from nsgSim). We assume 40 individuals.
+We assume to use a version of ANGSD 0.505 or higher. Please check ANGSD web site for other accepted genotype likleihoods formats.
 
-This computes genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
-```angsd0.204/angsd.g++ -sim1 pop.glf.gz -nInd 40 -doGeno 64 -doMaf 2 -outfiles all -doMajorMinor 1 -doGlf 3```
+First we compute genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
+``angsd -sim1 pop.glf.gz -nInd 40 -doGeno 32 -doPost 1 -doMaf 2 -out pops.geno -doMajorMinor 1``
 
-This computes sample allele frequency posterior probabilities assuming no prior (.sfs):
-```angsd0.204/angsd.g++ -outfiles pop -realSFS 1 -sim1 pop.glf.gz -nInd 40```
+We then compute sample allele frequency posterior probabilities assuming no prior (.sfs):
+``angsd -sim1 pop.glf.gz -nInd 40 -realSFS 1 -out pops``
 
-This estimates the overall SFS (.sfs.ml) using an ML approach:
-```angsd0.204/misc/optimSFS.gcc -binput pop.sfs -nChr 80 -outnames pop.sfs```
+and we estimate the overall SFS (.sfs.ml) using an ML approach (Nielsen et al. 2012):
+``misc/optimSFS.gcc -binput pops.sfs -nChr 80 -nThreads 10``
 
-This compute sample allele frequency posterior probabilities (.sfs.ml.norm):
-```angsd0.204/misc/sfstools.g++ -nChr 80 -priorFile pop.sfs.ml -sfsFile pop.sfs -dumpBinary 1 > pop.sfs.ml.norm```
+Finally we compute sample allele frequency posterior probabilities using the SFS as a prior (.sfs.ml.norm):
+``misc/sfstools.g++ -sfsFile pops.sfs -nChr 80 -priorFile pops.sfs.ml -dumpBinary 1 > pops.norm``
 
+Please note that if your data is folded you should use option -fold 1 at step -realSFS 1 and the set -nChr equal to -nInd.
 
 ### ngsFST
 
 Program to estimate FST from NGS data. It computes expected genetic variance components and estimate FST from those.
-In input it receives posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) for each population. It may receive also a 2D-SFS as a prior and in this case in gets in input posterior probabilities with uniform prior (angsd with -realSFS 1 only). Additionally it can use a corrected product of marginal spectra as prior. In this case it receives in input posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) and also marginal SFS.
+In input it receives posterior probabilities of sample allele frequencies for each population (ANGSD + sfstools). It may receive also a 2D-SFS as a prior and in this case in gets in input posterior probabilities with uniform prior (ANGSD with -realSFS 1 only, no need to run sfstools). Additionally it can use a corrected product of marginal spectra as prior. In this case it receives in input posterior probabilities of sample allele frequencies (from ANGSD and sfstools) and also marginal spectra.
 
 Output is a tab-separated text file. Each row is a site. Columns are: EA, EAB, FACT, (EA/EAB)+FACT, pvar; where EA is the expectation of genetic variance between populations, EAB is the expectation of the total genetic variance, FACT is the correcting factor for the ratio of expectations, (EA/EAB)+FACT is the per-site FST value, pvar is the probability for the site of being variable.
 
 Run with no arguments for help. Please note that populations must have the exact same number of sites.
 
 Examples:
-```ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst``` # using a 2D-SFS as prior, estimated using ngs2dSFS
-```ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.first.fst``` # here we don't provide prior files, so we do not correct for non-independece, but we use the output file as a first guess for the fst
-```Rscript --vanilla --slave -e 'source("ngsTools/getMultiFST.R"); getMultiFST(filein="pops.first.fst", fileout="pops.global.fst", from_known=FALSE)'``` # this will compute a global fst and used it as a first guess for all sites; .R script is easily changeable for other purposes (e.g. same fst for regions fo 10-20-50Kbp)
-```ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -priorfiles pop1.sfs.ml pop2.sfs.ml -nind 20 20 -nsites 100000 -outfile pops.corrected.fst -fstfile fst.global.fst -K 0```
+``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst`` # using a 2D-SFS as prior, estimated using ngs2dSFS
+``ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.first.fst`` # here we don't provide prior files, so we do not correct for non-independece, but we use the output file as a first guess for the fst
+``Rscript --vanilla --slave -e 'source("ngsTools/getMultiFST.R"); getMultiFST(filein="pops.first.fst", fileout="pops.global.fst", from_known=FALSE)'`` # this will compute a global FST, or local is you set win>0, and used it as a first guess for all sites;
+``ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -priorfiles pop1.sfs.ml pop2.sfs.ml -nind 20 20 -nsites 100000 -outfile pops.corrected.fst -fstfile fst.global.fst -K 0``
 
 Parameters:
 
