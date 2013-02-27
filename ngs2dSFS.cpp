@@ -82,15 +82,15 @@ int main (int argc, char *argv[]) {
   outpost = getFILE(foutpost, "w");
 
   // output
-  matrix<int> spec;
+  matrix<double> spec;
   spec.x=(2*nind1)+1;
   spec.y=(2*nind2)+1;
 
-  int **data = new int*[spec.x];
+  double **data = new double*[spec.x];
   for (int i=0; i<spec.x; i++) {
-    int *tmp = new int[spec.y];
+    double *tmp = new double[spec.y];
     for (int j=0; j<spec.y; j++) {
-      tmp[j] = 0;
+      tmp[j] = 0.0;
      }
     data[i] = tmp;
   }
@@ -158,33 +158,17 @@ int main (int argc, char *argv[]) {
 
   // if relative divide by nsites
   if (relative) {
-    matrix<double> specR;
-    specR.x=(2*nind1)+1;
-    specR.y=(2*nind2)+1;
-    double **dataR = new double*[specR.x];
-    for (int i=0; i<specR.x; i++) {
-      double *tmpR = new double[specR.y];
-      for (int j=0; j<specR.y; j++) {
-        tmpR[j] = 0.0;
-       }
-      dataR[i] = tmpR;
-    }
-    specR.data = dataR;
-    for (int i=0; i<specR.x; i++) {
-      for (int j=0; j<specR.y; j++) {
-        specR.data[i][j]=static_cast<double>(spec.data[i][j]) / (nsites-firstbase);
+    for (int i=0; i<spec.x; i++) {
+      for (int j=0; j<spec.y; j++) {
+        spec.data[i][j]=spec.data[i][j] / (nsites-firstbase);
       }
     }
-    writematrix(specR, outpost);
-    cleanup(specR);
-    cleanup(spec);
-  } else {
-    // write to file
-    writematrixInt(spec, outpost);
-    // free
-    cleanup(spec);  
   }
 
+  // write
+  writematrix(spec, outpost);
+  cleanup(spec);
+  
   // close file
   free(foutpost);
    
