@@ -158,10 +158,26 @@ int main (int argc, char *argv[]) {
 
   // if relative divide by nsites
   if (relative) {
-    for (int i=0; i<spec.x; i++) {
+    if (maxlike) {
+     for (int i=0; i<spec.x; i++) {
       for (int j=0; j<spec.y; j++) {
         spec.data[i][j]=spec.data[i][j] / (nsites-firstbase);
       }
+     }
+    } else {
+
+     double sumspec=0.0;
+     for (int i=0; i<spec.x; i++) {
+      for (int j=0; j<spec.y; j++) {
+        sumspec=sumspec+spec.data[i][j];
+      }
+     }
+     for (int i=0; i<spec.x; i++) {
+      for (int j=0; j<spec.y; j++) {
+        spec.data[i][j]=spec.data[i][j] / sumspec;
+      }
+     }
+
     }
   }
 
