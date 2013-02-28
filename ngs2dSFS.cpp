@@ -36,6 +36,7 @@ int main (int argc, char *argv[]) {
   int firstbase = 0;
   int relative = 1;
   int maxlike=1;
+  int folded=0; // is data folded?
 
   // READ AND ASSIGN INPUT PARAMETERS
   
@@ -57,6 +58,7 @@ int main (int argc, char *argv[]) {
     else if(strcmp(argv[argPos],"-offset")==0) firstbase = atoi(argv[argPos+1]); 
     else if(strcmp(argv[argPos],"-maxlike")==0) maxlike = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-relative")==0) relative = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-folded")==0) folded = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);
       return 0;
@@ -83,7 +85,7 @@ int main (int argc, char *argv[]) {
 
   // output
   matrix<double> spec;
-  spec.x=(2*nind1)+1;
+  spec.x=(2*nind1)+1; // note that dimensions are the same even for the folded spectrum; then after I will properly fold it
   spec.y=(2*nind2)+1;
 
   double **data = new double*[spec.x];
@@ -141,8 +143,8 @@ int main (int argc, char *argv[]) {
   for (int n=0; n<nwin; n++) {
       
     fprintf(stderr, "win %d out of %d from %d to %d", n, (nwin-1), start.data[n], end.data[n]);
-    post1 = readFileSub(sfsfile1, nind1, start.data[n], end.data[n], 0);
-    post2 = readFileSub(sfsfile2, nind2, start.data[n], end.data[n], 0);
+    post1 = readFileSub(sfsfile1, nind1, start.data[n], end.data[n], folded);
+    post2 = readFileSub(sfsfile2, nind2, start.data[n], end.data[n], folded);
   
     // COMPUTE SFS
     sumSpectrum(spec, post1, post2, maxlike);
