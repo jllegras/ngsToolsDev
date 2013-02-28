@@ -94,7 +94,7 @@ int main (int argc, char *argv[]) {
   if((sfsfile1 == NULL) & (sfsfile2 == NULL) ) {
     fprintf(stderr,"\nMust supply -postfiles.\n");
     info();
-    return 0;
+     return 0;
   }
   if(outfile == NULL) {
     fprintf(stderr,"\nMust supply -outfile.\n");
@@ -114,11 +114,9 @@ int main (int argc, char *argv[]) {
     info();
     return 0;
   }
-  if((isfold) & (priorfile12!=NULL)) {
-    fprintf(stderr,"\nSorry. Handling the folded 2D-SFS has not been implemented yet. Please contribute or push a request. Currently -isfold 1 and -priorfile12 !NULL are not compatible.\n");
-    info();
-    return 0;
-  }
+  if((priorfile12!=NULL) & (isfold)) {
+    fprintf(stderr,"\nRemember that the 2D-SFS given as a prior should be n1*2;n2*2 dimensions even if it is folded (non possible configurations should be set to 0");
+   }
 
   /// OUTPUT
   foutpost = append(outfile, "");
@@ -141,13 +139,14 @@ int main (int argc, char *argv[]) {
   matrix<double> prior12;
   if ((priorfile12==NULL)==0) {
     if (verbose==1) fprintf(stderr, "\nAdding 2D prior...");
-    prior12 = readPrior12(priorfile12, nind1*2+1, nind2*2+1);
+    prior12 = readPrior12(priorfile12, nind1*2+1, nind2*2+1); // same dimensions even if it is folded
     if (verbose==2) {
       fprintf(stderr, "\nPrior 2d:\n");
       writematrix(prior12, stderr);
     }
     //// the difference with this prior is that I don't add the prior, but I add the prior directly at computeFST step
   }
+
 
   /// GET POSITIONS OF BLOCKS
   if (block_size>(nsites-firstbase+1)) block_size=(nsites-firstbase+1);
