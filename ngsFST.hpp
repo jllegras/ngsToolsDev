@@ -1024,13 +1024,6 @@ void computeVarRey12New(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
       }
     }
 
-    if (s==0) {
-    fprintf(stderr, "\npost1: %f %f %f", m1.data[0][0], m1.data[0][1], m1.data[0][2]);
-    fprintf(stderr, "\npost2: %f %f %f", m2.data[0][0], m2.data[0][1], m2.data[0][2]);
-    fprintf(stderr, "\nNot\n");
-    writematrix(m12, stderr);
-    }
-
     // get the sum
     double somma=0.0;
       for (int j=0; j<m12.x; j++) {
@@ -1044,12 +1037,6 @@ void computeVarRey12New(matrix<double> &m1, matrix<double> &m2, int verbose, FIL
       for (int i=0;i<m12.y; i++) {
         m12.data[j][i] = m12.data[j][i]/somma;
       }
-    }
-
-    
-    if (s==0) {
-    fprintf(stderr, "\nNorm\n");
-    writematrix(m12, stderr);
     }
 
     // for each possible value of freq 1 and freq 2 compute the FST, so compute A, AB, VAR, COVAR (see Price paper for its meaning)
