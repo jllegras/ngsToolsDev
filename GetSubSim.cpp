@@ -80,7 +80,7 @@ int main (int argc, char *argv[]) {
   char *outfile;
   char *foufile=NULL;
 
-  int argPos = 1, nind = 0, nsites = 0, increment=0, debug=0, nind_new = 0, nsites_new = 0, verbose=0, ncat=10;
+  int argPos = 1, nind = 0, nsites = 0, increment=0, debug=0, nind_new = 0, nsites_new = 0, check=0, ncat=10;
 
   while (argPos<argc) {
     increment = 0;
@@ -98,8 +98,8 @@ int main (int argc, char *argv[]) {
       nind_new = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-nsites_new")==0)
       nsites_new = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-verbose")==0)
-      debug = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-check")==0)
+      check = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);
       return 0;
@@ -122,6 +122,8 @@ int main (int argc, char *argv[]) {
   int conta_ind=0; // 1 based
   int conta_site=1; // 1 based
 
+  int ntot=0;
+
   for (int i=0; i<(nsites*nind); i++) {
 
     conta_ind++;
@@ -129,9 +131,11 @@ int main (int argc, char *argv[]) {
     double *tmp = new double[ncat];
     fread(tmp,sizeof(double),ncat,fin);
     
-    if (conta_site<=nsites_new & conta_ind<=nind_new)
+    if (conta_site<=nsites_new & conta_ind<=nind_new) {
       fwrite(tmp, sizeof(double), ncat, fout);
-
+      ntot++;
+    }
+ 
     if ((i+1) % nind==0) { conta_site++; conta_ind=1; }
 
     delete [] tmp;
@@ -140,6 +144,19 @@ int main (int argc, char *argv[]) {
 
   fclose(fin);
   fclose(fout);
+
+  fprintf(stderr, "\nExpected %d lines and written %d lines\n", nsites_new*nind_new, ntot);
+
+  if (check) {
+    FILE *fp = getFILE(outfile, "rb");
+    size_t filesize =fsize(outfile);
+    if((filesize %(sizeof(double)*(nind_new*nsites_new*ncat)) )) {
+      fprintf(stderr,"\n\t-> Possible error, binaryfiles might be broken\n");
+      fclose(fp);
+      exit(-1);
+    }
+    fclose(fp);
+  }
 
 } // main
 
