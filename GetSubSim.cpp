@@ -117,16 +117,12 @@ int main (int argc, char *argv[]) {
     exit(-1);
   }
 
-  fseek(fin, sizeof(double)*(0), SEEK_SET);
-
-  int conta_ind=0; // 1 based
+  int conta_ind=1; // 1 based
   int conta_site=1; // 1 based
 
   int ntot=0;
 
   for (int i=0; i<(nsites*nind); i++) {
-
-    conta_ind++;
 
     double *tmp = new double[ncat];
     fread(tmp,sizeof(double),ncat,fin);
@@ -136,7 +132,8 @@ int main (int argc, char *argv[]) {
       ntot++;
     }
  
-    if ((i+1) % nind==0) { conta_site++; conta_ind=1; }
+    conta_ind++;
+    if ((conta_ind-1)==nind) { conta_site++; conta_ind=1; }
 
     delete [] tmp;
 
