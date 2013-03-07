@@ -336,7 +336,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
             }
 	  }
           if (norm) {
-	    subsomma = subsomma / sqrt(a.data[s]*(1-a.data[s])); 
+	    subsomma = subsomma / (a.data[s]*(1-a.data[s])); 
 	  } 
         }
 	if (isnan(subsomma)==0) somma = somma + subsomma;
@@ -384,7 +384,7 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
 	    }
             subsomma=subsomma*pvar.data[s];
             if (norm) {
-	      subsomma = subsomma / sqrt(a.data[s]*(1-a.data[s])); 
+	      subsomma = subsomma / (a.data[s]*(1-a.data[s])); 
 	    }
             if (isnan(subsomma)==0) somma = somma + subsomma;
       }
