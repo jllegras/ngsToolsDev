@@ -111,7 +111,7 @@ int main (int argc, char *argv[]) {
 
   FILE *fout = getFILE(outfile, "wb");
 
-  size_t filesize =fsize(fname);
+  size_t filesize =fsize(infile);
   if((filesize %(sizeof(double)*(nind*nsites*ncat)) )) {
     fprintf(stderr,"\n\t-> Possible error, binaryfiles might be broken\n");
     exit(-1);
@@ -127,12 +127,12 @@ int main (int argc, char *argv[]) {
     conta_ind++;
 
     double *tmp = new double[ncat];
-    fread(tmp,sizeof(double),nCat,fin);
+    fread(tmp,sizeof(double),ncat,fin);
     
     if (conta_site<=nsites_new & conta_ind<=nind_new)
       fwrite(tmp, sizeof(double), ncat, fout);
 
-    if ((i+1) %% nind==0) { conta_site++; conta_ind=1; }
+    if ((i+1) % nind==0) { conta_site++; conta_ind=1; }
 
     delete [] tmp;
 
