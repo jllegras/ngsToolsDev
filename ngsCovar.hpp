@@ -284,7 +284,7 @@ char *append(const char* a,const char *b){
 
 // print help
 void info() {
-  fprintf(stdout, "\ninput:\n-probfile: file with genotype posterior probabilities [required], this is the output from angsd -doGeno 64\n-outfile: name of output file [required], currently it is a text file, tab separated with n*n cells\n-sfsfile: file with SFS posterior probabilities [required if you want to weight each site by its probability of being variable], this is the binary output of sfstools after running realSFS1 and optimSFS\n-nind: nr of individuals [required];\n-nsites: nr of sites [required]\nnorm: which method to use to normalize the covariance matrix [optional] as in Patterson et al (0), using classic standard deviation (1), or no normalization (>1); default and suggested value is 0\n-verbose: level of verbosity [optional]\n-block_size: how many sites per block when reading the input file [optiona], default is 1 block equal to nr of sites, suggested 10K-20K\n-call: whether calling genotypes (1) or not (0), default\n-offset: starting position of subset analysis\n-minmaf: filter out sites with estimated MAF less than minmaf or greater than 1-minmaf [optional], default is 0; please note that this filtering won't take action when using the weighting approach because in teory you won't need that in that case.\n\nExample:\nngsSim -outfiles pops -npop 2 -nind 10 10 -nsites 1000 -pvar 1 -F 0.3 0.3\nangsd.g++ -sim1 pops.glf.gz -nInd 20 -doGeno 64 -doMajorMinor 1 -doMaf 2 -outfiles pops.geno\nangsd.g++ -sim1 pops.glf.gz -nInd 20 -realSFS 1 -outfiles POPS\noptimSFS.gcc -binput POPS.sfs -nChr 40 -nThread 10\nsfstools.g++ -sfsFile POPS.sfs -nChr 40 -priorFile POPS.sfs.ml -dumpBinary 1 > POPS.norm.sfs\n# no weighting: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile no -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0\n# weighting: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile si -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0 -sfsfile POPS.norm.sfs\n# no weighting but cutoff on maf: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile me -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0 -minmaf 0.1\n\nPlease note that this has been tested only with angsd 0.204\n");
+  fprintf(stdout, "\ninput:\n-probfile: file with genotype posterior probabilities [required], this is the output from angsd -doGeno 64\n-outfile: name of output file [required], currently it is a text file, tab separated with n*n cells\n-sfsfile: file with SFS posterior probabilities [required if you want to weight each site by its probability of being variable], this is the binary output of sfstools after running realSFS1 and optimSFS\n-nind: nr of individuals [required];\n-nsites: nr of sites [required]\n-verbose: level of verbosity [optional]\n-block_size: how many sites per block when reading the input file [optiona], default is 1 block equal to nr of sites, suggested 10K-20K\n-call: whether calling genotypes (1) or not (0), default\n-offset: starting position of subset analysis\n-minmaf: filter out sites with estimated MAF less than minmaf or greater than 1-minmaf [optional], default is 0; please note that this filtering won't take action when using the weighting approach because in teory you won't need that in that case.\n\nExample:\nngsSim -outfiles pops -npop 2 -nind 10 10 -nsites 1000 -pvar 1 -F 0.3 0.3\nangsd.g++ -sim1 pops.glf.gz -nInd 20 -doGeno 64 -doMajorMinor 1 -doMaf 2 -outfiles pops.geno\nangsd.g++ -sim1 pops.glf.gz -nInd 20 -realSFS 1 -outfiles POPS\noptimSFS.gcc -binput POPS.sfs -nChr 40 -nThread 10\nsfstools.g++ -sfsFile POPS.sfs -nChr 40 -priorFile POPS.sfs.ml -dumpBinary 1 > POPS.norm.sfs\n# no weighting: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile no -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0\n# weighting: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile si -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0 -sfsfile POPS.norm.sfs\n# no weighting but cutoff on maf: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile me -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0 -minmaf 0.1\n\nPlease note that this has been tested only with angsd 0.204\n");
 }
 
 // compute estimated allele frequencies from genotype posterior probabilities
@@ -308,7 +308,7 @@ array<double> getAlleFreq (matrix<double> &m) {
 }
 
 // get the covariance for a pair of individual; output is the effective number of sites (expected or passed the filter)
-double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double> &covar, double minmaf, array<int> good, int start) {
+double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, double minmaf, array<int> good, int start) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
@@ -329,15 +329,13 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
       somma = 0.0;
       for (int s=0; s<nsites; s++) {
 	subsomma = 0.0;
-        if ((a.data[s]>minmaf) && (a.data[s]<(1-minmaf))) {
+        if ((a.data[s]>minmaf) & (a.data[s]<(1-minmaf))) {
 	  for (int C1=0; C1<3; C1++) {
             for (int C2=0; C2<3; C2++) {
              subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2]*good.data[start+s];
             }
 	  }
-          if (norm) {
-	    subsomma = subsomma / (a.data[s]*(1-a.data[s])); 
-	  } 
+          subsomma = subsomma * good.data[start+s] / (a.data[s]*(1-a.data[s])); 
         }
 	if (isnan(subsomma)==0) somma = somma + subsomma;
       }
@@ -362,7 +360,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, int norm, matrix<double>
 
 
 // get the covariance for a pair of individual by weighting by
-void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<double> &covar, array<double> pvar, array<int> good, int start) {
+void calcCovarUpProb (matrix<double> &m, array<double> a, matrix<double> &covar, array<double> pvar, array<int> good, int start) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
@@ -379,14 +377,11 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, int norm, matrix<doubl
 	    subsomma = 0.0;
 	    for (int C1=0; C1<3; C1++) {
               for (int C2=0; C2<3; C2++) {
-	        subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2]*good.data[start+s];
+	        subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
               }
 	    }
-            subsomma=subsomma*pvar.data[s];
-            if (norm) {
-	      subsomma = subsomma / (a.data[s]*(1-a.data[s])); 
-	    }
-            if (isnan(subsomma)==0) somma = somma + subsomma;
+            subsomma=subsomma * good.data[start+s] * pvar.data[s] / (a.data[s]*(1-a.data[s])); 
+	    if (isnan(subsomma)==0) somma = somma + subsomma;
       }
       tmp[j] = somma;
     }
