@@ -332,7 +332,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, d
         if ((a.data[s]>minmaf) & (a.data[s]<(1-minmaf))) {
 	  for (int C1=0; C1<3; C1++) {
             for (int C2=0; C2<3; C2++) {
-             subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2]*good.data[start+s];
+             subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
             }
 	  }
           subsomma = subsomma * good.data[start+s] / (a.data[s]*(1-a.data[s])); 
