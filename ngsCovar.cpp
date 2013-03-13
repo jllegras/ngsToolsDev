@@ -29,7 +29,7 @@ int main (int argc, char *argv[]) {
   char *outfiles=NULL;
   char *foutest=NULL;
   
-  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, block_size = 0, call=0, offset=0, maxgeno=0, isfold=0;
+  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, block_size = 0, call=0, offset=0, maxgeno=0, isfold=0, norm=0;
   double esites = 0.0, minmaf = 0.0;
  
   /// READ AND ASSIGN INPUT PARAMETERS
@@ -54,6 +54,8 @@ int main (int argc, char *argv[]) {
       offset = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-call")==0)
       call = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-norm")==0) // 0 nothing, 1 p(1-p), 2 2p(1-p)
+      norm = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-genoquality")==0)
       genoquality = argv[argPos+1];
     else if(strcmp(argv[argPos],"-isfold")==0) // whether the .sfs. is folded or not 
@@ -210,7 +212,7 @@ int main (int argc, char *argv[]) {
       if (debug==1) fprintf(stderr, ": %d , %f %f", pvar.x, pvar.data[0], pvar.data[10]);
       cleanup(sfs);
       if (debug==1) fprintf(stderr, "\nUpdating covar...");
-      calcCovarUpProb(esti, pp, covar, pvar, good, start.data[n]);
+      calcCovarUpProb(esti, pp, covar, pvar, good, start.data[n], norm);
       if (debug==1) fprintf(stderr, "\nUpdating esite...");
       // divide by expected nr of segr sites -1 in case of pvar
       for (int i=0;i<pvar.x;i++) esites = esites + pvar.data[i];
@@ -218,7 +220,7 @@ int main (int argc, char *argv[]) {
     } else {
       if (debug==1) fprintf(stderr, "\n I am using this minmaf %f ", minmaf);
       fprintf(stderr, "...no weighting..."); 
-      double tmp_eff_nsites=calcCovarUp(esti, pp, covar, minmaf, good, start.data[n]);
+      double tmp_eff_nsites=calcCovarUp(esti, pp, covar, minmaf, good, start.data[n], norm);
       esites=esites+tmp_eff_nsites;
     }
        

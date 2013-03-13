@@ -308,7 +308,7 @@ array<double> getAlleFreq (matrix<double> &m) {
 }
 
 // get the covariance for a pair of individual; output is the effective number of sites (expected or passed the filter)
-double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, double minmaf, array<int> good, int start) {
+double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, double minmaf, array<int> good, int start, in norm) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
@@ -335,7 +335,9 @@ double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, d
              subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
             }
 	  }
-          subsomma = subsomma * good.data[start+s] / ((a.data[s]*(1-a.data[s]))); 
+          subsomma = subsomma * good.data[start+s];
+          if (norm==1) subsomma = subsomma /  ((a.data[s]*(1-a.data[s])));
+          if (norm==2) subsomma = subsomma /  (2*(a.data[s]*(1-a.data[s])));
         }
 	if (isnan(subsomma)==0) somma = somma + subsomma;
       }
@@ -380,7 +382,9 @@ void calcCovarUpProb (matrix<double> &m, array<double> a, matrix<double> &covar,
 	        subsomma = subsomma + (C1-(2*a.data[s]))*(C2-(2*a.data[s]))*m.data[s][(i*3)+C1]*m.data[s][(j*3)+C2];
               }
 	    }
-            subsomma=subsomma * good.data[start+s] * pvar.data[s] / ((a.data[s]*(1-a.data[s]))); 
+            subsomma=subsomma * good.data[start+s] * pvar.data[s]; 
+            if (norm==1) subsomma = subsomma /  ((a.data[s]*(1-a.data[s])));
+            if (norm==2) subsomma = subsomma /  (2*(a.data[s]*(1-a.data[s])));
 	    if (isnan(subsomma)==0) somma = somma + subsomma;
       }
       tmp[j] = somma;
