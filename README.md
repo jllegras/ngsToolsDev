@@ -68,7 +68,7 @@ Parameters:
 
 ### ngsCovar
 
-Program to compute the expected sample covariance matrix from genotype posterior probabilities. It receives in input genotype posterior probabilities (from angsd2.04 -doGeno 64). It can receive in input also posterior probabilities of sample allele frequencies (from angsd0.204 and sfstools) for computing the probability of each site to be variant.
+Program to compute the expected correlation matrix between individuals from genotype posterior probabilities. It receives in input genotype posterior probabilities (from angsd -doGeno 32). It can receive in input also posterior probabilities of sample allele frequencies (from angsd and sfstools) for computing the probability of each site to be variant.
 
 Run with no arguments for help.
 
@@ -89,7 +89,7 @@ Parameters:
 
 -outfile: name of the output file
 
--norm: if 1 matrix is normalized by sqrt(p(1-p)) as in Patterson et al 2006
+-norm: if 0 no normalization, if 1 matrix is normalized by (p(1-p)) as in Patterson et al 2006, if 2 normalization is 2p(1-p)
 
 -minmaf: ignore sites below this threhsold of minor allele frequency
 

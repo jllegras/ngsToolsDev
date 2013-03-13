@@ -308,7 +308,7 @@ array<double> getAlleFreq (matrix<double> &m) {
 }
 
 // get the covariance for a pair of individual; output is the effective number of sites (expected or passed the filter)
-double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, double minmaf, array<int> good, int start, in norm) {
+double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, double minmaf, array<int> good, int start, int norm) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
@@ -362,7 +362,7 @@ double calcCovarUp (matrix<double> &m, array<double> a, matrix<double> &covar, d
 
 
 // get the covariance for a pair of individual by weighting by
-void calcCovarUpProb (matrix<double> &m, array<double> a, matrix<double> &covar, array<double> pvar, array<int> good, int start) {
+void calcCovarUpProb (matrix<double> &m, array<double> a, matrix<double> &covar, array<double> pvar, array<int> good, int start, int norm) {
   int nsites = m.x;
   int nind = m.y/3;
   if (nsites != a.x) {
