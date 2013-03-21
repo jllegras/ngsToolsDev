@@ -176,5 +176,8 @@ This script plots some PCA figures from the output of ngsCovar.
 
 GetSubSFS
 
-This program extract a subset of .sfs files
+This program extracts a subset of .sfs files.
 
+GetSubSim
+
+This program extracts a subset of individuals or sites after running ngsSim.
