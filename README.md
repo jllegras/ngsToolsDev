@@ -28,16 +28,16 @@ Please note that if your data is folded you should use option -fold 1 at step -r
 ### ngsFST
 
 Program to estimate FST from NGS data. It computes expected genetic variance components and estimate FST from those.
-In input it receives posterior probabilities of sample allele frequencies for each population (ANGSD + sfstools). It may receive also a 2D-SFS as a prior, or marginal SFS for each population, and in this case in gets in input posterior probabilities with uniform prior (ANGSD with -realSFS 1 only, no need to run sfstools).
+In input it receives posterior probabilities of sample allele frequencies for each population (ANGSD + sfstools). It may receive also a 2D-SFS as a prior and in this case it gets in input posterior probabilities with uniform prior (ANGSD with -realSFS 1 only, do not run sfstools and set -islog 1). You can give also 2 marginal spectra as prior. 
 
 Output is a tab-separated text file. Each row is a site. Columns are: EA, EAB, FACT, (EA/EAB)+FACT, pvar; where EA is the expectation of genetic variance between populations, EAB is the expectation of the total genetic variance, FACT is the correcting factor for the ratio of expectations, (EA/EAB)+FACT is the per-site FST value, pvar is the probability for the site of being variable.
 
-Run with no arguments for help. Please note that populations must have the exact same number of sites.
+Run with no arguments for help. Please note that populations must have the exact same, and corresponding, number of sites.
 
 Examples:
-``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum2D.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst`` # using a 2D-SFS as a prior, estimated using ngs2dSFS
-``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfiles spectrum1.txt spectrum2.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst`` # using marginal spectra as priors, estimated using optimSFS
-``ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst`` # here we don't provide prior files, so we directly provide posterior probabilities (ANGSD+sfstools), and therefore we do not correct for non-independece;
+``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum2D.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1`` # using a 2D-SFS as a prior, estimated using ngs2dSFS
+``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfiles spectrum1.txt spectrum2.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1`` # using marginal spectra as priors, estimated using optimSFS
+``ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1`` # here we don't provide prior files, so we directly provide posterior probabilities (ANGSD+sfstools), and therefore we do not correct for non-independence;
 
 Parameters:
 
@@ -57,11 +57,11 @@ Parameters:
 
 -block_size: to be memory efficient, set this number as the number of sites you want to analyze at each chunk
 
--nsums: how many terms for the correction of the expectation of the ratio; set to 1
-
 -firstbase: in case you want to analyze a subset of your sites this is the lower limit
 
 -isfold: boolean, is your data folded or not?
+
+-islog: boolean, are postfiles in -log (from -realSFS 1 only, required if 2D-SFS is given)? If you use sfstools then -islog 1
 
 ### ngsCovar
 
