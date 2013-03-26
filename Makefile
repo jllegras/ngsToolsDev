@@ -17,7 +17,7 @@ ngsSim: ngsSim.cpp rbeta.cpp
 	  $(CC) ngsSim.cpp -o bin/ngsSim $(CFLAGS)
 
 ngsFST: ngsFST.cpp
-	  $(CC) ngsFST.cpp -o bin/ngsFST -lgsl -lgslcblas $(CFLAGS)
+	  $(CC) ngsFST.cpp -o bin/ngsFST $(CFLAGS)
 
 GetSubSfs: GetSubSfs.cpp
 	     $(CC) GetSubSfs.cpp -o bin/GetSubSfs
