@@ -2,7 +2,7 @@
 CC=g++
 CFLAGS=-lm -lz -O3 -Wall -g
 
-all: mkdir ngsCovar ngsSim ngs2dSFS ngsFST GetSubSfs GetSubSim GetSubGeno GetSwitchedGeno
+all: mkdir ngsCovar ngsSim ngs2dSFS ngsFST GetSubSfs GetSubSim GetSubGeno GetSwitchedGeno GetMergedGeno
 
 mkdir:
 	mkdir -p bin
@@ -31,6 +31,9 @@ GetSubGeno: GetSubGeno.cpp
 GetSwitchedGeno: GetSwitchedGeno.cpp
 	$(CC) GetSwitchedGeno.cpp -o bin/GetSwitchedGeno
 
+GetMergedGeno: GetMergedGeno.cpp
+	$(CC) GetMergedGeno.cpp -o bin/GetMergedGeno
+
 clean:
-	rm -rf *o bin/ngsFST bin/ngsCovar bin/ngsSim bin/ngs2dSFS bin/GetSubSfs bin/GetSubSim bin/GetSubGeno bin/GetSwitchedGeno
+	rm -rf *o bin/ngsFST bin/ngsCovar bin/ngsSim bin/ngs2dSFS bin/GetSubSfs bin/GetSubSim bin/GetSubGeno bin/GetSwitchedGeno bin/GetMergedGeno
 

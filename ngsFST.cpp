@@ -29,7 +29,7 @@ int main (int argc, char *argv[]) {
 
   /// DECLARE AND INITIALIZE VARIABLES
   
-  char *sfsfile1=NULL; // posterior probabilities
+  char *sfsfile1=NULL; // posterior probabilities or sample allele frequency likelihoods
   char *sfsfile2=NULL;
   char *priorfile1=NULL; // marginal priors
   char *priorfile2=NULL;
@@ -90,10 +90,14 @@ int main (int argc, char *argv[]) {
     info();
     return 0;
   }
-  if (priorfile12!=NULL & islog==0) {
-    fprintf(stderr, "\nIf you provide a 2D-SFS as a prior then -postfiles should be in log (from -realSFS 1, not sfstools).\n");
+  if ((priorfile12!=NULL) & (islog==0)) {
+    fprintf(stderr, "\nIf you provide a 2D-SFS as a prior then -postfiles should be in log froamt (from -realSFS 1, not from sfstools).\n");
     info();
     return 0;
+  }
+
+  if ((priorfile12==NULL) & (priorfile1==NULL)) {
+    fprintf(stderr, "\nYou are not providing any prior information. Have you already run sfstools?\n");
   }
 
   /// OUTPUT
@@ -109,14 +113,14 @@ int main (int argc, char *argv[]) {
   array<double> prior1;
   array<double> prior2;
   if (priorfile1 != NULL) {
-    if (verbose==1) fprintf(stderr, "\nAdding priors...");
+    if (verbose==1) fprintf(stderr, "\nReading priors...");
     prior1 = readArray(priorfile1, nind1, isfold);
     prior2 = readArray(priorfile2, nind2, isfold);
   }
   // 2D-SFS
   matrix<double> prior12;
   if ((priorfile12==NULL)==0) {
-    if (verbose==1) fprintf(stderr, "\nAdding 2D prior...");
+    if (verbose==1) fprintf(stderr, "\nReading 2D prior...");
     prior12 = readPrior12(priorfile12, nind1*2+1, nind2*2+1); // same dimensions even if it is folded
     if (verbose==2) {
       fprintf(stderr, "\nPrior 2d:\n");
@@ -146,17 +150,36 @@ int main (int argc, char *argv[]) {
     post1 = readFileSub(sfsfile1, nind1, start.data[n], end.data[n], isfold);
     post2 = readFileSub(sfsfile2, nind2, start.data[n], end.data[n], isfold);
 
+   // print first post probs
+    if (verbose==1) {
+      fprintf(stderr, "initial post probs 1: %f %f %f\n", post1.data[0][0], post1.data[0][1], post1.data[0][nind1]);
+      fprintf(stderr, "initial post probs 2: %f %f %f\n", post2.data[0][0], post2.data[0][1], post2.data[0][nind2]);
+    }
+
     // NORM FROM LOG if necessary
-    if ( (priorfile12!=NULL) | (islog) ) {
+    if (islog) {
       // if from -realSFS 1 they are -log
       normSFS(post1, 1); // 2nd argument is islog
       normSFS(post2, 1);
     }
 
-    // ADD PRIOR
+   if (verbose==1) {
+      fprintf(stderr, "mid post probs 1: %f %f %f\n", post1.data[0][0], post1.data[0][1], post1.data[0][nind1]);
+      fprintf(stderr, "mid post probs 2: %f %f %f\n", post2.data[0][0], post2.data[0][1], post2.data[0][nind2]);
+    }
+
+    // ADD PRIOR is marginal priors
     if (priorfile1!=NULL) {
       addPrior(post1, prior1);
       addPrior(post2, prior2);
+      normSFS(post1, 0); // 2nd argument is islog
+      normSFS(post2, 0);
+    }
+
+    // print first post probs
+    if (verbose==1) {
+      fprintf(stderr, "final post probs 1: %f %f %f\n", post1.data[0][0], post1.data[0][1], post1.data[0][nind1]);
+      fprintf(stderr, "final post probs 2: %f %f %f\n", post2.data[0][0], post2.data[0][1], post2.data[0][nind2]);
     }
 
     // CALCULATE FST
@@ -169,7 +192,13 @@ int main (int argc, char *argv[]) {
       }
     } else {
       if (verbose==1) fprintf(stderr,"Using 2D-SFS as prior.\n");
-      computeVarRey12New(post1, post2, verbose, outpost, nsums, prior12);
+      if (isfold) {
+        computeVarRey12Fold(post1, post2, verbose, outpost, nsums, prior12);
+      } else {
+        computeVarRey12(post1, post2, verbose, outpost, nsums, prior12);
+      }
+
+
     }
 
     cleanup(post1);

@@ -16,7 +16,7 @@
 int main (int argc, char *argv[]) {
   
   if (argc==1) {
-    printf("\n// this is to estimate 2D-SFS from geno post probabilities (from sfstools) // input: -postfiles, -outfile, -relative, -nind, -nsites, -block_size, -offset\n");
+    printf("\n// this is to estimate 2D-SFS from max like (realSFS 1, like in original paper, then set -islog 1) or geno post probabilities (from sfstools, then leave -islog 0) // input: -postfiles, -outfile, -relative, -nind, -nsites, -block_size, -offset, -maxlike\n");
     return 0;    
   }
 
@@ -36,6 +36,7 @@ int main (int argc, char *argv[]) {
   int firstbase = 0;
   int relative = 1;
   int maxlike=1;
+  int islog=0;
   int folded=0; // is data folded?
 
   // READ AND ASSIGN INPUT PARAMETERS
@@ -59,6 +60,7 @@ int main (int argc, char *argv[]) {
     else if(strcmp(argv[argPos],"-maxlike")==0) maxlike = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-relative")==0) relative = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-folded")==0) folded = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-islog")==0) islog = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);
       return 0;
@@ -142,10 +144,15 @@ int main (int argc, char *argv[]) {
   // for each block
   for (int n=0; n<nwin; n++) {
       
-    fprintf(stderr, "win %d out of %d from %d to %d", n, (nwin-1), start.data[n], end.data[n]);
+    fprintf(stderr, "win %d out of %d from %d to %d\n", n, (nwin-1), start.data[n], end.data[n]);
     post1 = readFileSub(sfsfile1, nind1, start.data[n], end.data[n], folded);
     post2 = readFileSub(sfsfile2, nind2, start.data[n], end.data[n], folded);
   
+    if (islog) {
+      normSFS(post1, islog);
+      normSFS(post2, islog);
+    }
+
     // COMPUTE SFS
     sumSpectrum(spec, post1, post2, maxlike);
 

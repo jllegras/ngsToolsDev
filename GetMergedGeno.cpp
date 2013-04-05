@@ -1,6 +1,6 @@
 
-// in input it receives a file .txt lines / sites to be kept (1 based)
-// in output it generates a new .geno file (binary) with only the sites retained
+// in input it receives 2 .geno files
+// in output it generates a new merged .geno file (binary)
 
 #include <cstdio>
 #include <cstdlib>
@@ -73,26 +73,6 @@ FILE *getFILE(const char*fname,const char* mode) {
   return fp;
 }
 
-array<int> readArray(const char *fname, int len) {
-  FILE *fp = getFILE(fname,"r");
-  size_t filesize =fsize(fname);
-  if(filesize==0){
-    fprintf(stderr,"file:%s looks empty\n",fname);
-    exit(0);
-  }
-  array<int> ret;
-  int *tmp = new int[len];
-  char *buf = new char[filesize];
-  fread(buf,sizeof(char),filesize,fp);
-  tmp[0] = atoi(strtok(buf,"\t \n"));
-  for(int i=1;i<(len);i++)
-    tmp[i] = atoi(strtok(NULL,"\t \n"));
-  fclose(fp);
-  ret.x = len;
-  ret.data = tmp;
-  return ret;
-}
-
 // read a file into a matrix
 matrix<double> readFile(char *fname, int nInd, int nSites) {
 
@@ -124,28 +104,26 @@ matrix<double> readFile(char *fname, int nInd, int nSites) {
 
 int main (int argc, char *argv[]) {
 
-  char *infile=NULL;
-  char *posfile=NULL; 
+  char *infile1=NULL;
+  char *infile2=NULL;
 
   char *outfile;
   char *foufile=NULL;
 
-  char *genoquality=NULL;
-
-  int argPos = 1, nind = 0, nsites = 0, increment=0, verbose=0, len=0;
+  int argPos = 1, nind = 0, nind1=0, nind2=0, nsites = 0, increment=0, verbose=0, len=0;
 
   while (argPos<argc) {
     increment = 0;
-    if(strcmp(argv[argPos],"-infile")==0)
-      infile = argv[argPos+1];
-    else if(strcmp(argv[argPos],"-posfile")==0)
-      posfile = argv[argPos+1];
-    else if(strcmp(argv[argPos],"-nind")==0)
-      nind = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-nsites")==0)
+    if(strcmp(argv[argPos],"-infiles")==0) {
+      infile1 = argv[argPos+1];
+      infile2 = argv[argPos+2];
+      increment = 1;
+    } else if(strcmp(argv[argPos],"-nind")==0) {
+      nind1 = atoi(argv[argPos+1]);
+      nind2 = atoi(argv[argPos+2]);
+      increment = 1;
+    } else if(strcmp(argv[argPos],"-nsites")==0)
       nsites = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-len")==0)
-      len = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-outfile")==0)
       outfile = argv[argPos+1];
     else if(strcmp(argv[argPos],"-verbose")==0)
@@ -157,25 +135,26 @@ int main (int argc, char *argv[]) {
     argPos = argPos + 2 + increment;
   } 
 
-  matrix<double> geno;
-  geno = readFile(infile, nind, nsites);
-  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f %f\n", geno.x, geno.y, geno.data[0][0], geno.data[0][1], geno.data[0][2]);
+  nind=nind1+nind2;
 
-  // posfile is a file newline-separated with numbers of lines/sites to keep
-  array<int> pos;
-  pos = readArray(posfile, len);
-  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d\n", pos.x, pos.data[0], pos.data[1]);
+  matrix<double> geno1;
+  geno1 = readFile(infile1, nind1, nsites);
+  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f %f\n", geno1.x, geno1.y, geno1.data[0][0], geno1.data[0][1], geno1.data[0][2]);
+
+  matrix<double> geno2;
+  geno2 = readFile(infile2, nind2, nsites);
+  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f %f\n", geno2.x, geno2.y, geno2.data[0][0], geno2.data[0][1], geno2.data[0][2]);
 
   // initialize
-  int new_nrow=len*nind; 
+  int new_nrow=nsites*nind; 
   matrix<double> new_geno;
   double **cdata = new double*[new_nrow];
   for(int i=0;i<new_nrow;i++){
-    double *ctmp = new double[geno.y];
+    double *ctmp = new double[geno1.y];
     cdata[i]= ctmp;
   }
   new_geno.x=new_nrow;
-  new_geno.y=geno.y;
+  new_geno.y=geno1.y;
   new_geno.data = cdata;
   for (int i=0; i<new_geno.x; i++) {
     for (int j=0; j<new_geno.y; j++) {
@@ -184,18 +163,33 @@ int main (int argc, char *argv[]) {
   }
   if (verbose) fprintf(stderr, "Dim output %d , %d; example %f %f %f\n", new_geno.x, new_geno.y, new_geno.data[0][0], new_geno.data[0][1], new_geno.data[0][2]);
 
-  // fill
-  // pos is 1 based
-  int row=0;
-  for (int s=0; s<pos.x; s++) {
-    row=pos.data[s];
-    for (int i=((row-1)*nind); i<(((row-1)*nind)+(nind)); i++) {
-      for (int j=0; j<geno.y; j++) {
-        new_geno.data[s][j]=geno.data[i][j];
+  // merge
+  int conta=0;
+
+  for (int s=0; s<nsites; s++) {
+
+    for (int i=(s*nind1); i<((s*nind1)+(nind1)); i++) {
+      for (int j=0; j<geno1.y; j++) {
+        new_geno.data[conta][j]=geno1.data[i][j];
       }
+      conta++;
     }
+
+    for (int i=(s*nind2); i<((s*nind2)+(nind2)); i++) {
+      for (int j=0; j<geno2.y; j++) {
+        new_geno.data[conta][j]=geno2.data[i][j];
+      }
+      conta++;
+    }
+
   }
+
   if (verbose) fprintf(stderr, "Dim output %d , %d; example %f %f %f\n", new_geno.x, new_geno.y, new_geno.data[0][0], new_geno.data[0][1], new_geno.data[0][2]);
+
+  if ( conta != (new_geno.x)) {
+    fprintf(stderr, "Possible error, the counts and the new geno are not the same %d %d\n", conta, new_geno.x);
+    exit(-1);
+  }
 
   FILE *fp = fopen(outfile,"wb");
 
