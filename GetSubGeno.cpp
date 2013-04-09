@@ -166,46 +166,15 @@ int main (int argc, char *argv[]) {
   pos = readArray(posfile, len);
   if (verbose) fprintf(stderr, "Dim pos %d; example %d %d\n", pos.x, pos.data[0], pos.data[1]);
 
-  // initialize
-  int new_nrow=len*nind; 
-  matrix<double> new_geno;
-  double **cdata = new double*[new_nrow];
-  for(int i=0;i<new_nrow;i++){
-    double *ctmp = new double[geno.y];
-    cdata[i]= ctmp;
-  }
-  new_geno.x=new_nrow;
-  new_geno.y=geno.y;
-  new_geno.data = cdata;
-  for (int i=0; i<new_geno.x; i++) {
-    for (int j=0; j<new_geno.y; j++) {
-      new_geno.data[i][j]=0.0;
-    }
-  }
-  if (verbose) fprintf(stderr, "Dim output %d , %d; example %f %f %f\n", new_geno.x, new_geno.y, new_geno.data[0][0], new_geno.data[0][1], new_geno.data[0][2]);
-
-  // fill
+  // print
   // pos is 1 based
-  int row=0;
-  for (int s=0; s<pos.x; s++) {
-    row=pos.data[s];
-    for (int i=((row-1)*nind); i<(((row-1)*nind)+(nind)); i++) {
-      for (int j=0; j<geno.y; j++) {
-        new_geno.data[s][j]=geno.data[i][j];
-      }
-    }
-  }
-  if (verbose) fprintf(stderr, "Dim output %d , %d; example %f %f %f\n", new_geno.x, new_geno.y, new_geno.data[0][0], new_geno.data[0][1], new_geno.data[0][2]);
-
   FILE *fp = fopen(outfile,"wb");
 
-  for (int i=0; i<new_geno.x; i++)
-    fwrite(new_geno.data[i], sizeof(double), new_geno.y, fp);
+  for (int s=0; s<pos.x; s++) {
+    int row = pos.data[s]-1;
+    for (int i=row*nind; i<(row+1)*nind; i++)
+      fwrite(geno.data[i], sizeof(double), geno.y, fp);
+  }
 
   fclose(fp);
-  //fclose(infile);
-  //fclose(posfile);
-
 } // main
-
-
