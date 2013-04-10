@@ -176,11 +176,11 @@ int main (int argc, char *argv[]) {
 
   matrix<double> sfs;
   sfs = readFileSub(infile, nind, 0, nsites, isfold);
-  fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
+  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
 
   array<int> pos;
   pos = readArray(posfile, len);
-  fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
+  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
 
   matrix<double> new_sfs;
   double **cdata = new double*[pos.x];
@@ -197,11 +197,11 @@ int main (int argc, char *argv[]) {
       new_sfs.data[i][j]=0.0;
     }
   }
-  fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
+  if(verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   for (int i=0; i<new_sfs.x; i++) {
+      fprintf(stderr, "%d %d \n", i, pos.data[i]);
       for (int j=0; j<new_sfs.y; j++) {
-        //fprintf(stderr, "%d %d\n", i, j);
         new_sfs.data[i][j]=sfs.data[pos.data[i]][j];
       }
   }
