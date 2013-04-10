@@ -145,7 +145,7 @@ int main (int argc, char *argv[]) {
   char *outfile;
   char *foufile=NULL;
 
-  int argPos = 1, nind = 0, nsites = 0, isfold=0, increment=0, debug=0, len=0;
+  int argPos = 1, nind = 0, nsites = 0, isfold=0, increment=0, verbose=0, len=0;
 
   while (argPos<argc) {
     increment = 0;
@@ -164,7 +164,7 @@ int main (int argc, char *argv[]) {
     else if(strcmp(argv[argPos],"-isfold")==0) // whether the .sfs. is folded or not 
       isfold = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-verbose")==0)
-      debug = atoi(argv[argPos+1]);
+      verbose = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);
       return 0;
