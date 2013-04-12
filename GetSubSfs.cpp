@@ -180,7 +180,7 @@ int main (int argc, char *argv[]) {
 
   array<int> pos;
   pos = readArray(posfile, len);
-  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
+  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[pos.x-1]);
 
   matrix<double> new_sfs;
   double **cdata = new double*[pos.x];
@@ -200,9 +200,10 @@ int main (int argc, char *argv[]) {
   if(verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   for (int i=0; i<new_sfs.x; i++) {
-      // fprintf(stderr, "%d %d \n", i, pos.data[i]);
+      if (verbose==2 & i>2094330) fprintf(stderr, "%d %d %d \n", i, pos.data[i], new_sfs.x);
       for (int j=0; j<new_sfs.y; j++) {
-        new_sfs.data[i][j]=sfs.data[pos.data[i]][j];
+        //fprintf(stderr, "%d %f\t", j, sfs.data[pos.data[i]][j]);
+        new_sfs.data[i][j]=sfs.data[(pos.data[i]-1)][j]; // -1 because it is 1-based to 0-based
       }
   }
 
