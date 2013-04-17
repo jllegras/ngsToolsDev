@@ -1,4 +1,7 @@
 
+// in input it receives a file .txt with lines \  sites to be switched major/minor or anc/der
+// in output it generates a new .sfs file (binary) with swicthed sites
+
 #include <cstdio>
 #include <cstdlib>
 #include <sys/stat.h>
@@ -83,14 +86,13 @@ array<int> readArray(const char *fname, int len) {
   fread(buf,sizeof(char),filesize,fp);
   tmp[0] = atoi(strtok(buf,"\t \n"));
   for(int i=1;i<(len);i++)
-    tmp[i] = (atoi(strtok(NULL,"\t \n")));
+    tmp[i] = (atoi(strtok(NULL,"\t \n"))-1); // from 1 to 0 based
   fclose(fp);
   ret.x = len;
   ret.data = tmp;
   return ret;
 }
 
-// read a file into a matrix but only for a specific subsets of positions (0-based notation)
 matrix<double> readFileSub(char *fname, int nInd, int start, int end, int isfold) {
   FILE *fp = getFILE(fname,"r");
   size_t filesize =fsize(fname);
@@ -137,10 +139,11 @@ matrix<double> readFileSub(char *fname, int nInd, int start, int end, int isfold
   return ret;
 }
 
+
 int main (int argc, char *argv[]) {
 
   char *infile=NULL;
-  char *posfile=NULL; 
+  char *posfile=NULL;
 
   char *outfile;
   char *foufile=NULL;
@@ -170,9 +173,7 @@ int main (int argc, char *argv[]) {
       return 0;
     }
     argPos = argPos + 2 + increment;
-  } 
-
-  //outfile = getFILE(foutest, "wb");
+  }
 
   matrix<double> sfs;
   sfs = readFileSub(infile, nind, 0, nsites, isfold);
@@ -180,7 +181,7 @@ int main (int argc, char *argv[]) {
 
   array<int> pos;
   pos = readArray(posfile, len);
-  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[pos.x-1]);
+  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
 
   matrix<double> new_sfs;
   double **cdata = new double*[pos.x];
@@ -194,16 +195,17 @@ int main (int argc, char *argv[]) {
   fprintf(stderr, "Dim output %d , %d", new_sfs.x, new_sfs.y);
   for (int i=0; i<new_sfs.x; i++) {
     for (int j=0; j<new_sfs.y; j++) {
-      new_sfs.data[i][j]=0.0;
+      new_sfs.data[i][j]=sfs.data[i][j];
     }
   }
-  if(verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
+  if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
-  for (int i=0; i<new_sfs.x; i++) {
+  for (int s=0; s<pos.x; s++) {
+    for (int i=0; i<new_sfs.x; i++) {
       for (int j=0; j<new_sfs.y; j++) {
-        //fprintf(stderr, "%d %f\t", j, sfs.data[pos.data[i]][j]);
-        new_sfs.data[i][j]=sfs.data[(pos.data[i]-1)][j]; // -1 because it is 1-based to 0-based
+        new_sfs.data[pos.data[s]][j]=sfs.data[pos.data[s]][new_sfs.y-j-1];
       }
+    }
   }
 
   if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
@@ -214,8 +216,6 @@ int main (int argc, char *argv[]) {
     fwrite(new_sfs.data[i], sizeof(double), new_sfs.y, fp);
 
   fclose(fp);
-  //fclose(infile);
-  //fclose(posfile);
 
 } // main
 
