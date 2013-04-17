@@ -125,7 +125,8 @@ Parameters:
 
 -mfreq: minimum population frequency
 
--F: FST value(s) in case of 2/3 populations, inbreeding coefficient in case of 1 population
+-F: inbreeding coefficient if 1 population; can also be a file with individual coefficients per line
+    FST value(s) in case of 2/3 populations
 
 -model: set to for 0=fixed errate or 1=variable errate
 

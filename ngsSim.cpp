@@ -87,7 +87,7 @@ gzFile getGz(const char*fname,const char* mode){
 }
 
 FILE *getFile(const char*fname,const char *mode){
-  if(fexists(fname)){
+  if(strncmp(mode,"r",1) && fexists(fname)){
     fprintf(stderr,"\t-> File exists: %s exiting... Terminate\n",fname);
     exit(0);
   }
@@ -348,7 +348,7 @@ void info() {
   fprintf(stderr,"\t\t-depth\tMean sequencing depth [5]\n");
   fprintf(stderr,"\t\t-pvar\tProbability that a site is variable in the population [0.015]\n");
   fprintf(stderr,"\t\t-mfreq\tMinimum population frequency [0.0005]\n");
-  fprintf(stderr,"\t\t-F\tFST value of 1st and 2nd split [0.4 0.1]; in case of 1 pop this is the inbreeding [0]\n");
+  fprintf(stderr,"\t\t-F\tFST value of 1st and 2nd split [0.4 0.1] OR inbreeding value/file in case of 1 pop [0]\n");
   fprintf(stderr,"\t\t-model\t0=fixed errate 1=variable errate [1]\n");
   fprintf(stderr,"\t\t-simpleRand\tboolean [1]\n");
   fprintf(stderr,"\t\t-seed\trandom number [0]\n");
@@ -373,6 +373,7 @@ int main(int argc, char *argv[]) { // read input parameters
   static int genotype[2], genotype1[2], genotype2[2], genotype3[2]; // array /matrix of genotypes for all pops
   double pfreq=0.0, pfreq1=0.0, pfreq2=0.0, pfreq3=0.0, pfreqB=0.0, pvar= 0.015, meandepth = 5, errate = 0.0075, F=0.0, F1=0.0, F2=0.0, minfreq=0.0001;
   double basefreq[4] = {0.25, 0.25, 0.25, 0.25}; // background frequencies
+  double* indF; //per individual F
  
   int debug = 0; // change to 1 for debugging
   
@@ -411,7 +412,7 @@ int main(int argc, char *argv[]) { // read input parameters
       increment = increment + npop -1; // argPos will be then 1+1=2 if 2 pops
       if (npop==1) {
 	nind = atoi(argv[argPos+1]);
-	nind1 = nind2 =0;
+	nind1 = nind2 = 0;
       } else if (npop==2) {
 	nind1 = atoi(argv[argPos+1]);
 	nind2 = atoi(argv[argPos+2]);
@@ -429,13 +430,21 @@ int main(int argc, char *argv[]) { // read input parameters
 
     else if(strcmp(argv[argPos],"-F")==0) {
       increment = increment + npop -1; // argPos will be then 1+1=2 if 2 pops
+
       if (npop==1) {
-	F = atof(argv[argPos+1]); // inbreeding
+	char *str;
+	F = strtod(argv[argPos+1], &str); // inbreeding
+	if(strcmp(str,"")!=0)
+	  F=argPos+1;
+	else if(F<0 || F>1) {
+	  printf("error in F (%f); must be [0,1]\n", F); 
+	  exit(-1);
+	}
       } else if (npop==2) {
 	F1 = atof(argv[argPos+1]); // FST
 	F2 = atof(argv[argPos+2]); // FST (redundant)
 	F = 0.0; // no inbreeding"
-     } else if (npop==3) {
+      } else if (npop==3) {
 	F1 = atof(argv[argPos+1]); // this is FST first split
 	F2 = atof(argv[argPos+2]); // FST second split
 	F = 0.0; // no inbreeding"
@@ -449,18 +458,18 @@ int main(int argc, char *argv[]) { // read input parameters
 
     else if(strcmp(argv[argPos],"-errate")==0)   errate  = atof(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-depth")==0) meandepth  = atof(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-pvar")==0)  pvar  = atof(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-mfreq")==0)  minfreq  = atof(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-outfiles")==0) outfiles  = (argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-nsites")==0)  nsites  = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-seed")==0)  seed  = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-pvar")==0)  pvar = atof(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-mfreq")==0)  minfreq = atof(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-outfiles")==0) outfiles = (argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-nsites")==0)  nsites = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-seed")==0)  seed = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-multi_depth")==0) {
       multi_depth_coverage  = atoi(argv[argPos+1]);
       multi_depth_nind  = atoi(argv[argPos+2]);
       increment = increment + 1;
-    }
-    else if(strcmp(argv[argPos],"-model")==0)  model  = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-simpleRand")==0) simpleRand  = atoi(argv[argPos+1]);
+      }
+    else if(strcmp(argv[argPos],"-model")==0)  model = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-simpleRand")==0) simpleRand = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-base_freq")==0) {
      increment = increment + 3;
      basefreq[0] = atof(argv[argPos+1]); basefreq[1] = atof(argv[argPos+2]); basefreq[2] = atof(argv[argPos+3]); basefreq[3] = atof(argv[argPos+4]); 
@@ -479,11 +488,27 @@ int main(int argc, char *argv[]) { // read input parameters
   } // end while all inputs
   
   // check if there is the output file
-   if(outfiles == NULL) {
+  if(outfiles == NULL) {
     fprintf(stderr,"\nMust supply -outfiles. Terminate\n");
     return 0;
   }
-
+  
+  // Initialize indF
+  indF = (double*) malloc(nind*sizeof(double));
+  // Read indF file
+  if(F > 1) {
+    int cnt = 0;
+    char buf[100];
+    FILE* indF_f = getFile(argv[int(F)], "r");
+    while( fgets(buf,100,indF_f) )
+      indF[cnt++] = atof(buf);
+    fclose(indF_f);
+    F = indF[0];
+  } else {
+    for (int i = 0; i < nind; i++)
+      indF[i] = F;
+  }
+  
   // check if multi_depth_nind is higher than nind and if you have multiple populations
   if(multi_depth_nind>nind) {
     fprintf(stderr,"\nmulti_depth individuals must be lower than total number of individuals -npop. Terminate\n");
@@ -500,7 +525,7 @@ int main(int argc, char *argv[]) { // read input parameters
   myConst = -log(minfreq);
   
   // print input arguments
-  fprintf(stderr,"\t->Using args: -npop %d -nind %d -nind1 %d -nind2 %d -nind3 %d -errate %f -depth %f -pvar %f -mfreq %f -nsites %d -F %f -F1 %f -F2 %f -model %d -simpleRand %d -seed %d -base_freq %f %f %f %f \n", npop, nind, nind1, nind2, nind3, errate, meandepth, pvar, minfreq, nsites, F, F1, F2, model, simpleRand, seed, basefreq[0], basefreq[1], basefreq[2], basefreq[3]); 
+  fprintf(stderr,"\t->Using args: -npop %d -nind %d -nind1 %d -nind2 %d -nind3 %d -errate %f -depth %f -pvar %f -mfreq %f -nsites %d -F %f -F1 %f -F2 %f -model %d -simpleRand %d -seed %d -base_freq %f %f %f %f \n", npop, nind, nind1, nind2, nind3, errate, meandepth, pvar, minfreq, nsites, F, F1, F2, model, simpleRand, seed, basefreq[0], basefreq[1], basefreq[2], basefreq[3]);
   
   /// output files
   fArg = append(outfiles,".args");
@@ -683,7 +708,7 @@ int main(int argc, char *argv[]) { // read input parameters
 
       if (var==1) {
 
-	if (uniform(seed)>=F) { //no inbreeding case
+	if (uniform(seed)>=indF[j]) { //no inbreeding case
 	  for (k=0; k<2; k++) {
 	    if (uniform(seed)<=pfreq) 
 	      genotype[k] = b1;
@@ -760,7 +785,7 @@ int main(int argc, char *argv[]) { // read input parameters
       /// 1st pop (same as the whole)
       for (j=0; j<nind1; j++) {
 	if (var==1) {
-	  if (uniform(seed)>F) { // this will alwasy be TRUE now 
+	  if (uniform(seed)>=F) { // this will alwasy be TRUE now 
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq1) 
 		genotype1[k] = b1;
@@ -872,7 +897,7 @@ int main(int argc, char *argv[]) { // read input parameters
       /// 1st pop (same as the whole)
       for (j=0; j<nind1; j++) {
 	if (var==1) {
-	  if (uniform(seed)>F) { // this will alwasy be TRUE now 
+	  if (uniform(seed)>=F) { // this will alwasy be TRUE now 
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq1) 
 		genotype1[k] = b1;
