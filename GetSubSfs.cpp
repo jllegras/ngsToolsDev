@@ -145,7 +145,7 @@ int main (int argc, char *argv[]) {
   char *outfile;
   char *foufile=NULL;
 
-  int argPos = 1, nind = 0, nsites = 0, isfold=0, increment=0, debug=0, len=0;
+  int argPos = 1, nind = 0, nsites = 0, isfold=0, increment=0, verbose=0, len=0;
 
   while (argPos<argc) {
     increment = 0;
@@ -164,7 +164,7 @@ int main (int argc, char *argv[]) {
     else if(strcmp(argv[argPos],"-isfold")==0) // whether the .sfs. is folded or not 
       isfold = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-verbose")==0)
-      debug = atoi(argv[argPos+1]);
+      verbose = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);
       return 0;
@@ -176,11 +176,11 @@ int main (int argc, char *argv[]) {
 
   matrix<double> sfs;
   sfs = readFileSub(infile, nind, 0, nsites, isfold);
-  fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
+  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
 
   array<int> pos;
   pos = readArray(posfile, len);
-  fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
+  if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[pos.x-1]);
 
   matrix<double> new_sfs;
   double **cdata = new double*[pos.x];
@@ -197,12 +197,13 @@ int main (int argc, char *argv[]) {
       new_sfs.data[i][j]=0.0;
     }
   }
-  fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
+  if(verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   for (int i=0; i<new_sfs.x; i++) {
+      if (verbose==2 & i>2094330) fprintf(stderr, "%d %d %d \n", i, pos.data[i], new_sfs.x);
       for (int j=0; j<new_sfs.y; j++) {
-        //fprintf(stderr, "%d %d\n", i, j);
-        new_sfs.data[i][j]=sfs.data[pos.data[i]][j];
+        //fprintf(stderr, "%d %f\t", j, sfs.data[pos.data[i]][j]);
+        new_sfs.data[i][j]=sfs.data[(pos.data[i]-1)][j]; // -1 because it is 1-based to 0-based
       }
   }
 
