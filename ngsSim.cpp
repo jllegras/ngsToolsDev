@@ -434,7 +434,7 @@ int main(int argc, char *argv[]) { // read input parameters
 	char *str;
 	F = strtod(argv[argPos+1], &str); // inbreeding
 	if(strcmp(str,"")!=0)
-	  F=argPos+1;
+	  F=-(argPos+1);
 	else if(F<0 || F>1) {
 	  printf("error in F (%f); must be [0,1]\n", F); 
 	  exit(-1);
@@ -460,7 +460,7 @@ int main(int argc, char *argv[]) { // read input parameters
       char *str;
       meandepth = strtod(argv[argPos+1], &str); // depth
       if(strcmp(str,"")!=0)
-	meandepth=argPos+1;
+	meandepth=-(argPos+1);
       else if(meandepth<0) {
 	printf("error in depth (%f); must be greater than 0\n", F); 
 	exit(-1);
@@ -498,10 +498,10 @@ int main(int argc, char *argv[]) { // read input parameters
   // Inbreeding: initialize indF
   indF = (double*) malloc(nind*sizeof(double));
   // Read indF file
-  if(F > 1) {
+  if(F < 0) {
     int cnt = 0;
     char buf[100];
-    FILE* indF_f = getFile(argv[int(F)], "r");
+    FILE* indF_f = getFile(argv[int(-F)], "r");
     while( fgets(buf,100,indF_f) )
       indF[cnt++] = atof(buf);
     fclose(indF_f);
@@ -515,10 +515,10 @@ int main(int argc, char *argv[]) { // read input parameters
   // Depth: initialize indD
   indD = (double*) malloc(nind*sizeof(double));
   // Read indF file
-  if(meandepth > 1) {
+  if(meandepth < 0) {
     int cnt = 0;
     char buf[100];
-    FILE* indD_f = getFile(argv[int(meandepth)], "r");
+    FILE* indD_f = getFile(argv[int(-meandepth)], "r");
     while( fgets(buf,100,indD_f) )
       indD[cnt++] = atof(buf);
     fclose(indD_f);
