@@ -83,7 +83,7 @@ array<int> readArray(const char *fname, int len) {
   fread(buf,sizeof(char),filesize,fp);
   tmp[0] = atoi(strtok(buf,"\t \n"));
   for(int i=1;i<(len);i++)
-    tmp[i] = (atoi(strtok(NULL,"\t \n"))-1); // from 1 based to 0 based
+    tmp[i] = (atoi(strtok(NULL,"\t \n")));
   fclose(fp);
   ret.x = len;
   ret.data = tmp;
@@ -200,14 +200,13 @@ int main (int argc, char *argv[]) {
   if(verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   for (int i=0; i<new_sfs.x; i++) {
-      if (verbose==2 & i>2094330) fprintf(stderr, "%d %d %d \n", i, pos.data[i], new_sfs.x);
       for (int j=0; j<new_sfs.y; j++) {
         //fprintf(stderr, "%d %f\t", j, sfs.data[pos.data[i]][j]);
         new_sfs.data[i][j]=sfs.data[(pos.data[i]-1)][j]; // -1 because it is 1-based to 0-based
       }
   }
 
-  fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
+  if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   FILE *fp = fopen(outfile,"wb");
 
