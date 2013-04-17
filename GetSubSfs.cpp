@@ -83,7 +83,7 @@ array<int> readArray(const char *fname, int len) {
   fread(buf,sizeof(char),filesize,fp);
   tmp[0] = atoi(strtok(buf,"\t \n"));
   for(int i=1;i<(len);i++)
-    tmp[i] = atoi(strtok(NULL,"\t \n"));
+    tmp[i] = (atoi(strtok(NULL,"\t \n"))-1); // from 1 based to 0 based
   fclose(fp);
   ret.x = len;
   ret.data = tmp;

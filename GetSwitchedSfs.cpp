@@ -1,6 +1,6 @@
 
-// in input it receives a file .txt lines / sites to be kept (1 based)
-// in output it generates a new .geno file (binary) with only the sites retained
+// in input it receives a file .txt with lines \  sites to be switched major/minor or anc/der
+// in output it generates a new .sfs file (binary) with swicthed sites
 
 #include <cstdio>
 #include <cstdlib>
@@ -86,53 +86,69 @@ array<int> readArray(const char *fname, int len) {
   fread(buf,sizeof(char),filesize,fp);
   tmp[0] = atoi(strtok(buf,"\t \n"));
   for(int i=1;i<(len);i++)
-    tmp[i] = atoi(strtok(NULL,"\t \n"));
+    tmp[i] = (atoi(strtok(NULL,"\t \n"))-1); // from 1 to 0 based
   fclose(fp);
   ret.x = len;
   ret.data = tmp;
   return ret;
 }
 
-// read a file into a matrix
-matrix<double> readFile(char *fname, int nInd, int nSites) {
-
-  FILE *fp = getFILE(fname,"rb");
+matrix<double> readFileSub(char *fname, int nInd, int start, int end, int isfold) {
+  FILE *fp = getFILE(fname,"r");
   size_t filesize =fsize(fname);
-
-  if((filesize %(sizeof(double)*nInd*3*nSites)) ) {
+  if (isfold==0) {
+    if((filesize %(sizeof(double)*(2*nInd+1)) )) {
       fprintf(stderr,"\n\t-> Possible error,binaryfiles might be broken\n");
       exit(-1);
+    }
+  } else {
+    if((filesize %(sizeof(double)*(nInd+1)) )) {
+      fprintf(stderr,"\n\t-> Possible error,binaryfiles might be broken\n");
+      exit(-1);
+    }
   }
-
-  double **data = new double*[nSites*nInd];
-  fseek(fp, 0, SEEK_SET);
-  
-  for(int i=0; i<(nSites*nInd); i++) {
-    double *tmp = new double[3];
-    fread(tmp,sizeof(double),3,fp);
-    data[i]= tmp;
+  int nsites = end-start;
+  double **data = new double*[nsites];
+  if (isfold) {
+          fseek(fp, sizeof(double)*(nInd+1)*start, SEEK_SET);
+  } else {
+          fseek(fp, sizeof(double)*(2*nInd+1)*start, SEEK_SET);
   }
-
+  if (isfold) {
+    for(int i=0; i<nsites; i++) {
+      double *tmp = new double[nInd+1];
+      fread(tmp,sizeof(double),nInd+1,fp);
+      data[i]= tmp;
+    }
+  } else {
+    for(int i=0; i<nsites; i++) {
+      double *tmp = new double[2*nInd+1];
+      fread(tmp,sizeof(double),2*nInd+1,fp);
+      data[i]= tmp;
+    }
+  }
   fclose(fp);
   matrix<double> ret;
-  ret.x = nSites*nInd;
-  ret.y = 3;
+  ret.x = nsites;
+  if (isfold) {
+    ret.y = nInd+1;
+  } else {
+    ret.y = 2*nInd+1;
+  }
   ret.data = data;
   return ret;
-
 }
+
 
 int main (int argc, char *argv[]) {
 
   char *infile=NULL;
-  char *posfile=NULL; 
+  char *posfile=NULL;
 
   char *outfile;
   char *foufile=NULL;
 
-  char *genoquality=NULL;
-
-  int argPos = 1, nind = 0, nsites = 0, increment=0, verbose=0, len=0;
+  int argPos = 1, nind = 0, nsites = 0, isfold=0, increment=0, verbose=0, len=0;
 
   while (argPos<argc) {
     increment = 0;
@@ -148,6 +164,8 @@ int main (int argc, char *argv[]) {
       len = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-outfile")==0)
       outfile = argv[argPos+1];
+    else if(strcmp(argv[argPos],"-isfold")==0) // whether the .sfs. is folded or not 
+      isfold = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-verbose")==0)
       verbose = atoi(argv[argPos+1]);
     else {
@@ -155,58 +173,49 @@ int main (int argc, char *argv[]) {
       return 0;
     }
     argPos = argPos + 2 + increment;
-  } 
+  }
 
-  matrix<double> geno;
-  geno = readFile(infile, nind, nsites);
-  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f\n", geno.x, geno.y, geno.data[0][0], geno.data[1][1]);
+  matrix<double> sfs;
+  sfs = readFileSub(infile, nind, 0, nsites, isfold);
+  if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
 
-  // posfile is a file newline-separated with numbers of lines/sites to keep
   array<int> pos;
   pos = readArray(posfile, len);
   if (verbose) fprintf(stderr, "Dim pos %d; example %d %d \n", pos.x, pos.data[0], pos.data[1]);
 
-  // initialize
-  int new_nrow=len*nind; 
-  matrix<double> new_geno;
-  double **cdata = new double*[new_nrow];
-  for(int i=0;i<new_nrow;i++){
-    double *ctmp = new double[geno.y];
+  matrix<double> new_sfs;
+  double **cdata = new double*[pos.x];
+  for(int i=0;i<pos.x;i++){
+    double *ctmp = new double[sfs.y];
     cdata[i]= ctmp;
   }
-  new_geno.x=new_nrow;
-  new_geno.y=geno.y;
-  new_geno.data = cdata;
-  if (verbose) fprintf(stderr, "Dim output %d , %d", new_geno.x, new_geno.y);
-  for (int i=0; i<new_geno.x; i++) {
-    for (int j=0; j<new_geno.y; j++) {
-      new_geno.data[i][j]=0.0;
+  new_sfs.x=pos.x;
+  new_sfs.y=sfs.y;
+  new_sfs.data = cdata;
+  fprintf(stderr, "Dim output %d , %d", new_sfs.x, new_sfs.y);
+  for (int i=0; i<new_sfs.x; i++) {
+    for (int j=0; j<new_sfs.y; j++) {
+      new_sfs.data[i][j]=sfs.data[i][j];
     }
   }
-  if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_geno.x, new_geno.y, new_geno.data[0][0], new_geno.data[1][1]);
+  if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
-  // fill
-  // pos is 1 based
-  int row=0;
   for (int s=0; s<pos.x; s++) {
-    row=pos.data[s];
-    for (int i=((row-1)*nind); i<(((row-1)*nind)+(nind-1)); i++) {
-      for (int j=0; j<geno.y; j++) {
-        new_geno.data[s][j]=geno.data[pos.data[i]][j];
+    for (int i=0; i<new_sfs.x; i++) {
+      for (int j=0; j<new_sfs.y; j++) {
+        new_sfs.data[pos.data[s]][j]=sfs.data[pos.data[s]][new_sfs.y-j-1];
       }
     }
   }
-  
-  if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_geno.x, new_geno.y, new_geno.data[0][0], new_geno.data[1][1]);
+
+  if (verbose) fprintf(stderr, "\nDim output %d , %d; example %f %f;", new_sfs.x, new_sfs.y, new_sfs.data[0][0], new_sfs.data[1][1]);
 
   FILE *fp = fopen(outfile,"wb");
 
-  for (int i=0; i<new_geno.x; i++)
-    fwrite(new_geno.data[i], sizeof(double), new_geno.y, fp);
+  for (int i=0; i<new_sfs.x; i++)
+    fwrite(new_sfs.data[i], sizeof(double), new_sfs.y, fp);
 
   fclose(fp);
-  //fclose(infile);
-  //fclose(posfile);
 
 } // main
 
