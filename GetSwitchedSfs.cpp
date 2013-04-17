@@ -175,6 +175,11 @@ int main (int argc, char *argv[]) {
     argPos = argPos + 2 + increment;
   }
 
+  if (isfold) {
+    fprintf(stderr, "You cannot use this program with a folded spectrum. Terminate\n");
+    exit(-1);
+  }
+
   matrix<double> sfs;
   sfs = readFileSub(infile, nind, 0, nsites, isfold);
   if (verbose) fprintf(stderr, "Dim input %d , %d; example %f %f\n", sfs.x, sfs.y, sfs.data[0][0], sfs.data[1][1]);
