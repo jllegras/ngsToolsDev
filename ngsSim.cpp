@@ -215,7 +215,7 @@ int print_ind_site(double errate, double meandepth, int genotype[2], gzFile resu
   for (int j=0; j<4; j++)
     ireads[j]=0;
   
-  numreads = Poisson(meandepth);  // mumber of reads, poisson distributed with lambda=meandepth
+  numreads = Poisson(meandepth); // mumber of reads, poisson distributed with lambda=meandepth
   char res[numreads]; // char alleles for all the reads
 
   for (i=0; i<10; i++) like[i] = 0.0; // initialize GL values for all 10 possible genotypes
@@ -272,7 +272,7 @@ int print_ind_site2(double errate, double meandepth, int genotype[2], gzFile res
   int ireads[4]; // sum of 0 1 2 3 reads for each individual
   for (int j=0; j<4; j++)
     ireads[j]=0;
-  numreads = Poisson(meandepth);  // mumber of reads, poisson distributed with lambda=meandepth
+  numreads = Poisson(meandepth); // mumber of reads, poisson distributed with lambda=meandepth
   char res[numreads]; // char alleles for all the reads
   for (i=0; i<10; i++) like[i] = 0.0; // initialize GL values for all 10 possible genotypes
   // compute like
@@ -286,7 +286,7 @@ int print_ind_site2(double errate, double meandepth, int genotype[2], gzFile res
   }
   fprintf(fname, "%d\t%d\t%d\t%d\n", ireads[0], ireads[1], ireads[2], ireads[3]);
   fprintf(fname2, "%d\t%d\t%d\t%d\n", ireads[0], ireads[1], ireads[2], ireads[3]);
-  // write into files  
+  // write into files
   if(dumpBinary) { // if binary
    if (first==1) {
      char sep[1]={'\n'};
@@ -345,7 +345,7 @@ void info() {
   fprintf(stderr,"\t\t-nind\tNumber of diploid individuals for each population [10]\n");
   fprintf(stderr,"\t\t-nsites\tNumber of sites [500000]\n");
   fprintf(stderr,"\t\t-errate\tThe sequencing error rate [0.0075]\n");
-  fprintf(stderr,"\t\t-depth\tMean sequencing depth [5]\n");
+  fprintf(stderr,"\t\t-depth\tMean sequencing depth OR file with individual depths per line [5]\n");
   fprintf(stderr,"\t\t-pvar\tProbability that a site is variable in the population [0.015]\n");
   fprintf(stderr,"\t\t-mfreq\tMinimum population frequency [0.0005]\n");
   fprintf(stderr,"\t\t-F\tFST value of 1st and 2nd split [0.4 0.1] OR inbreeding value/file in case of 1 pop [0]\n");
@@ -353,7 +353,6 @@ void info() {
   fprintf(stderr,"\t\t-simpleRand\tboolean [1]\n");
   fprintf(stderr,"\t\t-seed\trandom number [0]\n");
   fprintf(stderr,"\t\t-base_freq\tBackground allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]\n");
-  fprintf(stderr,"\t\t-multi_depth\tSimulate uneven covered individuals. -multi_depth 6 10: first 10 individuals have 6X while the rest is as -depth.[0 0]\n");
 }
 
 ///		///
@@ -369,11 +368,11 @@ int main(int argc, char *argv[]) { // read input parameters
 
   /// define and initialize the variables (with default values)
   
-  int i=0, j=0, k=0, b1=0, b2=0, var=0, nsites = 500000, nind = 10, npop=1, model=1, nind1=0, nind2=0, nind3=0, increment=0, seed=0, multi_depth_coverage=0, multi_depth_nind=0;
+  int i=0, j=0, k=0, b1=0, b2=0, var=0, nsites = 500000, nind = 10, npop=1, model=1, nind1=0, nind2=0, nind3=0, increment=0, seed=0;
   static int genotype[2], genotype1[2], genotype2[2], genotype3[2]; // array /matrix of genotypes for all pops
   double pfreq=0.0, pfreq1=0.0, pfreq2=0.0, pfreq3=0.0, pfreqB=0.0, pvar= 0.015, meandepth = 5, errate = 0.0075, F=0.0, F1=0.0, F2=0.0, minfreq=0.0001;
   double basefreq[4] = {0.25, 0.25, 0.25, 0.25}; // background frequencies
-  double* indF; //per individual F
+  double *indD, *indF; //per individual D e F
  
   int debug = 0; // change to 1 for debugging
   
@@ -456,18 +455,22 @@ int main(int argc, char *argv[]) { // read input parameters
     // argPos+1 because you count the -flag too (argPos is 1!)
     // argPos+1+npop-1 == argPos+npop; es. 2 pops, increment is 3 for the next inpute read 
 
-    else if(strcmp(argv[argPos],"-errate")==0)   errate  = atof(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-depth")==0) meandepth  = atof(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-errate")==0)   errate = atof(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-depth")==0) {
+      char *str;
+      meandepth = strtod(argv[argPos+1], &str); // depth
+      if(strcmp(str,"")!=0)
+	meandepth=argPos+1;
+      else if(meandepth<0) {
+	printf("error in depth (%f); must be greater than 0\n", F); 
+	exit(-1);
+      }
+    }
     else if(strcmp(argv[argPos],"-pvar")==0)  pvar = atof(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-mfreq")==0)  minfreq = atof(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-outfiles")==0) outfiles = (argv[argPos+1]);
     else if(strcmp(argv[argPos],"-nsites")==0)  nsites = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-seed")==0)  seed = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-multi_depth")==0) {
-      multi_depth_coverage  = atoi(argv[argPos+1]);
-      multi_depth_nind  = atoi(argv[argPos+2]);
-      increment = increment + 1;
-      }
     else if(strcmp(argv[argPos],"-model")==0)  model = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-simpleRand")==0) simpleRand = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-base_freq")==0) {
@@ -476,11 +479,10 @@ int main(int argc, char *argv[]) { // read input parameters
     }
 
     else { // input is not a valid one 
-     
+      
       printf("\tUnknown arguments: %s\n",argv[argPos]);
       info();
       return 0; // terminate
-      
     }
     
     argPos = argPos + 2 + increment; // increment next value (+2 because un count the input flags too)
@@ -493,7 +495,7 @@ int main(int argc, char *argv[]) { // read input parameters
     return 0;
   }
   
-  // Initialize indF
+  // Inbreeding: initialize indF
   indF = (double*) malloc(nind*sizeof(double));
   // Read indF file
   if(F > 1) {
@@ -508,19 +510,25 @@ int main(int argc, char *argv[]) { // read input parameters
     for (int i = 0; i < nind; i++)
       indF[i] = F;
   }
+
+
+  // Depth: initialize indD
+  indD = (double*) malloc(nind*sizeof(double));
+  // Read indF file
+  if(meandepth > 1) {
+    int cnt = 0;
+    char buf[100];
+    FILE* indD_f = getFile(argv[int(meandepth)], "r");
+    while( fgets(buf,100,indD_f) )
+      indD[cnt++] = atof(buf);
+    fclose(indD_f);
+    meandepth = indD[0];
+  } else {
+    for (int i = 0; i < nind; i++)
+      indD[i] = meandepth;
+  }
   
-  // check if multi_depth_nind is higher than nind and if you have multiple populations
-  if(multi_depth_nind>nind) {
-    fprintf(stderr,"\nmulti_depth individuals must be lower than total number of individuals -npop. Terminate\n");
-    return 0;
-  }
-  if(multi_depth_nind>0 && npop>1) {
-    fprintf(stderr,"\nmulti_depth supported only if simulating 1 population. Terminate\n");
-    return 0;
-  }
-
-
-
+  
   // to adjust the exponential function according to the lowest allele frequency detectable
   myConst = -log(minfreq);
   
@@ -575,7 +583,7 @@ int main(int argc, char *argv[]) { // read input parameters
     genofile2 =getFile(fGeno2, "w");
 
     // joint-SFS
-    fFreq12 = append(outfiles,"12.frq");    
+    fFreq12 = append(outfiles,"12.frq");
     freqfile12 = getFile(fFreq12, "w"); 
   
   }
@@ -630,7 +638,7 @@ int main(int argc, char *argv[]) { // read input parameters
   
 
   // write args file
-  fprintf(argfile,"\t->Using args: -npop %d -nind %d -nind1 %d -nind2 %d -errate %f -depth %f -pvar %f -mfreq %f -nsites %d -F %f -F1 %f -F2 %f -model %d -simpleRand %d -seed %d -base_freq %f %f %f %f -multi_depth %d %d\n", npop, nind, nind1, nind2, errate, meandepth, pvar, minfreq, nsites, F, F1, F2, model, simpleRand, seed, basefreq[0], basefreq[1], basefreq[2], basefreq[3], multi_depth_coverage, multi_depth_nind); 
+  fprintf(argfile,"\t->Using args: -npop %d -nind %d -nind1 %d -nind2 %d -errate %f -depth %f -pvar %f -mfreq %f -nsites %d -F %f -F1 %f -F2 %f -model %d -simpleRand %d -seed %d -base_freq %f %f %f %f\n", npop, nind, nind1, nind2, errate, meandepth, pvar, minfreq, nsites, F, F1, F2, model, simpleRand, seed, basefreq[0], basefreq[1], basefreq[2], basefreq[3]);
 
   /// COMPUTE
   
@@ -712,7 +720,8 @@ int main(int argc, char *argv[]) { // read input parameters
 	  for (k=0; k<2; k++) {
 	    if (uniform(seed)<=pfreq) 
 	      genotype[k] = b1;
-	    else genotype[k] = b2; 
+	    else
+	      genotype[k] = b2;
 	  }
 	} else { //inbreeding case
 	  if (uniform(seed)<=pfreq) {
@@ -733,23 +742,15 @@ int main(int argc, char *argv[]) { // read input parameters
       // write genotypes in the output file (append it)
       int has_reads =0;
       // compute and print likelihoods
-      if (debug) fprintf(stderr,"\nStart writing reads for whole sample; indiv %d", j);      
+      if (debug) fprintf(stderr,"\nStart writing reads for whole sample; indiv %d", j);
       if (model==0) {
-        if (multi_depth_coverage>0 && j<multi_depth_nind) {
-          has_reads=print_ind_site(errate, multi_depth_coverage, genotype, resultfile, glffile, ireadsfile);
-        } else {        
-	  has_reads=print_ind_site(errate, meandepth, genotype, resultfile, glffile, ireadsfile);
-        }
+	has_reads=print_ind_site(errate, indD[j], genotype, resultfile, glffile, ireadsfile);
       } else {
-        if (multi_depth_coverage>0 && j<multi_depth_nind) {
-          has_reads=print_ind_site(2*errate*uniform(seed), multi_depth_coverage, genotype, resultfile, glffile, ireadsfile);
-        } else {
-	has_reads=print_ind_site(2*errate*uniform(seed), meandepth, genotype, resultfile, glffile, ireadsfile);
-        }
+	has_reads=print_ind_site(2*errate*uniform(seed), indD[j], genotype, resultfile, glffile, ireadsfile);
       }
-      fprintf(genofile,"%d %d\t",genotype[0],genotype[1]);      
+      fprintf(genofile,"%d %d\t",genotype[0],genotype[1]);
       
-      if (debug) fprintf(stderr,"\nEnd writing reads for whole sample");      
+      if (debug) fprintf(stderr,"\nEnd writing reads for whole sample");
       
       // now write binary files
       if (j<nind-1) {
@@ -771,7 +772,7 @@ int main(int argc, char *argv[]) { // read input parameters
     
     if (npop==2) {
 
-      if (debug) fprintf(stderr,"\n\n START 2 POPS");      
+      if (debug) fprintf(stderr,"\n\n START 2 POPS");
       
       // then assign subpop freq based on time-split? theory of pop genet
   
@@ -789,10 +790,11 @@ int main(int argc, char *argv[]) { // read input parameters
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq1) 
 		genotype1[k] = b1;
-	    else genotype1[k] = b2; 
+	      else
+		genotype1[k] = b2;
 	  }
 	} else {
-	  if (uniform(seed)<=pfreq1	) {
+	  if (uniform(seed)<=pfreq1) {
 	    genotype1[0] = b1;
 	    genotype1[1] = b1;
 	  } else {
@@ -803,83 +805,84 @@ int main(int argc, char *argv[]) { // read input parameters
 	basecheck1[genotype1[0]]++; basecheck1[genotype1[1]]++;
 	basecheck[genotype1[0]]++; basecheck[genotype1[1]]++;
 	}
-      fprintf(genofile1,"%d %d\t",genotype1[0],genotype1[1]);     
-      // write also into whole genotype file
-      fprintf(genofile,"%d %d\t",genotype1[0],genotype1[1]);
-      int has_reads1 =0, has_reads=0;
-      if (debug) fprintf(stderr,"\nStart writing reads for 1 sample");      
-      if (model==0) {
-	has_reads1=has_reads=print_ind_site2(errate, meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
-      } else {
-        has_reads1=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
-      }
-      if (debug) fprintf(stderr,"\nEnd writing reads for 1 sample");      
-      if (j<nind1-1) {
-	if(dumpBinary) {
-	  char sep[1]={'\t'};
-	  gzwrite(resultfile1, sep, 1);
-	  gzwrite(resultfile, sep, 1); // write also into whole genotype file
+	fprintf(genofile1,"%d %d\t",genotype1[0],genotype1[1]);
+	// write also into whole genotype file
+	fprintf(genofile,"%d %d\t",genotype1[0],genotype1[1]);
+	int has_reads1 =0, has_reads=0;
+	if (debug) fprintf(stderr,"\nStart writing reads for 1 sample");
+	if (model==0) {
+	  has_reads1=has_reads=print_ind_site2(errate, meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
 	} else {
-	  fprintf(stderr,"non binary output disabled\n");
-	  exit(0);
+	  has_reads1=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
 	}
-      }
+	if (debug) fprintf(stderr,"\nEnd writing reads for 1 sample");
+	if (j<nind1-1) {
+	  if(dumpBinary) {
+	    char sep[1]={'\t'};
+	    gzwrite(resultfile1, sep, 1);
+	    gzwrite(resultfile, sep, 1); // write also into whole genotype file
+	  } else {
+	    fprintf(stderr,"non binary output disabled\n");
+	    exit(0);
+	  }
+	}
       }
 
       /// 2nd pop (same as above)
       for (j=0; j<nind2; j++) {
 	if (var==1) {
-	  if (uniform(seed)>F) { // this will always be TRUE now
+	  if (uniform(seed)>=F) { // this will always be TRUE now
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq2) 
 		genotype2[k] = b1;
-	    else genotype2[k] = b2; 
-	  }
-	} else {
-	  if (uniform(seed)<=pfreq2	) {
-	    genotype2[0] = b1;
-	    genotype2[1] = b1;
+	      else
+		genotype2[k] = b2; 
+	    }
 	  } else {
-	    genotype2[0] = b2; 
-	    genotype2[1] = b2;
-	  }
-	}	
-	basecheck2[genotype2[0]]++; basecheck2[genotype2[1]]++;
-	basecheck[genotype2[0]]++; basecheck[genotype2[1]]++;
-      }
-
-      fprintf(genofile2,"%d %d\t",genotype2[0],genotype2[1]);      
-      fprintf(genofile,"%d %d\t",genotype2[0],genotype2[1]);      
-      int has_reads2 =0, has_reads=0;
-      if (debug) fprintf(stderr,"\nStart writing reads for 2 sample");      
-      if (model==0) {
-	has_reads2=has_reads=print_ind_site2(errate, meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
-      } else {
-	has_reads2=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
-      }
-      if (debug) fprintf(stderr,"\nEnd writing reads for 2 sample");    
-
-      if (j<nind2-1) {
-	if(dumpBinary) {
-	  char sep[1]={'\t'};
-	  gzwrite(resultfile2, sep, 1);
-	  gzwrite(resultfile, sep, 1);
+	    if (uniform(seed)<=pfreq2) {
+	      genotype2[0] = b1;
+	      genotype2[1] = b1;
+	    } else {
+	      genotype2[0] = b2; 
+	      genotype2[1] = b2;
+	    }
+	  }	
+	  basecheck2[genotype2[0]]++; basecheck2[genotype2[1]]++;
+	  basecheck[genotype2[0]]++; basecheck[genotype2[1]]++;
+	}
+	
+	fprintf(genofile2,"%d %d\t",genotype2[0],genotype2[1]);
+	fprintf(genofile,"%d %d\t",genotype2[0],genotype2[1]);
+	int has_reads2 =0, has_reads=0;
+	if (debug) fprintf(stderr,"\nStart writing reads for 2 sample");
+	if (model==0) {
+	  has_reads2=has_reads=print_ind_site2(errate, meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
 	} else {
-	  fprintf(stderr,"non binary output disabled\n");
-	  exit(0);
-
+	  has_reads2=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
+	}
+	if (debug) fprintf(stderr,"\nEnd writing reads for 2 sample");
+	
+	if (j<nind2-1) {
+	  if(dumpBinary) {
+	    char sep[1]={'\t'};
+	    gzwrite(resultfile2, sep, 1);
+	    gzwrite(resultfile, sep, 1);
+	  } else {
+	    fprintf(stderr,"non binary output disabled\n");
+	    exit(0);
+	    
+	  }
 	}
       }
-    }
-    
+      
     } // end if multi populations npop==2
-
+    
 
     // 3 POPULATIONS
 
     if (npop==3) {
 
-      if (debug) fprintf(stderr,"\n\n START 3 POPS");      
+      if (debug) fprintf(stderr,"\n\n START 3 POPS");
       
 
       // use now balding-nichols and write one set of files for each population
@@ -901,137 +904,139 @@ int main(int argc, char *argv[]) { // read input parameters
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq1) 
 		genotype1[k] = b1;
-	    else genotype1[k] = b2; 
-	  }
-	} else {
-	  if (uniform(seed)<=pfreq1	) {
-	    genotype1[0] = b1;
-	    genotype1[1] = b1;
+	      else
+		genotype1[k] = b2;
+	    }
 	  } else {
-	    genotype1[0] = b2; 
-	    genotype1[1] = b2;
-	  }
-	}	
-	basecheck1[genotype1[0]]++; basecheck1[genotype1[1]]++;
-	basecheck[genotype1[0]]++; basecheck[genotype1[1]]++;
+	    if (uniform(seed)<=pfreq1) {
+	      genotype1[0] = b1;
+	      genotype1[1] = b1;
+	    } else {
+	      genotype1[0] = b2; 
+	      genotype1[1] = b2;
+	    }
+	  }	
+	  basecheck1[genotype1[0]]++; basecheck1[genotype1[1]]++;
+	  basecheck[genotype1[0]]++; basecheck[genotype1[1]]++;
 	}
-      fprintf(genofile1,"%d %d\t",genotype1[0],genotype1[1]);     
-      // write also into whole genotype file
-      fprintf(genofile,"%d %d\t",genotype1[0],genotype1[1]);
-      int has_reads1 =0, has_reads=0;
-      if (debug) fprintf(stderr,"\nStart writing reads for 1 sample");      
-      if (model==0) {
-	has_reads1=has_reads=print_ind_site2(errate, meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
-      } else {
-        has_reads1=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
-      }
-      if (debug) fprintf(stderr,"\nEnd writing reads for 1 sample");      
-      if (j<nind1-1) {
-	if(dumpBinary) {
-	  char sep[1]={'\t'};
-	  gzwrite(resultfile1, sep, 1);
-	  gzwrite(resultfile, sep, 1); // write also into whole genotype file
+	fprintf(genofile1,"%d %d\t",genotype1[0],genotype1[1]);
+	// write also into whole genotype file
+	fprintf(genofile,"%d %d\t",genotype1[0],genotype1[1]);
+	int has_reads1 =0, has_reads=0;
+	if (debug) fprintf(stderr,"\nStart writing reads for 1 sample");
+	if (model==0) {
+	  has_reads1=has_reads=print_ind_site2(errate, meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
 	} else {
-	  fprintf(stderr,"non binary output disabled\n");
-	  exit(0);
+	  has_reads1=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype1, resultfile, glffile, ireadsfile, resultfile1, glffile1, ireadsfile1, 0);
+	}
+	if (debug) fprintf(stderr,"\nEnd writing reads for 1 sample");
+	if (j<nind1-1) {
+	  if(dumpBinary) {
+	    char sep[1]={'\t'};
+	    gzwrite(resultfile1, sep, 1);
+	    gzwrite(resultfile, sep, 1); // write also into whole genotype file
+	  } else {
+	    fprintf(stderr,"non binary output disabled\n");
+	    exit(0);
+	  }
 	}
       }
-      }
-
+      
       /// 2nd pop (same as above)
       for (j=0; j<nind2; j++) {
 	if (var==1) {
-	  if (uniform(seed)>F) { // this will always be TRUE now
+	  if (uniform(seed)>=F) { // this will always be TRUE now
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq2) 
 		genotype2[k] = b1;
-	    else genotype2[k] = b2; 
-	  }
-	} else {
-	  if (uniform(seed)<=pfreq2	) {
-	    genotype2[0] = b1;
-	    genotype2[1] = b1;
+	      else
+		genotype2[k] = b2; 
+	    }
 	  } else {
-	    genotype2[0] = b2; 
-	    genotype2[1] = b2;
-	  }
-	}	
-	basecheck2[genotype2[0]]++; basecheck2[genotype2[1]]++;
-	basecheck[genotype2[0]]++; basecheck[genotype2[1]]++;
-      }
-
-      fprintf(genofile2,"%d %d\t",genotype2[0],genotype2[1]);      
-      fprintf(genofile,"%d %d\t",genotype2[0],genotype2[1]);      
-      int has_reads2 =0, has_reads=0;
-      if (debug) fprintf(stderr,"\nStart writing reads for 2 sample");      
-      if (model==0) {
-	has_reads2=has_reads=print_ind_site2(errate, meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
-      } else {
-	has_reads2=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
-      }
-      if (debug) fprintf(stderr,"\nEnd writing reads for 2 sample");    
-
-      if (j<nind2-1) {
-	if(dumpBinary) {
-	  char sep[1]={'\t'};
-	  gzwrite(resultfile2, sep, 1);
-	  gzwrite(resultfile, sep, 1);
+	    if (uniform(seed)<=pfreq2) {
+	      genotype2[0] = b1;
+	      genotype2[1] = b1;
+	    } else {
+	      genotype2[0] = b2; 
+	      genotype2[1] = b2;
+	    }
+	  }	
+	  basecheck2[genotype2[0]]++; basecheck2[genotype2[1]]++;
+	  basecheck[genotype2[0]]++; basecheck[genotype2[1]]++;
+	}
+	
+	fprintf(genofile2,"%d %d\t",genotype2[0],genotype2[1]);
+	fprintf(genofile,"%d %d\t",genotype2[0],genotype2[1]);
+	int has_reads2 =0, has_reads=0;
+	if (debug) fprintf(stderr,"\nStart writing reads for 2 sample");
+	if (model==0) {
+	  has_reads2=has_reads=print_ind_site2(errate, meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
 	} else {
-	  fprintf(stderr,"non binary output disabled\n");
-	  exit(0);
-
+	  has_reads2=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype2, resultfile, glffile, ireadsfile, resultfile2, glffile2, ireadsfile2, (j+1));
+	}
+	if (debug) fprintf(stderr,"\nEnd writing reads for 2 sample");
+	
+	if (j<nind2-1) {
+	  if(dumpBinary) {
+	    char sep[1]={'\t'};
+	    gzwrite(resultfile2, sep, 1);
+	    gzwrite(resultfile, sep, 1);
+	  } else {
+	    fprintf(stderr,"non binary output disabled\n");
+	    exit(0);
+	    
+	  }
 	}
       }
-    }
-    
-    /// 3rd pop (same as above), exactly as pop 2 but use genotype3, files3...
-
-     for (j=0; j<nind3; j++) {
+      
+      /// 3rd pop (same as above), exactly as pop 2 but use genotype3, files3...
+      
+      for (j=0; j<nind3; j++) {
 	if (var==1) {
-	  if (uniform(seed)>F) { // this will always be TRUE now
+	  if (uniform(seed)>=F) { // this will always be TRUE now
 	    for (k=0; k<2; k++) {
 	      if (uniform(seed)<=pfreq3) 
 		genotype3[k] = b1;
-	    else genotype3[k] = b2; 
-	  }
-	} else {
-	  if (uniform(seed)<=pfreq3) {
-	    genotype3[0] = b1;
-	    genotype3[1] = b1;
+	      else
+		genotype3[k] = b2; 
+	    }
 	  } else {
-	    genotype3[0] = b2; 
-	    genotype3[1] = b2;
-	  }
-	}	
-	basecheck3[genotype3[0]]++; basecheck3[genotype3[1]]++;
-	basecheck[genotype3[0]]++; basecheck[genotype3[1]]++;
-      }
-
-      fprintf(genofile3,"%d %d\t",genotype3[0],genotype3[1]);      
-      fprintf(genofile,"%d %d\t",genotype3[0],genotype3[1]);
-      
-      int has_reads3 =0, has_reads=0;
-      if (debug) fprintf(stderr,"\nStart writing reads for 2 sample");      
-      if (model==0) {
-	has_reads3=has_reads=print_ind_site2(errate, meandepth, genotype3, resultfile, glffile, ireadsfile, resultfile3, glffile3, ireadsfile3, (j+1));
-      } else {
-	has_reads3=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype3, resultfile, glffile, ireadsfile, resultfile3, glffile3, ireadsfile3, (j+1));
-      }
-      if (debug) fprintf(stderr,"\nEnd writing reads for 2 sample");    
-
-      if (j<nind3-1) {
-	if(dumpBinary) {
-	  char sep[1]={'\t'};
-	  gzwrite(resultfile3, sep, 1);
-	  gzwrite(resultfile, sep, 1);
+	    if (uniform(seed)<=pfreq3) {
+	      genotype3[0] = b1;
+	      genotype3[1] = b1;
+	    } else {
+	      genotype3[0] = b2; 
+	      genotype3[1] = b2;
+	    }
+	  }	
+	  basecheck3[genotype3[0]]++; basecheck3[genotype3[1]]++;
+	  basecheck[genotype3[0]]++; basecheck[genotype3[1]]++;
+	}
+	
+	fprintf(genofile3,"%d %d\t",genotype3[0],genotype3[1]);
+	fprintf(genofile,"%d %d\t",genotype3[0],genotype3[1]);
+	
+	int has_reads3 =0, has_reads=0;
+	if (debug) fprintf(stderr,"\nStart writing reads for 3 sample");
+	if (model==0) {
+	  has_reads3=has_reads=print_ind_site2(errate, meandepth, genotype3, resultfile, glffile, ireadsfile, resultfile3, glffile3, ireadsfile3, (j+1));
 	} else {
-	  fprintf(stderr,"non binary output disabled\n");
-	  exit(0);
-
+	  has_reads3=has_reads=print_ind_site2(2*errate*uniform(seed), meandepth, genotype3, resultfile, glffile, ireadsfile, resultfile3, glffile3, ireadsfile3, (j+1));
+	}
+	if (debug) fprintf(stderr,"\nEnd writing reads for 3 sample");
+	
+	if (j<nind3-1) {
+	  if(dumpBinary) {
+	    char sep[1]={'\t'};
+	    gzwrite(resultfile3, sep, 1);
+	    gzwrite(resultfile, sep, 1);
+	  } else {
+	    fprintf(stderr,"non binary output disabled\n");
+	    exit(0);
+	  }
 	}
       }
-    }
-
+      
     } // end if multi populations npop==3
 
     // EOL

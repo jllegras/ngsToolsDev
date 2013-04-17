@@ -119,7 +119,7 @@ Parameters:
 
 -errate: sequencing error rate
 
--depth: mean sequencing depth
+-depth: mean sequencing depth; can also be a file with individual depths per line
 
 -pvar: probability to each site is variable in the population
 
