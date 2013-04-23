@@ -333,6 +333,7 @@ void computeVarRey(matrix<double> &m1, matrix<double> &m2, int verbose, FILE *fn
     } // end for in i
     A.data=dataA;
     AB.data=dataAB;
+    if (EA<0.0) EA=0.0; // protect against -0.000 cases
     // SECOND CYCLE: get VAR and COVAR, and then the correcting FACTor, according to number of sums to retain
     VAR = 0.0, COVAR = 0.0, FACT = 0.0;
     if ((verbose==4) & (s==0)) fprintf(stderr, "\t second cycle %d", nsums);
@@ -401,6 +402,7 @@ void computeVarReyFold(matrix<double> &m1, matrix<double> &m2, int verbose, FILE
     } // end for in i
     A.data=dataA;
     AB.data=dataAB;
+    if (EA<0.0) EA=0.0; // protect against -0.000 cases
     // SECOND CYCLE: get VAR and COVAR, and then the correcting FACTor, according to number of sums to retain
     VAR = 0.0, COVAR = 0.0, FACT = 0.0;
     if ((verbose==4) & (s==0)) fprintf(stderr, "\t second cycle %d", nsums);
@@ -559,6 +561,7 @@ void computeVarRey12(matrix<double> &m1, matrix<double> &m2, int verbose, FILE *
     A.data=dataA;
     AB.data=dataAB;
 
+    if (EA<0.0) EA=0.0; // protect against -0.000 cases
     // SECOND CYCLE: get VAR and COVAR, and then the correcting FACTor, according to number of sums to retain
     VAR = 0.0, COVAR = 0.0, FACT = 0.0;
 
@@ -696,6 +699,8 @@ void computeVarRey12Fold(matrix<double> &m1, matrix<double> &m2, int verbose, FI
 
     A.data=dataA;
     AB.data=dataAB;
+
+    if (EA<0.0) EA=0.0; // protect against -0.000 cases
 
     // SECOND CYCLE: get VAR and COVAR, and then the correcting FACTor, according to number of sums to retain
     VAR = 0.0, COVAR = 0.0, FACT = 0.0;
