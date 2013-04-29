@@ -330,6 +330,12 @@ double simfreqBN(double F, double p_anc) {
   return rbeta( ((1-F)/F)*p_anc, ((1-F)/F)*(1-p_anc)) ;
 }
 
+// simulate sfs for ancesteral population with exp^2
+double simfreqExpansion() {
+  double tmp=exp(uniform()*myConst-myConst);
+  return tmp*tmp;
+}
+
 // to append names
 char *append(const char* a,const char *b){
   char *c =(char *) malloc((strlen(a)+strlen(b)+1)*sizeof(char));
@@ -351,6 +357,7 @@ void info() {
   fprintf(stderr,"\t\t-F\tFST value of 1st and 2nd split [0.4 0.1] OR inbreeding value/file in case of 1 pop [0]\n");
   fprintf(stderr,"\t\t-model\t0=fixed errate 1=variable errate [1]\n");
   fprintf(stderr,"\t\t-simpleRand\tboolean [1]\n");
+  fprintf(stderr,"\t\t-expansion\tboolean [o]\n");
   fprintf(stderr,"\t\t-seed\trandom number [0]\n");
   fprintf(stderr,"\t\t-base_freq\tBackground allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]\n");
 }
@@ -368,7 +375,7 @@ int main(int argc, char *argv[]) { // read input parameters
 
   /// define and initialize the variables (with default values)
   
-  int i=0, j=0, k=0, b1=0, b2=0, var=0, nsites = 500000, nind = 10, npop=1, model=1, nind1=0, nind2=0, nind3=0, increment=0, seed=0;
+  int i=0, j=0, k=0, b1=0, b2=0, var=0, nsites = 5000, nind = 10, npop=1, model=1, nind1=0, nind2=0, nind3=0, increment=0, seed=0, expansion=0;
   static int genotype[2], genotype1[2], genotype2[2], genotype3[2]; // array /matrix of genotypes for all pops
   double pfreq=0.0, pfreq1=0.0, pfreq2=0.0, pfreq3=0.0, pfreqB=0.0, pvar= 0.015, meandepth = 5, errate = 0.0075, F=0.0, F1=0.0, F2=0.0, minfreq=0.0001;
   double basefreq[4] = {0.25, 0.25, 0.25, 0.25}; // background frequencies
@@ -473,6 +480,7 @@ int main(int argc, char *argv[]) { // read input parameters
     else if(strcmp(argv[argPos],"-seed")==0)  seed = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-model")==0)  model = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-simpleRand")==0) simpleRand = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-expansion")==0) expansion = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-base_freq")==0) {
      increment = increment + 3;
      basefreq[0] = atof(argv[argPos+1]); basefreq[1] = atof(argv[argPos+2]); basefreq[2] = atof(argv[argPos+3]); basefreq[3] = atof(argv[argPos+4]); 
@@ -702,7 +710,7 @@ int main(int argc, char *argv[]) { // read input parameters
       // here it is just a check if the site is variable and which alleles to take.
 	
       // simulate population allele frequency (or ancestral if 2/3 subpops)
-      pfreq=simfreq(); // if site is not variable, you don't need to compute pfreq
+      if (expansion==0) { pfreq=simfreq(); } else { pfreq=simfreqExpansion(); } // if site is not variable, you don't need to compute pfreq
       
       fprintf(parfile, "%f\t%f\t%f\t%f\n", pfreq, F, F1, F2);
 
