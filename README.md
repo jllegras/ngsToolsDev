@@ -165,6 +165,21 @@ Parameters:
 
 -relative: boolean, if 1 number are relative frequencies from 0 to 1 which sum up 1; if 0 numbers are absolute counts of sites having a specific joint allele frequency
 
+### ngsStat
+
+Program to compute estimates of the number of segregating sites, the expected average heterozygosity, and the number of fixed differences (if 2 populations data is provided). It receives in input sample allele frequency posterior probabilities (from angsd, sfstools) from 1 or 2 populations. Please parameter -npop should be set as the first one.
+To compute statistics across non-overlapping windows, set the length of each window with -block_size and set -iswin 1, otherwise -block_size will be simply used to increase memory efficiency.
+
+Output is a text file with columns: start, end, segregating sites (pop 1), heterozygoisty (pop 1), segregating sites (pop 2), heterozygosity (pop 2), fixed differences.
+
+Example:
+```/home/mfumagalli/Documents/Software/ngsTools/bin/ngsStat -npop 2 -postfiles pop1.sfs.norm pop2.sfs.norm -nsites 1000 -iswin 1 -nind 10 50 -islog 0 -outfile pops.stat -isfold 0 -verbose 0 -block_size 100```
+```/home/mfumagalli/Documents/Software/ngsTools/bin/ngsStat -npop 1 -postfiles pop1.sfs.norm -nsites 1000 -iswin 1 -nind 10 -islog 0 -outfile pops.stat -isfold 0 -verbose 0 -block_size 100
+```
+```/home/mfumagalli/Documents/Software/ngsTools/bin/ngsStat -npop 1 -postfiles pop1.sfs.norm -nsites 1000 -iswin 0 -nind 10 -islog 0 -outfile pops.stat -isfold 0 -verbose 0
+```
+
+
 ### Misc utilities
 
 getMultiFST.R
