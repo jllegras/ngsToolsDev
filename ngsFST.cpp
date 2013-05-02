@@ -135,9 +135,10 @@ int main (int argc, char *argv[]) {
   array<int> start; array<int> end;
   start=getStart(nsites, firstbase, block_size);
   end=getEnd(nsites, firstbase, block_size);
-  int nwin = start.x;
+  int nwin= (nsites-firstbase+1)/block_size;
+  if ( ( (nsites-firstbase+1) % block_size)!=0) nwin++;
 
-  if (verbose==1) fprintf(stderr, "\n num win %d win0 is %d %d", nwin, start.data[0], end.data[0]);
+  if (verbose==1) fprintf(stderr, "\n num win %d win0 is %d %d\n", nwin, start.data[0], end.data[0]);
 
   /// ITERATE OVER EACH BLOCK
   for (int n=0; n<nwin; n++) {

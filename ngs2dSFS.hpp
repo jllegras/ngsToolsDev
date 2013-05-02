@@ -54,6 +54,62 @@ char *append(const char* a,const char *b){
   return c;
 }
 
+array<int> getStart(int nsites, int firstbase, int block_size) {
+
+  // note that firstbase and nsites are 1-based
+  int len = nsites-firstbase+1;
+
+  int nwin = len/block_size;
+  if ( (len % block_size)!=0) nwin=nwin+1;
+
+  array<int> start;
+  start.x=nwin;
+
+  int *tStart= new int [nwin];
+  for (int i=0; i<nwin; i++) {
+    tStart[i]=(i)*block_size;
+  }
+
+  // if you dont start from beginning
+  if (firstbase>1) {
+    for (int i=0; i<nwin; i++) {
+      tStart[i]=tStart[i]+firstbase-1; // -1 because firstbase is 1-based
+    }
+  }
+  start.data=tStart;
+  return start;
+}
+
+array<int> getEnd(int nsites, int firstbase, int block_size) {
+
+  // note that firstbase and nsites are 1-based
+  int len = nsites-firstbase+1;
+
+  int nwin = len/block_size;
+  if ( (len % block_size)!=0) nwin=nwin+1;
+
+  array<int> end;
+  end.x=nwin;
+
+  int *tEnd= new int [nwin];
+  for (int i=0; i<nwin; i++) {
+    tEnd[i]=(i)*block_size+block_size-1;
+  }
+  tEnd[nwin-1]=nsites-1; // nsites is 1 based
+
+
+  // if you dont start from beginning
+  if (firstbase>0) {
+    for (int i=0; i<nwin; i++) {
+      tEnd[i]=tEnd[i]+firstbase-1;
+    }
+  }
+
+  end.data=tEnd;
+  return end;
+}
+
+
 // a nice wrapper for getting files
 FILE *getFILE(const char*fname,const char* mode) {
   int writeFile = 0;

@@ -108,7 +108,8 @@ int main (int argc, char *argv[]) {
   end=getEnd(nsites, offset, block_size);
   int maxlen=end.data[0]-start.data[0]+1; // len for each win, it will never be greater than this
   double temp_sum=0.0; // check at each iteration not NA, for debug 
-  int nwin = start.x;
+  int nwin= (nsites-offset+1)/block_size;
+  if ( ( (nsites-offset+1) % block_size)!=0) nwin++;
 
   // prepare out
   fprintf(stderr,"\t->Dumping file: %s\n", foutest);

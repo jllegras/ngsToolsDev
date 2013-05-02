@@ -36,7 +36,7 @@ array<int> getStart(int nsites, int firstbase, int block_size) {
   // note that firstbase and nsites are 1-based
   int len = nsites-firstbase+1;
   int nwin = len/block_size;
-  if ( (len % block_size)!=0) nwin=nwin+1;
+  if ( (len % block_size)!=0) { nwin=nwin+1; }
   array<int> start;
   start.x=nwin;
   int *tStart= new int [nwin];
@@ -57,7 +57,7 @@ array<int> getEnd(int nsites, int firstbase, int block_size) {
   // note that firstbase and nsites are 1-based
   int len = nsites-firstbase+1;
   int nwin = len/block_size;
-  if ( (len % block_size)!=0) nwin=nwin+1;
+  if ( (len % block_size)!=0) { nwin=nwin+1; }
   array<int> end;
   end.x=nwin;
   int *tEnd= new int [nwin];
@@ -267,9 +267,13 @@ void computeStats(matrix<double> &post1, int verbose, FILE *outpost, int iswin, 
     start++;
 
     segsites.data[s] = 1.0 - post1.data[s][0];
+
+    if (verbose==2) fprintf(stderr, "\n%f %f", post1.data[s][0], segsites.data[s]);
     if (isfold==0) segsites.data[s] = segsites.data[s] - post1.data[s][post1.y-1];
+    if (verbose==2) fprintf(stderr, " %f %f", post1.data[s][post1.y-1],  segsites.data[s]);
+
     temp=0.0;
-    for (int j=0; j<post1.y; j++) { temp=temp+ 2.0*(j/(nind*2.0))*((nind*2.0-j)/(nind*2.0))*post1.data[s][j]; }
+    for (int j=0; j<post1.y; j++) { temp = temp+ 2.0*(j/(nind*2.0))*((nind*2.0-j)/(nind*2.0))*post1.data[s][j];  }
     hetero.data[s]=temp;
 
     if (iswin==0) fprintf(outpost, "%d\t%d\t%f\t%f\n", start, start, segsites.data[s], hetero.data[s]);

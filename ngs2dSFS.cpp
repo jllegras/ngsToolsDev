@@ -104,39 +104,14 @@ int main (int argc, char *argv[]) {
   /// READ POSTERIOR PROBABILITY FILES
 
   // BLOCKS
-
-  if (block_size>(nsites-firstbase)) block_size=nsites;
-
-  int nwin = ((nsites-firstbase)/block_size);
-  array<int> start, end;
-    
-  if ( ((nsites-firstbase) % block_size)!=0) {
-    start.x=nwin+1; end.x=nwin+1;
-  } else {
-    start.x=nwin, end.x=nwin;
-  }
-  int *tStart= new int [nwin]; 
-  int *tEnd= new int [nwin]; 
-    
-  for (int i=0; i<nwin; i++) {
-    tEnd[i]=(i+1)*block_size-1;
-    tStart[i]=(i)*block_size;
-  }
-  // if there is rest
-  if ( (nsites % block_size)!=0) {
-    tEnd[nwin]=nsites-1;
-    tStart[nwin]=tStart[(nwin-1)]+block_size;
-    nwin=nwin+1;
-  }
-  // if you dont start from beginning
-  if (firstbase>0) {
-    for (int i=0; i<nwin; i++) {
-      tEnd[i]=tEnd[i]+firstbase;
-      tStart[i]=tStart[i]+firstbase;
-    }
-  }
-  start.data=tStart;
-  end.data=tEnd;
+  /// GET POSITIONS OF BLOCKS
+  if (block_size>(nsites-firstbase+1)) block_size=(nsites-firstbase+1);
+  if (block_size==0) block_size=nsites-firstbase+1;
+  array<int> start; array<int> end;
+  start=getStart(nsites, firstbase, block_size);
+  end=getEnd(nsites, firstbase, block_size);
+  int nwin= (nsites-firstbase+1)/block_size;
+  if ( ( (nsites-firstbase+1) % block_size)!=0) nwin++;
 
   matrix<double> post1;
   matrix<double> post2; 
@@ -194,6 +169,9 @@ int main (int argc, char *argv[]) {
   writematrix(spec, outpost);
   cleanup(spec);
   
+  delete [] start.data;
+  delete [] end.data;
+
   // close file
   free(foutpost);
    
