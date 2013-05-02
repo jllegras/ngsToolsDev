@@ -68,7 +68,7 @@ int main (int argc, char *argv[]) {
   }
 
   /// CHECK INPUT
-  if((sfsfile1 == NULL) | (sfsfile2 == NULL) ) {
+  if(sfsfile1 == NULL) {
     fprintf(stderr,"\nMust supply -postfiles.\n");
     info();
      return 0;
@@ -119,7 +119,7 @@ int main (int argc, char *argv[]) {
     if (npop==2) computeStats2Pops(post1, verbose, outpost, iswin, isfold, start.data[n], post2);
 
     cleanup(post1);
-    if (npop==2) cleanup(post2);
+    cleanup(post2);
 
   } // end for n
 
