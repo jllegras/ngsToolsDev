@@ -241,12 +241,19 @@ void computeStats(matrix<double> &post1, int verbose, FILE *outpost, int iswin, 
   // init
   array<double> segsites;
   segsites.x=nsites;
+  double *tmp1 = new double [nsites];
+  for (int i=0; i<nsites; i++) { 
+    tmp1[i]=0.0; 
+  }
+  segsites.data=tmp1;
+
   array<double> hetero;
   hetero.x=nsites;
-  double *tmp= new double [nsites];
-  for (int i=0; i<nsites; i++) tmp[i]=0.0;
-  segsites.data=tmp;
-  hetero.data=tmp;
+  double *tmp2 = new double [nsites];
+  for (int i=0; i<nsites; i++) { 
+    tmp2[i]=0.0; 
+  }
+  hetero.data=tmp2;
 
   double temp=0.0;
 
@@ -260,9 +267,9 @@ void computeStats(matrix<double> &post1, int verbose, FILE *outpost, int iswin, 
     start++;
 
     segsites.data[s] = 1.0 - post1.data[s][0];
-    if (isfold==0) segsites.data[s] = segsites.data[s] - post1.data[s][post1.y];
+    if (isfold==0) segsites.data[s] = segsites.data[s] - post1.data[s][post1.y-1];
     temp=0.0;
-    for (int j=0; j<post1.y; j++) temp=temp+ 2.0*(j/(nind*2.0))*((nind*2.0-j)/(nind*2.0))*post1.data[s][j];
+    for (int j=0; j<post1.y; j++) { temp=temp+ 2.0*(j/(nind*2.0))*((nind*2.0-j)/(nind*2.0))*post1.data[s][j]; }
     hetero.data[s]=temp;
 
     if (iswin==0) fprintf(outpost, "%d\t%d\t%f\t%f\n", start, start, segsites.data[s], hetero.data[s]);
@@ -305,13 +312,21 @@ void computeStats2Pops(matrix<double> &post1, int verbose, FILE *outpost, int is
   hetero2.x=nsites;
   array<double> fixed;
   fixed.x=nsites;
-  double *tmp= new double [nsites];
-  for (int i=0; i<nsites; i++) tmp[i]=0.0;
-  segsites1.data=tmp;
-  hetero1.data=tmp;
-  segsites2.data=tmp;
-  hetero2.data=tmp;
-  fixed.data=tmp;
+  double *tmp1= new double [nsites];
+  for (int i=0; i<nsites; i++) { tmp1[i]=0.0; }
+  segsites1.data=tmp1;
+  double *tmp2= new double [nsites];
+  for (int i=0; i<nsites; i++) { tmp2[i]=0.0; }
+  hetero1.data=tmp2;
+  double *tmp3= new double [nsites];
+  for (int i=0; i<nsites; i++) { tmp3[i]=0.0; }
+  segsites2.data=tmp3;
+  double *tmp4= new double [nsites];
+  for (int i=0; i<nsites; i++) { tmp4[i]=0.0; }
+  hetero2.data=tmp4;
+  double *tmp5= new double [nsites];
+  for (int i=0; i<nsites; i++) { tmp5[i]=0.0; }
+  fixed.data=tmp5;
 
   double temp=0.0;
 
@@ -327,17 +342,17 @@ void computeStats2Pops(matrix<double> &post1, int verbose, FILE *outpost, int is
     start++;
 
     segsites1.data[s]= 1.0 - post1.data[s][0];
-    if (isfold==0) segsites1.data[s]=segsites1.data[s] - post1.data[s][post1.y];
+    if (isfold==0) segsites1.data[s]=segsites1.data[s] - post1.data[s][post1.y-1];
     temp=0.0;
-    for (int j=0; j<post1.y; j++) temp=temp + 2.0*(j/(nind1*2.0))*((nind1*2.0-j)/(nind1*2.0))*post1.data[s][j];
+    for (int j=0; j<post1.y; j++) { temp=temp + 2.0*(j/(nind1*2.0))*((nind1*2.0-j)/(nind1*2.0))*post1.data[s][j]; }
     hetero1.data[s]=temp;
     sum_segsites1=sum_segsites1+segsites1.data[s];
     sum_hetero1=sum_hetero1+hetero1.data[s];
 
     segsites2.data[s]= 1.0 - post2.data[s][0];
-    if (isfold==0) segsites2.data[s]=segsites2.data[s] - post2.data[s][post2.y];
+    if (isfold==0) segsites2.data[s]=segsites2.data[s] - post2.data[s][post2.y-1];
     temp=0.0;
-    for (int j=0; j<post2.y; j++) temp=temp + 2.0*(j/(nind2*2.0))*((nind2*2.0-j)/(nind2*2.0))*post2.data[s][j];
+    for (int j=0; j<post2.y; j++) { temp=temp + 2.0*(j/(nind2*2.0))*((nind2*2.0-j)/(nind2*2.0))*post2.data[s][j]; }
     hetero2.data[s]=temp;
     sum_segsites2=sum_segsites2+segsites2.data[s];
     sum_hetero2=sum_hetero2+hetero2.data[s];
@@ -345,7 +360,7 @@ void computeStats2Pops(matrix<double> &post1, int verbose, FILE *outpost, int is
     if (isfold) {
       fixed.data[s]=-999.9;
     } else {
-      fixed.data[s]=post1.data[s][0]*post2.data[s][post2.y] + post2.data[s][0]*post1.data[s][post1.y];
+      fixed.data[s]=post1.data[s][0]*post2.data[s][post2.y-1] + post2.data[s][0]*post1.data[s][post1.y-1];
     }
 
     if (iswin==0) fprintf(outpost, "%d\t%d\t%f\t%f\t%f\t%f\t%f\n", start, start, segsites1.data[s], hetero1.data[s], segsites2.data[s], hetero2.data[s], fixed.data[s]);

@@ -119,7 +119,7 @@ int main (int argc, char *argv[]) {
     if (npop==2) computeStats2Pops(post1, verbose, outpost, iswin, isfold, start.data[n], post2);
 
     cleanup(post1);
-    cleanup(post2);
+    if (npop==2) cleanup(post2);
 
   } // end for n
 
