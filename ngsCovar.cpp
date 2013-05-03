@@ -29,7 +29,7 @@ int main (int argc, char *argv[]) {
   char *outfiles=NULL;
   char *foutest=NULL;
   
-  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, block_size = 0, call=0, offset=0, maxgeno=0, isfold=0, norm=0;
+  int argPos = 1, increment = 0, nind = 0, nsites = 0, debug = 0, block_size = 0, call=0, offset=1, maxgeno=0, isfold=0, norm=0;
   double esites = 0.0, minmaf = 0.0;
  
   /// READ AND ASSIGN INPUT PARAMETERS

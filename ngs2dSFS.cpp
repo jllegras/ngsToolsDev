@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
   int increment = 0;
   int nind1 = 0, nind2 = 0, nsites = 0;
   int block_size = 10000;
-  int firstbase = 0;
+  int firstbase = 1;
   int relative = 1;
   int maxlike=1;
   int islog=0;

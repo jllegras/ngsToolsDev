@@ -27,7 +27,7 @@ int main (int argc, char *argv[]) {
   char *outfile=NULL;
   char *foutpost=NULL;
 
-  int argPos = 1, increment = 0, npop = 1, nind1 = 0, nind2 = 0, nsites = 0, verbose = 0, block_size = 0, isfold=0, firstbase=0, iswin = 0, islog = 0;
+  int argPos = 1, increment = 0, npop = 1, nind1 = 0, nind2 = 0, nsites = 0, verbose = 0, block_size = 0, isfold=0, firstbase=1, iswin = 0, islog = 0;
 
   // if iswin==1 then block_size is the window size and print the valeus for each window
   // if iswin==0 then block_size is just for efficiency and print values for each site
@@ -93,8 +93,8 @@ int main (int argc, char *argv[]) {
   start=getStart(nsites, firstbase, block_size);
   end=getEnd(nsites, firstbase, block_size);
   int nwin= (nsites-firstbase+1)/block_size;
-  if ( ( (nsites-firstbase+1) % block_size)!=0) nwin++;
-
+  if ( ( (nsites-firstbase+1) % block_size)>0) nwin=nwin+1;
+  if (verbose==1) fprintf(stderr, "\nLen %d and win %d and rest is %d", (nsites-firstbase+1), block_size, ( (nsites-firstbase+1) % block_size));
 
   if (verbose==1) fprintf(stderr, "\nNum of win %d and win[0] is %d %d\n", nwin, start.data[0], end.data[0]);
 
