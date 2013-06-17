@@ -1,8 +1,6 @@
 getMultiFST<-function(filein, fileout, from_known=FALSE, len_win=0) {
 
-	# this script converts the output of ngsFST and compute multiple-site FST and rewrite the file with this new values of FST (to be used as -firstfile) 
-
-	# len_win: length of windows with same FST. In practice it is usual to assign the same FST to multiple site for each window (a subset of your data) by computing the local FST
+	# len_win: length of windows
 
 	i1=1; if (from_known) i1=8;
 
