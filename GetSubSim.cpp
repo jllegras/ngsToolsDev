@@ -80,7 +80,8 @@ int main (int argc, char *argv[]) {
   char *outfile;
   char *foufile=NULL;
 
-  int argPos = 1, nind = 0, nsites = 0, increment=0, debug=0, nind_new = 0, nsites_new = 0, check=0, ncat=10;
+  int argPos = 1, nind = 0, increment=0, debug=0, nind_new = 0, check=0, ncat=10;
+  long int nsites = 0, nsites_new = 0;
 
   while (argPos<argc) {
     increment = 0;
@@ -111,16 +112,16 @@ int main (int argc, char *argv[]) {
 
   FILE *fout = getFILE(outfile, "wb");
 
-  size_t filesize =fsize(infile);
-  if((filesize %(sizeof(double)*(nind*nsites*ncat)) )) {
-    fprintf(stderr,"\n\t-> Possible error, binaryfiles might be broken\n");
+  size_t filesize = fsize(infile);
+  if((filesize % (sizeof(double)*(nind*nsites*ncat)) )) {
+    fprintf(stderr, "\n\t-> Possible error, binaryfiles might be broken. %d %lu\n", nind, nsites);
     exit(-1);
   }
 
   int conta_ind=1; // 1 based
   int conta_site=1; // 1 based
 
-  int ntot=0;
+  long int ntot=0;
 
   for (int i=0; i<(nsites*nind); i++) {
 
@@ -142,7 +143,7 @@ int main (int argc, char *argv[]) {
   fclose(fin);
   fclose(fout);
 
-  fprintf(stderr, "\nExpected %d lines and written %d lines\n", nsites_new*nind_new, ntot);
+  fprintf(stderr, "\nExpected %lu lines and written %lu lines\n", nsites_new*nind_new, ntot);
 
   if (check) {
     FILE *fp = getFILE(outfile, "rb");
