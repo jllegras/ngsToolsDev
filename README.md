@@ -1,4 +1,4 @@
-Set of programs to analyze Next-Generation Sequencing (NGS) data for genetic analysis of multiple populations.
+Programs to analyze Next-Generation Sequencing (NGS) data for population genetics analysis.
 
 ### INSTALL
 
@@ -6,38 +6,40 @@ See INSTALL file on how to link to repository and compile all programs.
 
 ### INPUT FILES
 
-All programs receive as input files produced by software ANGSD (http://popgen.dk/wiki/index.php/ANGSD). In general these files can contain genotype likelihoods, genotype posterior probabilities, sample allele frequency posterior probabilities or an estimate of the Site Frequency Spectrum (SFS).
+All programs receive as input files produced by software ANGSD (http://popgen.dk/angsd). In general, these files can contain genotype likelihoods, genotype posterior probabilities, sample allele frequency posterior probabilities or an estimate of the Site Frequency Spectrum (SFS).
 
-A typical pipeline can be the following. Assuming we have genotype likelihoods data for one pop in 'sim1' format (e.g. generated from nsgSim) for 40 individuals.
-We assume to use ANGSD version 0.505 or higher. Please check ANGSD web site for other accepted genotype likelihood formats.
+A typical pipeline can be the following. Assuming we have genotype likelihoods data for one pop in 'sim1' format (e.g. generated from nsgSim) for 40 individuals. We assume to use ANGSD version 0.539 or higher. Please check ANGSD web site for other accepted genotype likelihood formats.
 
 First we compute genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
-``angsd -sim1 pop.glf.gz -nInd 40 -doGeno 32 -doPost 1 -doMaf 2 -out pops.geno -doMajorMinor 1``
+`angsd -sim1 pop.glf.gz -nInd 40 -doGeno 32 -doPost 1 -doMaf 2 -out pops.geno -doMajorMinor 1`
 
-We then compute sample allele frequency posterior probabilities assuming no prior (.sfs, values will be in log format):
-``angsd -sim1 pop.glf.gz -nInd 40 -realSFS 1 -out pops``
+We then compute sample allele frequency posterior probabilities assuming no prior (.sfs, values will be in log format and files in binary format):
+`angsd -sim1 pop.glf.gz -nInd 40 -realSFS 1 -out pops`
 
 We estimate the overall SFS (.sfs.ml) using an Maximum Likelihood (ML) approach (Nielsen et al. 2012, PLoS One):
-``misc/optimSFS.gcc -binput pops.sfs -nChr 80 -nThreads 10``
+`misc/optimSFS -binput pops.sfs -nChr 80 -nThreads 10`
 
-Finally we compute sample allele frequency posterior probabilities using the estimated SFS as a prior (.sfs.ml.norm, values will not be in log format anymore):
-``misc/sfstools.g++ -sfsFile pops.sfs -nChr 80 -priorFile pops.sfs.ml -dumpBinary 1 > pops.norm``
+Finally we compute sample allele frequency posterior probabilities using the estimated SFS as a prior (.sfs.ml.norm, values won't be in log format anymore but files still in binary):
+`misc/sfstools -sfsFile pops.sfs -nChr 80 -priorFile pops.sfs.ml -dumpBinary 1 > pops.sfs.norm
 
-Please note that if your data is folded you should use option -fold 1 at step -realSFS 1 and the set -nChr equal to -nInd.
+Please note that if your data is folded you should use option `-fold 1` at step `-realSFS 1` and the set `-nChr` equal to `-nInd`.
 
 ### ngsFST
 
-Program to estimate FST from NGS data. It computes expected genetic variance components and estimate FST from those.
-In input it receives posterior probabilities of sample allele frequencies for each population (ANGSD + sfstools). It may receive also a 2D-SFS as a prior and in this case it gets in input posterior probabilities with uniform prior (ANGSD with -realSFS 1 only, do not run sfstools and set -islog 1). You can give also 2 marginal spectra as priors. 
+Program to estimate FST from NGS data. It computes expected genetic variance components and estimate per-site FST from those using methods-of-moments estimator. See Fumagalli et al. Genetics 2013 for more details.
+In input it receives posterior probabilities of sample allele frequencies for each population (.sfs or .sfs.norm files). It may receive also a 2D-SFS as a prior and in this case it gets in input posterior probabilities with uniform prior (ANGSD with -realSFS 1 only, do not run sfstools and set -islog 1). You can give also 2 marginal spectra as priors. 
 
 The output is a tab-separated text file. Each row represents a site. Columns are: EA, EAB, FACT, (EA/EAB)+FACT, pvar; where EA is the expectation of genetic variance between populations, EAB is the expectation of the total genetic variance, FACT is the correcting factor for the ratio of expectations, (EA/EAB)+FACT is the per-site FST value, pvar is the probability for the site of being variable.
 
 Run with no arguments for help. Please note that populations must have the exact same number of sites.
 
 Examples:
-``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum2D.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1`` # using a 2D-SFS as a prior, estimated using ngs2dSFS
-``ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfiles spectrum1.txt spectrum2.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1`` # using marginal spectra as priors, estimated using optimSFS
-``ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1`` # here we don't provide prior files, so we directly provide posterior probabilities (ANGSD+sfstools), and therefore we do not correct for non-independence;
+
+`ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum2D.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1` # using a 2D-SFS as a prior, estimated using ngs2dSFS  
+
+`ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfiles spectrum1.txt spectrum2.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1` # using marginal spectra as priors, estimated using optimSFS  
+
+`ngsTools/bin/ngsFST -postfiles pop1.sfs.ml.norm pop2.sfs.ml.norm -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1` # here we don't provide prior files, so we directly provide posterior probabilities (ANGSD+sfstools), and therefore we do not correct for non-independence;
 
 Parameters:
 

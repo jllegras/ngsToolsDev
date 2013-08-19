@@ -11,4 +11,8 @@ make clean
 
 make
 
+# ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF.
+
+
+
 
