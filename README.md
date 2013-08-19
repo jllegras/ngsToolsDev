@@ -20,7 +20,7 @@ We estimate the overall SFS (.sfs.ml) using an Maximum Likelihood (ML) approach 
 `misc/optimSFS -binput pops.sfs -nChr 80 -nThreads 10`
 
 Finally we compute sample allele frequency posterior probabilities using the estimated SFS as a prior (.sfs.ml.norm, values won't be in log format anymore but files still in binary):
-`misc/sfstools -sfsFile pops.sfs -nChr 80 -priorFile pops.sfs.ml -dumpBinary 1 > pops.sfs.norm
+`misc/sfstools -sfsFile pops.sfs -nChr 80 -priorFile pops.sfs.ml -dumpBinary 1 > pops.sfs.norm`
 
 Please note that if your data is folded you should use option `-fold 1` at step `-realSFS 1` and the set `-nChr` equal to `-nInd`.
 
@@ -35,7 +35,7 @@ Run with no arguments for help. Please note that populations must have the exact
 
 Examples:
 
-`ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum2D.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1` # using a 2D-SFS as a prior, estimated using ngs2dSFS  
+```ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfile spectrum2D.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1 # using a 2D-SFS as a prior, estimated using ngs2dSFS```
 
 `ngsTools/bin/ngsFST -postfiles pop1.sfs pop2.sfs -priorfiles spectrum1.txt spectrum2.txt -nind 20 20 -nsites 100000 -block_size 20000 -outfile pops.fst -islog 1` # using marginal spectra as priors, estimated using optimSFS  
 
