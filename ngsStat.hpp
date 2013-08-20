@@ -366,6 +366,7 @@ void computeStats2Pops(matrix<double> &post1, int verbose, FILE *outpost, int is
     } else {
       fixed.data[s]=post1.data[s][0]*post2.data[s][post2.y-1] + post2.data[s][0]*post1.data[s][post1.y-1];
     }
+    sum_fixed = sum_fixed + fixed.data[s];
 
     if (iswin==0) fprintf(outpost, "%d\t%d\t%f\t%f\t%f\t%f\t%f\n", start, start, segsites1.data[s], hetero1.data[s], segsites2.data[s], hetero2.data[s], fixed.data[s]);
 
