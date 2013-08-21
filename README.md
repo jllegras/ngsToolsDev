@@ -4,11 +4,15 @@ Programs to analyze Next-Generation Sequencing (NGS) data for population genetic
 
 See INSTALL file on how to link to repository and compile all programs.
 
+### EXAMPLE
+
+Several examples on how to use all programs explained below and run analyses are provided in the EXAMPLE folder. A detailed README in also available.
+
 ### INPUT FILES
 
 All programs receive as input files produced by software ANGSD (http://popgen.dk/angsd). In general, these files can contain genotype likelihoods, genotype posterior probabilities, sample allele frequency posterior probabilities or an estimate of the Site Frequency Spectrum (SFS).
 
-A typical pipeline can be the following. Assuming we have genotype likelihoods data for one pop in 'sim1' format (e.g. generated from nsgSim) for 40 individuals. We assume to use ANGSD version 0.539 or higher. Please check ANGSD web site for other accepted genotype likelihood formats.
+A typical pipeline can be the following. We assume to have genotype likelihoods data for one pop in 'sim1' format (e.g. generated from nsgSim) for 40 individuals. BAM/SAM files can also be used as input. We assume to use ANGSD version 0.539 or higher. Please check ANGSD web site for other accepted genotype likelihood formats.
 
 First we compute genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
 `angsd -sim1 pop.glf.gz -nInd 40 -doGeno 32 -doPost 1 -doMaf 2 -out pops.geno -doMajorMinor 1`
