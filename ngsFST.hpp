@@ -512,7 +512,7 @@ void computeVarRey12(matrix<double> &m1, matrix<double> &m2, int verbose, FILE *
       }
     }
 
-    fprintf(stderr, "final2d %f %f %f %f\n", m12.data[0][0], m12.data[0][1], m12.data[1][0], m12.data[1][1]);  
+    //fprintf(stderr, "final2d %f %f %f %f\n", m12.data[0][0], m12.data[0][1], m12.data[1][0], m12.data[1][1]);  
 
     // for each possible value of freq 1 and freq 2 compute the FST, so compute A, AB, VAR, COVAR (see Price paper for its meaning)
     matrix<double> A;
