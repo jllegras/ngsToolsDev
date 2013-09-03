@@ -7,7 +7,7 @@ These are several examples on how to generate and analyse NGS data using ngsTool
 Change the path to software according to your installation directory.
 
     NGSTOOLS=/home/mfumagalli/Documents/Software/ngsTools    
-    ANGSD=/home/mfumagalli/Documents/Software/angsd0.539    
+    ANGSD=/home/mfumagalli/Documents/Software/angsd0.543    
   
 ## Principal Component Analysis (PCA)
 
@@ -76,11 +76,15 @@ These commands will produce text files with a symmetric covariance matrix MxM, w
 
 # PCA plot
 
-We can use a simple R script to perform an eigenvalue decomposition of the covariance matrix and plot the PCA results. Assuming we want to plot the first 2 PCA components from our previous results, the command would be:
+We can use a simple R script to perform an eigenvalue decomposition of the covariance matrix and plot the PCA results. First, let's create a dummy plink cluster file.
 
-    Rscript --vanilla --slave $NGSTOOLS/plotPCA.R testA.covar1 1 2 testA.pca.eps 3 10 8 6    
+    Rscript --vanilla --slave -e 'write.table(cbind(seq(1,24),rep(1,24),c(rep("A",10),rep("B",8),rep("C",6))), row.names=F, col.names=c("FID","IID","CLUSTER"), sep="\t", file="testA.clst", quote=F)'    
 
-This script will output the explained genetic variance for each component and save as output the PCA plot. As a proof, PCA plot from called genotypes (testA.covar3) shows a less clear clustering of population. This can be seen by this command:
+Assuming we want to plot the first 2 PCA components from our previous results, the command would be:
+
+    Rscript --vanilla --slave $NGSTOOLS/plotPCA.R -i testA.covar1 -c 1-2 -a testA.clst -o testA.pca.eps     
+
+Please note that you need 'ggplot2' and 'optparse' R libraries installed. This script will output the explained genetic variance for each component and save as output the PCA plot. As a proof, PCA plot from called genotypes (testA.covar3) shows a less clear clustering of population. This can be seen by this command:
 
     Rscript --vanilla --slave $NGSTOOLS/plotPCA.R testA.covar3 1 2 testA.pca.call.eps 3 10 8 6     
 

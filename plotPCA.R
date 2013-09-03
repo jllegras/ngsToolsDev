@@ -1,5 +1,6 @@
 
-# Usage: Rscript infile.covar component1 component2 outfile.eps npop nind1 nind2 ... nindNPOP
+# Usage: Rscript -i infile.covar -c component1-component2 -a annotation.file -o outfile.eps
+
 library(optparse)
 library(ggplot2)
 
@@ -10,6 +11,8 @@ option_list <- list(make_option(c('-i','--in_file'), action='store', type='chara
                     )
 opt <- parse_args(OptionParser(option_list = option_list))
 
+# Annotation file is in plink. fam format
+
 #################################################################################
 
 # Read input file
@@ -17,7 +20,7 @@ covar <- read.table(opt$in_file, stringsAsFact=F);
 
 # Read annot file
 annot <- read.table(opt$annot_file, sep="\t");
-colnames(annot)[6] <- "Pop"
+colnames(annot)[3] <- "Pop"
 
 # Parse components to analyze
 comp <- as.numeric(strsplit(opt$comp, "-", fixed=TRUE)[[1]])
@@ -40,3 +43,4 @@ y_axis = paste("PC",comp[2],sep="")
 ggplot() + geom_point(data=PC, aes_string(x=x_axis, y=y_axis, color="Pop")) + ggtitle(title)
 ggsave(opt$out_file)
 unlink("Rplots.pdf", force=TRUE)
+
