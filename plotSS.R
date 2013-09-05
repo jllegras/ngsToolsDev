@@ -11,54 +11,6 @@ option_list <- list(make_option(c('-i','--in_file'), action='store', type='chara
                     )
 opt <- parse_args(OptionParser(option_list = option_list))
 
-# How many pops
-pops <- as.character(strsplit(opt$names, "-", fixed=TRUE)[[1]]);
-npop=length(pops);
-
-# Read input file
-values <- read.table(opt$in_file, stringsAsFact=F);
-pos=as.numeric(values[,1]+(values[,2]-values[,1])/2);
-
-# Plot
-
-if (npop==2) {
-
-  title <- "";
-
-  # Data
-  df=data.frame(cbind( Pop=c(rep(pops[1],length(pos)),rep(pops[2],length(pos))), Pos=pos, Segr.sites=c(values[,3], values[,5]), Exp.heterozygosity=c(values[,4],values[,6]), Fixed.differences=(rep(values[,7],2)) ) );
-  df[,2:5]=sapply(df[,2:5], as.character)
-  df[,2:5]=sapply(df[,2:5], as.numeric)
-
-  p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
-  p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
-  p3=ggplot(data=df, aes(x=Pos, y=Fixed.differences)) + geom_line() + ggtitle(title)
-
-  multiplot(p1, p2, p3, cols=1);
-
-  ggsave(opt$out_file)
-  unlink("Rplots.pdf", force=TRUE)
-
-}
-
-if (npop==1) {
-
-  df=data.frame(cbind( Pop=rep(pops[1],length(pos)), Pos=pos, Segr.sites=values[,3], Exp.heterozygosity=values[,4]));
-  df[,2:4]=sapply(df[,2:4], as.character)
-  df[,2:4]=sapply(df[,2:4], as.numeric)
-
-  title <- "";
-
-  p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
-  p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
-
-  multiplot(p1, p2, cols=1);
-
-  ggsave(opt$out_file)
-  unlink("Rplots.pdf", force=TRUE)
-
-}
-
 # from: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
 # Multiple plot function
 #
@@ -105,4 +57,52 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
     }
   }
 }
+
+
+# How many pops
+pops <- as.character(strsplit(opt$names, "-", fixed=TRUE)[[1]]);
+npop=length(pops);
+
+# Read input file
+values <- read.table(opt$in_file, stringsAsFact=F);
+pos=as.numeric(values[,1]+(values[,2]-values[,1])/2);
+
+# Plot
+
+if (npop==2) {
+
+  title <- "";
+
+  # Data
+  df=data.frame(cbind( Pop=c(rep(pops[1],length(pos)),rep(pops[2],length(pos))), Pos=pos, Segr.sites=c(values[,3], values[,5]), Exp.heterozygosity=c(values[,4],values[,6]), Fixed.differences=(rep(values[,7],2)) ) );
+  df[,2:5]=sapply(df[,2:5], as.character)
+  df[,2:5]=sapply(df[,2:5], as.numeric)
+
+  p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
+  p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
+  p3=ggplot(data=df, aes(x=Pos, y=Fixed.differences)) + geom_line() + ggtitle(title)
+
+  pdf(opt$out_file);
+  multiplot(p1, p2, p3, ncol=1)
+  dev.off();
+
+}
+
+if (npop==1) {
+
+  df=data.frame(cbind( Pop=rep(pops[1],length(pos)), Pos=pos, Segr.sites=values[,3], Exp.heterozygosity=values[,4]));
+  df[,2:4]=sapply(df[,2:4], as.character)
+  df[,2:4]=sapply(df[,2:4], as.numeric)
+
+  title <- "";
+
+  p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
+  p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
+
+  pdf(opt$out_file);
+  multiplot(p1, p2, ncol=1)
+  dev.off();
+
+}
+
 

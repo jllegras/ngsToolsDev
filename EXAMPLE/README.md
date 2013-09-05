@@ -129,10 +129,10 @@ We use ngsStat to compute expectations of some basic statistics of the data, spe
 
      $NGSTOOLS/bin/ngsStat -npop 2 -postfiles testB1.rf.sfs.norm testB2.rf.sfs.norm -nsites 10000 -iswin 1 -nind 10 8 -outfile testB.stat -isfold 0 -islog 0 -block_size 100    
 
-This produces a file with these values, for each window: start, end, number of variable sites in pop 1, expected heterozygosity in pop 1, number of variable sites in pop 2, expected heterozygosity in pop 2, number of fixed differences between populations. Values can be plot by a simple R script, either for both populations or only one:
+This produces a file with these values, for each window: start, end, number of variable sites in pop 1, expected heterozygosity in pop 1, number of variable sites in pop 2, expected heterozygosity in pop 2, number of fixed differences between populations. Values can be plotted (on a .pdf file) by a simple R script, either for both populations or only one:
 
-     Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.eps -c pop1-pop2   
-     Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.pop1.eps -c pop1    
+     Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.pdf -n pop1-pop2   
+     Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.pop1.pdf -n pop1
 
 ## FST
 
@@ -141,9 +141,9 @@ We use the same data simulated and file generated for the previous analysis. In 
     $NGSTOOLS/bin/ngs2dSFS -postfiles testB1.rf.sfs.norm testB2.rf.sfs.norm -outfile testB.joint.spec -relative 1 -nind 10 8 -nsites 10000 -maxlike 0    
 
 Alternatively, as proposed in the original formulation of the method, testB1.rf.sfs and testB2.rf.sfs can be used with `-islog 1`. Another solution, for medium to high coverage data and in case of a large number of sites, would be to set `-maxlike 1`. 
-You can plot the joint SFS with this simple script:
+You can plot the joint SFS on a .pdf file with this simple script:
 
-    Rscript --vanilla --slave $NGSTOOLS/plot2dSFS.R testB.joint.spec testB.joint.spec.eps pop1 pop2    
+    Rscript --vanilla --slave $NGSTOOLS/plot2dSFS.R testB.joint.spec testB.joint.spec.pdf pop1 pop2    
 
 Then we calculate method-of-moments estimator of FST, at each site, with the following command:
 
@@ -156,7 +156,7 @@ Note that here we use .rf.sfs instead of .rf.sfs.norm since we are using .joint.
 
 We can calculate and print the overall FST, as well as plot FST in sliding windows, using this simple R script:
 
-    Rscript --vanilla --slave $NGSTOOLS/plotFST.R testB.fst testB.fst.eps 100 50
+    Rscript --vanilla --slave $NGSTOOLS/plotFST.R -i testB.fst -o testB.fst.eps -w 100 -s 50
 
 ## FOLDED DATA
 
