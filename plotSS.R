@@ -1,40 +1,108 @@
 
-# Usage: Rscript infile.stat outfile.eps npop name_pop1 name_pop2
+# Usage: Rscript -i infile.stat -o outfile.eps -n name1-name2
+# Usage: Rscript -i infile.stat -o outfile.eps -n name1 # if only 1 pop
 
-# Read parameters
-args <- commandArgs(trailingOnly = TRUE);
-infile <- args[1];
-outfile <- args[2];
-npop <- as.integer(args[3]);
-nampop <- as.array(args[4:(npop+3)]);
-rm(args);
+library(optparse)
+library(ggplot2)
+
+option_list <- list(make_option(c('-i','--in_file'), action='store', type='character', default=NULL, help='Input file'),
+                    make_option(c('-n','--names'), action='store', type='character', default=1-2, help='Name(s) of population(s)'),
+                    make_option(c('-o','--out_file'), action='store', type='character', default=NULL, help='Output file')
+                    )
+opt <- parse_args(OptionParser(option_list = option_list))
+
+# How many pops
+pops <- as.character(strsplit(opt$names, "-", fixed=TRUE)[[1]]);
+npop=length(pops);
 
 # Read input file
-values <- read.table(infile, stringsAsFact=F);
-pos=values[,1]+(values[,2]-values[,1])/2;
+values <- read.table(opt$in_file, stringsAsFact=F);
+pos=as.numeric(values[,1]+(values[,2]-values[,1])/2);
 
 # Plot
-if (npop==1)
-{
-	x11();
-	par(mfrow=c(2,1));
-	plot(x=pos, y=values[,3], col="black", xlab="Position", ylab="Segregating sites", ty="b", main=nampop[1], sub="");
-	plot(x=pos, y=values[,4], col="black", xlab="Position", ylab="Expected heterozygosity", ty="b", main="", sub="");	
 
-} else {
+if (npop==2) {
 
-        x11();
-        par(mfrow=c(3,1));
-        plot(x=pos, y=values[,3], col="red", xlab="Position", ylab="Segregating sites", ty="b", main="", sub="");
-	lines(x=pos, y=values[,5], col="blue", ty="b");
-	legend(legend=nampop, col=c("red", "blue"), x="topright", pch=1);
-        plot(x=pos, y=values[,4], col="red", xlab="Position", ylab="Expected heterozygosity", ty="b", main="", sub="");
-        lines(x=pos, y=values[,6], col="blue", ty="b");
-        legend(legend=nampop, col=c("red", "blue"), x="topright", pch=1);
-        plot(x=pos, y=values[,7], col="black", xlab="Position", ylab="Fixed differences", ty="b", main="", sub="");       
+  title <- "";
+
+  # Data
+  df=data.frame(cbind( Pop=c(rep(pops[1],length(pos)),rep(pops[2],length(pos))), Pos=pos, Segr.sites=c(values[,3], values[,5]), Exp.heterozygosity=c(values[,4],values[,6]), Fixed.differences=(rep(values[,7],2)) ) );
+  df[,2:5]=sapply(df[,2:5], as.character)
+  df[,2:5]=sapply(df[,2:5], as.numeric)
+
+  p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
+  p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
+  p3=ggplot(data=df, aes(x=Pos, y=Fixed.differences)) + geom_line() + ggtitle(title)
+
+  multiplot(p1, p2, p3, cols=1);
+
+  ggsave(opt$out_file)
+  unlink("Rplots.pdf", force=TRUE)
 
 }
 
-dev.copy2eps(file=outfile);
-dev.off();
+if (npop==1) {
+
+  df=data.frame(cbind( Pop=rep(pops[1],length(pos)), Pos=pos, Segr.sites=values[,3], Exp.heterozygosity=values[,4]));
+  df[,2:4]=sapply(df[,2:4], as.character)
+  df[,2:4]=sapply(df[,2:4], as.numeric)
+
+  title <- "";
+
+  p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
+  p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
+
+  multiplot(p1, p2, cols=1);
+
+  ggsave(opt$out_file)
+  unlink("Rplots.pdf", force=TRUE)
+
+}
+
+# from: http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  require(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
 

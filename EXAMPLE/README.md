@@ -4,10 +4,12 @@
 These are several examples on how to generate and analyse NGS data using ngsTools.
 
 # Configuration
-Change the path to software according to your installation directory.
+Change the path to the software according to your installation directory. For example, here's mine
 
     NGSTOOLS=/home/mfumagalli/Documents/Software/ngsTools    
-    ANGSD=/home/mfumagalli/Documents/Software/angsd0.543    
+    ANGSD=/home/mfumagalli/Documents/Software/angsd0.539    
+
+Be sure to use the latest stable version of ANGSD (available at http://popgen.dk/software/download/angsd/) and ngsTools.
   
 ## Principal Component Analysis (PCA)
 
@@ -54,7 +56,6 @@ In case we want to use weighting scheme on each site rather than calling SNPs, w
     $ANGSD/angsd -sim1 testA.glf.gz -nInd 24 -realSFS 1 -out testA.rf    
     $ANGSD/misc/optimSFS -binput testA.rf.sfs -nChr 48 -nThreads 10    
     $ANGSD/misc/sfstools -sfsFile testA.rf.sfs -nChr 48 -priorFile testA.rf.sfs.ml -dumpBinary 1 > testA.rf.sfs.norm    
-
 testA.rf.sfs.norm file is in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
 
 # Covariance matrix
@@ -86,9 +87,7 @@ Assuming we want to plot the first 2 PCA components from our previous results, t
 
 Please note that you need 'ggplot2' and 'optparse' R libraries installed. This script will output the explained genetic variance for each component and save as output the PCA plot. As a proof, PCA plot from called genotypes (testA.covar3) shows a less clear clustering of population. This can be seen by this command:
 
-    Rscript --vanilla --slave $NGSTOOLS/plotPCA.R testA.covar3 1 2 testA.pca.call.eps 3 10 8 6     
-
-Much more complex PCA plots can be obtained using the script plotPCAadv.R.
+    Rscript --vanilla --slave $NGSTOOLS/plotPCA.R -i testA.covar3 -c 1-2 -a testA.clst -o testA.pca.call.eps     
 
 ## SUMMARY STATISTICS
 
@@ -122,7 +121,7 @@ We use ANGSD to compute sample allele frequency posterior probabilities for each
     $ANGSD/misc/optimSFS -binput testB2.rf.sfs -nChr 16 -nThreads 10
     $ANGSD/misc/sfstools -sfsFile testB2.rf.sfs -nChr 16 -priorFile testB2.rf.sfs.ml -dumpBinary 1 > testB2.rf.sfs.norm    
 
-testB1.rf.sfs.norm and testB2.rf.sfs.norm filee are in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
+Note that testB1.rf.sfs.norm and testB2.rf.sfs.norm files are in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
 
 # Summary statistics
  
@@ -132,8 +131,8 @@ We use ngsStat to compute expectations of some basic statistics of the data, spe
 
 This produces a file with these values, for each window: start, end, number of variable sites in pop 1, expected heterozygosity in pop 1, number of variable sites in pop 2, expected heterozygosity in pop 2, number of fixed differences between populations. Values can be plot by a simple R script, either for both populations or only one:
 
-     Rscript --vanilla --slave $NGSTOOLS/plotSS.R testB.stat testB.stat.eps 2 pop1 pop2   
-     Rscript --vanilla --slave $NGSTOOLS/plotSS.R testB.stat testB.stat.pop1.eps 1 pop1    
+     Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.eps -c pop1-pop2   
+     Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.pop1.eps -c pop1    
 
 ## FST
 
@@ -180,7 +179,7 @@ Currently, it is not possible to estimate a joint-SFS from folded data. To compu
 
     NGSF=/home/mfumagalli/Documents/Software/ngsF    
 
-In case of data with inbreeding, almost all analyses can be carried out in the same fashion. Main difference is in how we use ANGSD and ngsF to estimate inbreeding coefficients and incorporate them into the analyses.
+In case of data with inbreeding, almost all analyses can be carried out in the same fashion. Main difference is in how we use ANGSD and ngsF to estimate inbreeding coefficients and incorporate them into the analyses. Also, output from `angsd_inbreed` is in log format, so all analyses shoudl be carried using `islog 1` option.
 
 Simulation settings:
 * 1 population, with mean inbreeding coefficient per individual of 0.3;

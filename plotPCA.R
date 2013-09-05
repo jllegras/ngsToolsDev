@@ -11,7 +11,7 @@ option_list <- list(make_option(c('-i','--in_file'), action='store', type='chara
                     )
 opt <- parse_args(OptionParser(option_list = option_list))
 
-# Annotation file is in plink. fam format
+# Annotation file is in plink cluster format
 
 #################################################################################
 
