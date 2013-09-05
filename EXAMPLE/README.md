@@ -159,7 +159,6 @@ We can calculate and print the overall FST, as well as plot FST in sliding windo
 
     Rscript --vanilla --slave $NGSTOOLS/plotFST.R testB.fst testB.fst.eps 100 50
 
-
 ## FOLDED DATA
 
 In many cases, ancestral allelic status is unknown and analyses are carried out using folded allele frequencies. As an illustration, we show how we can compute summary statistics even in case of folded data. We use data from pop1 from previous analysis.
@@ -175,11 +174,11 @@ We now calculate summary statistics:
 
 Note that these values are very similar, as expected, to the one retrieved using the unfolded data (testB.stat). Differences derive from a different prior used to compute posterior probabilities.
 
-Currently, it is not possible to estimate a joint-SFS from folded data. To compute FST from folded data, please use one of the two alternatives provided in the example above. PCA can be performed with folded data by adding `-isfold 1` in ngsCovar if we choose to weight each site by its probability of being variable.
+Currently, it is not possible to estimate a joint-SFS from folded data. To compute FST from folded data, please use one of the two alternatives provided in the example above. A folded joint-SFS can also be estimated by first computing posterior probabilities of sample allele frequencies assuming a uniform prior (simply provide a file with n+1 equal values as prior SFS), run ngs2dSFS, and fold the spectrum afterwards. PCA can be performed with folded data by adding `-isfold 1` in ngsCovar if we choose to weight each site by its probability of being variable.
 
 ## INBREEDING
 
-NGSF=/home/mfumagalli/Documents/Software/ngsF
+    NGSF=/home/mfumagalli/Documents/Software/ngsF    
 
 In case of data with inbreeding, almost all analyses can be carried out in the same fashion. Main difference is in how we use ANGSD and ngsF to estimate inbreeding coefficients and incorporate them into the analyses.
 
@@ -211,7 +210,6 @@ We can use these files to perform analyses described above. We can calculate the
 and summary statistics, for instance for the whole region, with:
 
      $NGSTOOLS/bin/ngsStat -npop 1 -postfiles testD.rf.sfs -nsites $NS -iswin 1 -nind 20 -outfile testD.stat -isfold 0 -islog 0 -block_size $NS
-
 
 An estimate of the Site Frequency Spectrum can be retrieved with these commands, if folded:
 

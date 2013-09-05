@@ -19,7 +19,7 @@ opt <- parse_args(OptionParser(option_list = option_list))
 covar <- read.table(opt$in_file, stringsAsFact=F);
 
 # Read annot file
-annot <- read.table(opt$annot_file, sep="\t");
+annot <- read.table(opt$annot_file, sep="\t", header=T);
 colnames(annot)[3] <- "Pop"
 
 # Parse components to analyze
