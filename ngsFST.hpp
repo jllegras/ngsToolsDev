@@ -260,19 +260,7 @@ char *append(const char* a,const char *b){
 
 // print help
 void info() {
-  fprintf(stdout, "Input:
--postfiles: .sfs files with posterior probabilities of sample allele frequencies for each population [required]
--priorfile: 2D-SFS to be used as a prior; you can use ngs2DSFS with parameter -relative set to 1 [NULL]
--priorfiles: marginal spectra to be used as a prior; you can use optimSFS in ANGSD [NULL]
--outfile: name of the output file [required]
--nind: number of individuals for each population [required]
--nsites: total number of sites; in case you want to analyze a subset of sites this is the upper limit [required]
--verbose: level of verbosity [0]
--block_size: to be memory efficient, set this number as the number of sites you want to analyze at each chunk [0]
--firstbase: in case you want to analyze a subset of your sites this is the lower limit [1]
--isfold: boolean, is your data folded? [0]
--islog: boolean, are postfiles in -log (from -realSFS 1 only, required if 2D-SFS is given)? If you use sfstools then set to 1 [0]
-\n");
+  fprintf(stdout, "\nInput:\n-postfiles: .sfs files with posterior probabilities of sample allele frequencies for each population [required]\n-priorfile: 2D-SFS to be used as a prior; you can use ngs2DSFS with parameter -relative set to 1 [NULL]\n-priorfiles: marginal spectra to be used as a prior; you can use optimSFS in ANGSD [NULL]\n-outfile: name of the output file [required]\n-nind: number of individuals for each population [required]\n-nsites: total number of sites; in case you want to analyze a subset of sites this is the upper limit [required]\n-verbose: level of verbosity [0]\n-block_size: to be memory efficient, set this number as the number of sites you want to analyze at each chunk [0]\n-firstbase: in case you want to analyze a subset of your sites this is the lower limit [1]\n-isfold: boolean, is your data folded? [0]\n-islog: boolean, are postfiles in -log (from -realSFS 1 only, required if 2D-SFS is given)? If you use sfstools then set to 1 [0]\n\n");
 }
 
 /// 

@@ -311,22 +311,7 @@ char *append(const char* a,const char *b){
 
 // print help
 void info() {
-  fprintf(stdout, "\ninput:
--probfile: file with genotype posterior probabilities [required]
--outfile: name of output file [required], currently it is a text file, tab separated with n*n cells
--sfsfile: file with SFS posterior probabilities [required if you want to weight each site by its probability of being variable]
--nind: nr of individuals [required]
--nsites: nr of sites [required]
--norm: if 0 no normalization, if 1 matrix is normalized by (p(1-p)) as in Patterson et al 2006, if 2 normalization is 2p(1-p) [0]
--verbose: level of verbosity [0]
--block_size: how many sites per block when reading the input file [0]
--call: whether calling genotypes (1) or not (0) [0]
--offset: starting position of subset analysis [1]
--minmaf: filter out sites with estimated MAF less than minmaf or greater than 1-minmaf [0] (this filtering will be ignored when using the weighting approach
--genoquality: text file with nsites lines; each line has a 0 and 1; if 0 the program will ignore this site [NULL]
--isfold: whether data in -sfsfile is folded [0]
--islog: whether data in -sfsfile is in log values [0]\n
-");
+  fprintf(stdout, "\nInput:\n-probfile: file with genotype posterior probabilities [required]\n-outfile: name of output file [required], currently it is a text file, tab separated with n*n cells\n-sfsfile: file with SFS posterior probabilities [required if you want to weight each site by its probability of being variable]\n-nind: nr of individuals [required]\n-nsites: nr of sites [required]\n-norm: if 0 no normalization, if 1 matrix is normalized by (p(1-p)) as in Patterson et al 2006, if 2 normalization is 2p(1-p) [0]\n-verbose: level of verbosity [0]\n-block_size: how many sites per block when reading the input file [0]\n-call: whether calling genotypes (1) or not (0) [0]\n-offset: starting position of subset analysis [1]\n-minmaf: filter out sites with estimated MAF less than minmaf or greater than 1-minmaf [0] (this filtering will be ignored when using the weighting approach\n-genoquality: text file with nsites lines; each line has a 0 and 1; if 0 the program will ignore this site [NULL]\n-isfold: whether data in -sfsfile is folded [0]\n-islog: whether data in -sfsfile is in log values [0]\n\n");
 }
 
 // compute estimated allele frequencies from genotype posterior probabilities

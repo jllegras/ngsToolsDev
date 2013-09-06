@@ -16,20 +16,8 @@
 int main (int argc, char *argv[]) {
   
   if (argc==1) {
-    printf("\n//This program estimates 2D-SFS from posterior probabilities of sample allele frequencies.//
-    Input:
-    -postfiles: file with sample allele frequency posterior probabilities for each population
-    -outfile: name of output file
-    -nind: number of individuals per population
-    -nsites: number of sites, or upper limit in case of analyzing a subset
-    -block_size: memory efficiency, number of sites for each chunk
-    -offset: lower limit in case of analyzing a subset
-    -maxlike: if 1 compute the most likely joint allele frequency and sum across sites, if 0 it computes the sum of the products of likelihoods
-    -relative: boolean, if 1 number are relative frequencies from 0 to 1 which sum up 1; if 0 numbers are absolute counts of sites having a specific joint allele frequency
-    -offset: lower limit of sites in case you want to analyze a subset
-    -isfold: is data folded?
-    -islog: is data in log values?"
-    return 0;    
+    fprintf(stdout, "\nInput:\n-postfiles: file with sample allele frequency posterior probabilities for each population\n-outfile: name of output file\n-nind: number of individuals per population\n    -nsites: number of sites, or upper limit in case of analyzing a subset\n-block_size: memory efficiency, number of sites for each chunk\n-offset: lower limit in case of analyzing a subset\n-maxlike: if 1 compute the most likely joint allele frequency and sum across sites, if 0 it computes the sum of the products of likelihoods\n-relative: boolean, if 1 number are relative frequencies from 0 to 1 which sum up 1; if 0 numbers are absolute counts of sites having a specific joint allele frequency\n-offset: lower limit of sites in case you want to analyze a subset\n-isfold: is data folded?\n-islog: is data in log values?\n\n");
+    return 0;
   }
 
   /// DECLARE AND INITIALIZE VARIABLES
