@@ -40,7 +40,7 @@ For PCA we are only interested in data from the whole population (testA), so we 
 
     rm testA1* testA2* testA3*    
 
-# Posterior probabilities of genotypes and sample allele frequencies
+## Posterior probabilities of genotypes and sample allele frequencies
 
 We use ANGSD to compute genotype posterior probabilities. Please refer to http://popgen.dk/angsd for more details on ANGSD parameters. Here is a possible command line:
 
@@ -59,7 +59,7 @@ In case we want to use weighting scheme on each site rather than calling SNPs, w
 
 testA.rf.sfs.norm file is in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
 
-# Covariance matrix
+## Covariance matrix
 
 We use ngsCovar to estimate a covariance matrix between pairs of individuals. This can be achieved in different ways. For low coverage sequencing depth, we recommend to use `-norm 0` option which disables normalization proposed in Patterson et al. PLoS Genetics (2006).
 The first way is to compute an approximation of the posterior of the covariance matrix, by weighting each site by its probability of being variable, as proposed in Fumagalli et al. Genetics (2013). Here is to command:
@@ -76,7 +76,7 @@ Finally, in case of high sequencing depth, one can call genotypes as the genotyp
 
 These commands will produce text files with a symmetric covariance matrix MxM, with M individuals.
 
-# PCA plot
+## PCA plot
 
 We can use a simple R script to perform an eigenvalue decomposition of the covariance matrix and plot the PCA results. First, let's create a dummy plink cluster file.
 
@@ -90,9 +90,9 @@ Please note that you need 'ggplot2' and 'optparse' R libraries installed. This s
 
     Rscript --vanilla --slave $NGSTOOLS/plotPCA.R -i testA.covar3 -c 1-2 -a testA.clst -o testA.pca.call.eps     
 
-## SUMMARY STATISTICS
+# SUMMARY STATISTICS
 
-# Data simulation
+## Data simulation
 
 Simulation settings:
 * 2 populations, differentiated by an average FST of 0.2 (please note that in the arguments you need to pass this value twice);
@@ -110,7 +110,7 @@ Under these conditions, we simulate NGS data with this command line:
 
 Please refer to the previous example for a description of each file produced.
 
-# Posterior probabilities of sample allele frequencies
+## Posterior probabilities of sample allele frequencies
 
 We use ANGSD to compute sample allele frequency posterior probabilities for each population separately. Please refer to http://popgen.dk/angsd for more details on ANGSD parameters. Here is the command line:
 
@@ -124,7 +124,7 @@ We use ANGSD to compute sample allele frequency posterior probabilities for each
 
 Note that testB1.rf.sfs.norm and testB2.rf.sfs.norm files are in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
 
-# Summary statistics
+## Summary statistics
  
 We use ngsStat to compute expectations of some basic statistics of the data, specifically the number of segregating sites, the expected heterozygosity, and the number of fixed differences between populations. We also want to compute these quantities in non-overlapping sliding windows of 100 sites each, by using the options `-iswin` and `-block_size`. Here is the command to achieve this goal:
 
@@ -137,7 +137,7 @@ This produces a file with these values, for each window: start, end, number of v
 
 R package 'grid' installed is needed.
 
-## FST
+# FST
 
 We use the same data simulated and file generated for the previous analysis. In case of low coverage sequencing depth, an improvement in the estimation accuracy can be achieved by using the joint-SFS as a prior for the sample allele frequency posterior distributions, as shown in Fumagalli et al. Genetics (2013). Therefore we first estimate a joint-SFS for our pair of populations:
 
@@ -161,7 +161,7 @@ We can calculate and print the overall FST, as well as plot FST in sliding windo
 
     Rscript --vanilla --slave $NGSTOOLS/plotFST.R -i testB.fst -o testB.fst.eps -w 100 -s 50
 
-## FOLDED DATA
+# FOLDED DATA
 
 In many cases, ancestral allelic status is unknown and analyses are carried out using folded allele frequencies. As an illustration, we show how we can compute summary statistics even in case of folded data. We use data from pop1 from previous analysis.
 As usual, we use ANGSD to compute sample allele frequency posterior probabilities:
@@ -178,7 +178,7 @@ Note that these values are very similar, as expected, to the one retrieved using
 
 Currently, it is not possible to estimate a joint-SFS from folded data. To compute FST from folded data, please use one of the two alternatives provided in the example above. A folded joint-SFS can also be estimated by first computing posterior probabilities of sample allele frequencies assuming a uniform prior (simply provide a file with n+1 equal values as prior SFS), run ngs2dSFS, and fold the spectrum afterwards. PCA can be performed with folded data by adding `-isfold 1` in ngsCovar if we choose to weight each site by its probability of being variable.
 
-## INBREEDING
+# INBREEDING
 
     NGSF=/home/mfumagalli/Documents/Software/ngsF    
 
@@ -224,13 +224,5 @@ if unfolded:
     cat testD.rf.sfs | hexdump -v -e "$((N_IND+1))/8 \"%.10g\t\"\"\n\"" | perl -na -e '$sum=0; $sum+=exp($_) for @F; for $i (0..$#F){$frq[$i]+=exp($F[$i])/$sum}; END{$tsum+=$_ for @frq; $_/=$tsum for @frq; print join("\t",@frq)."\n"}' > testD.sfs_unf_sum
 
 Please note that FST estimation with inbreeding cannot use a joint-SFS as a prior, and therefore alternative methods proposed, like in the case of folded data, should be used.
-
-
-
-
-
-
-
-
 
 
