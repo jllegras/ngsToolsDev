@@ -360,6 +360,8 @@ void info() {
   fprintf(stderr,"\t\t-expansion\tboolean [o]\n");
   fprintf(stderr,"\t\t-seed\trandom number [0]\n");
   fprintf(stderr,"\t\t-base_freq\tBackground allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]\n");
+  fprintf(stderr,"\t\t-expansion: boolen, vary naive method to simulate population expansion [0]\n");
+  fprintf(stderr,"\t\t-multi_depth: Simulate uneven covered individuals, e.g. -multi_depth 6 10: first 10 individuals have 6X while the rest is as -depth [NULL]\n");
 }
 
 ///		///

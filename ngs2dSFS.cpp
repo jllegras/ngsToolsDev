@@ -16,7 +16,19 @@
 int main (int argc, char *argv[]) {
   
   if (argc==1) {
-    printf("\n// this is to estimate 2D-SFS from max like (realSFS 1, like in original paper, then set -islog 1) or geno post probabilities (from sfstools, then leave -islog 0) // input: -postfiles, -outfile, -relative, -nind, -nsites, -block_size, -offset, -maxlike\n");
+    printf("\n//This program estimates 2D-SFS from posterior probabilities of sample allele frequencies.//
+    Input:
+    -postfiles: file with sample allele frequency posterior probabilities for each population
+    -outfile: name of output file
+    -nind: number of individuals per population
+    -nsites: number of sites, or upper limit in case of analyzing a subset
+    -block_size: memory efficiency, number of sites for each chunk
+    -offset: lower limit in case of analyzing a subset
+    -maxlike: if 1 compute the most likely joint allele frequency and sum across sites, if 0 it computes the sum of the products of likelihoods
+    -relative: boolean, if 1 number are relative frequencies from 0 to 1 which sum up 1; if 0 numbers are absolute counts of sites having a specific joint allele frequency
+    -offset: lower limit of sites in case you want to analyze a subset
+    -isfold: is data folded?
+    -islog: is data in log values?"
     return 0;    
   }
 
@@ -59,7 +71,7 @@ int main (int argc, char *argv[]) {
     else if(strcmp(argv[argPos],"-offset")==0) firstbase = atoi(argv[argPos+1]); 
     else if(strcmp(argv[argPos],"-maxlike")==0) maxlike = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-relative")==0) relative = atoi(argv[argPos+1]);
-    else if(strcmp(argv[argPos],"-folded")==0) folded = atoi(argv[argPos+1]);
+    else if(strcmp(argv[argPos],"-isfold")==0) folded = atoi(argv[argPos+1]);
     else if(strcmp(argv[argPos],"-islog")==0) islog = atoi(argv[argPos+1]);
     else {
       printf("\tUnknown arguments: %s\n",argv[argPos]);

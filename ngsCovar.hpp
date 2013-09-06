@@ -311,7 +311,22 @@ char *append(const char* a,const char *b){
 
 // print help
 void info() {
-  fprintf(stdout, "\ninput:\n-probfile: file with genotype posterior probabilities [required], this is the output from angsd -doGeno 64\n-outfile: name of output file [required], currently it is a text file, tab separated with n*n cells\n-sfsfile: file with SFS posterior probabilities [required if you want to weight each site by its probability of being variable], this is the binary output of sfstools after running realSFS1 and optimSFS\n-nind: nr of individuals [required];\n-nsites: nr of sites [required]\n-verbose: level of verbosity [optional]\n-block_size: how many sites per block when reading the input file [optiona], default is 1 block equal to nr of sites, suggested 10K-20K\n-call: whether calling genotypes (1) or not (0), default\n-offset: starting position of subset analysis\n-minmaf: filter out sites with estimated MAF less than minmaf or greater than 1-minmaf [optional], default is 0; please note that this filtering won't take action when using the weighting approach because in teory you won't need that in that case.\n\nExample:\nngsSim -outfiles pops -npop 2 -nind 10 10 -nsites 1000 -pvar 1 -F 0.3 0.3\nangsd.g++ -sim1 pops.glf.gz -nInd 20 -doGeno 64 -doMajorMinor 1 -doMaf 2 -outfiles pops.geno\nangsd.g++ -sim1 pops.glf.gz -nInd 20 -realSFS 1 -outfiles POPS\noptimSFS.gcc -binput POPS.sfs -nChr 40 -nThread 10\nsfstools.g++ -sfsFile POPS.sfs -nChr 40 -priorFile POPS.sfs.ml -dumpBinary 1 > POPS.norm.sfs\n# no weighting: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile no -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0\n# weighting: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile si -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0 -sfsfile POPS.norm.sfs\n# no weighting but cutoff on maf: ngsCoVar_ultimate_fast -probfile pops.geno.geno -outfile me -nind 20 -nsites 1000 -verbose 0 -block_size 500 -norm 0 -minmaf 0.1\n\nPlease note that this has been tested only with angsd 0.204\n");
+  fprintf(stdout, "\ninput:
+-probfile: file with genotype posterior probabilities [required]
+-outfile: name of output file [required], currently it is a text file, tab separated with n*n cells
+-sfsfile: file with SFS posterior probabilities [required if you want to weight each site by its probability of being variable]
+-nind: nr of individuals [required]
+-nsites: nr of sites [required]
+-norm: if 0 no normalization, if 1 matrix is normalized by (p(1-p)) as in Patterson et al 2006, if 2 normalization is 2p(1-p) [0]
+-verbose: level of verbosity [0]
+-block_size: how many sites per block when reading the input file [0]
+-call: whether calling genotypes (1) or not (0) [0]
+-offset: starting position of subset analysis [1]
+-minmaf: filter out sites with estimated MAF less than minmaf or greater than 1-minmaf [0] (this filtering will be ignored when using the weighting approach
+-genoquality: text file with nsites lines; each line has a 0 and 1; if 0 the program will ignore this site [NULL]
+-isfold: whether data in -sfsfile is folded [0]
+-islog: whether data in -sfsfile is in log values [0]\n
+");
 }
 
 // compute estimated allele frequencies from genotype posterior probabilities

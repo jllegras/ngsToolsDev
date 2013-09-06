@@ -112,6 +112,8 @@ int main (int argc, char *argv[]) {
 
   int argPos = 1, nind = 0, nind1=0, nind2=0, nsites = 0, increment=0, verbose=0, len=0;
 
+  // CHECK HERE FOR USAGE:
+
   while (argPos<argc) {
     increment = 0;
     if(strcmp(argv[argPos],"-infiles")==0) {
