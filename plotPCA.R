@@ -4,9 +4,9 @@
 library(optparse)
 library(ggplot2)
 
-option_list <- list(make_option(c('-i','--in_file'), action='store', type='character', default=NULL, help='Input file'),
+option_list <- list(make_option(c('-i','--in_file'), action='store', type='character', default=NULL, help='Input file (output from ngsCovar)'),
                     make_option(c('-c','--comp'), action='store', type='character', default=1-2, help='Components to plot'),
-                    make_option(c('-a','--annot_file'), action='store', type='character', default=NULL, help='Annotation file with individual populations'),
+                    make_option(c('-a','--annot_file'), action='store', type='character', default=NULL, help='Annotation file with individual classification (2 column TSV with ID and ANNOTATION)'),
                     make_option(c('-o','--out_file'), action='store', type='character', default=NULL, help='Output file')
                     )
 opt <- parse_args(OptionParser(option_list = option_list))
@@ -19,8 +19,8 @@ opt <- parse_args(OptionParser(option_list = option_list))
 covar <- read.table(opt$in_file, stringsAsFact=F);
 
 # Read annot file
-annot <- read.table(opt$annot_file, sep="\t", header=T);
-colnames(annot)[3] <- "Pop"
+annot <- read.table(opt$annot_file, sep="\t");
+colnames(annot)[2] <- "Pop"
 
 # Parse components to analyze
 comp <- as.numeric(strsplit(opt$comp, "-", fixed=TRUE)[[1]])
