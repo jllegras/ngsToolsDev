@@ -34,5 +34,5 @@ cd ..
 
 # !!! IMPORTANT NOTE FOR USERS THAT WANT TO INTEGRATE INBREEDING ESTIMATES FROM ngsF IN ANGSD:
 # temporarly, please use the ANGSD version available here https://sites.google.com/site/mattefumagalli/dissemination which have been fully tested for the inclusion of inbreeding estimates; soon a comprehensive version of ANGSD will be available.
-
+# ANGSD main programmers, Thorfinn Korneliussen and Anders Albrechtsen, are not responsible for bugs or problems with this version.
 
