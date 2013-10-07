@@ -1,4 +1,3 @@
-
 Methods in ANGSD can be cited as:
 
 SNP calling, genotype calling, and sample allele frequency estimation from New-Generation Sequencing data.
@@ -17,10 +16,17 @@ Estimating inbreeding coefficients from NGS data: impact on genotype calling and
 Vieira FG, Fumagalli M, Albrechtsen A, Nielsen R.
 Genome Res. 2013 Aug 15. [Epub ahead of print]
 
-Nucleotide diversity estimates from NGS data implemented here were first proposed in:
+Nucleotide diversity estimates from NGS data implemented here are proposed in:
 
 Sequencing of 50 human exomes reveals adaptation to high altitude.
 Yi X, Liang Y, Huerta-Sanchez E, Jin X, Cuo ZX, Pool JE, Xu X, Jiang H, Vinckenbosch N, Korneliussen TS, Zheng H, Liu T, He W, Li K, Luo R, Nie X, Wu H, Zhao M, Cao H, Zou J, Shan Y, Li S, Yang Q, Asan, Ni P, Tian G, Xu J, Liu X, Jiang T, Wu R, Zhou G, Tang M, Qin J, Wang T, Feng S, Li G, Huasang, Luosang J, Wang W, Chen F, Wang Y, Zheng X, Li Z, Bianba Z, Yang G, Wang X, Tang S, Gao G, Chen Y, Luo Z, Gusang L, Cao Z, Zhang Q, Ouyang W, Ren X, Liang H, Zheng H, Huang Y, Li J, Bolund L, Kristiansen K, Li Y, Zhang Y, Zhang X, Li R, Li S, Yang H, Nielsen R, Wang J, Wang J.
 Science. 2010 Jul 2;329(5987):75-8. doi: 10.1126/science.1190371.
 
+Calculation of Tajima's D and other neutrality test statistics from low depth next-generation sequencing data.
+Korneliussen TS, Moltke I, Albrechtsen A, Nielsen R.
+BMC Bioinformatics. 2013 Oct 2;14(1):289. [Epub ahead of print]
+
+Assessing the effect of sequencing depth and sample size in population genetics inferences.
+Fumagalli M.
+PLoS ONE, accepted, soon available online.
 
