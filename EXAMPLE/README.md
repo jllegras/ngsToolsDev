@@ -59,7 +59,7 @@ which will generate these files:
 
 You can now inspect the file with estimated allele frequencies:
 
-    zcat testA.geno.mafs.gz | head     
+    gunzip -c testA.geno.mafs.gz | head     
 
 In case we want to use weighting scheme on each site rather than calling SNPs, we need to calculate posterior probabilities of sample allele frequencies. These commands will generate these files in ANGSD:
 

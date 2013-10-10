@@ -355,9 +355,8 @@ void info() {
   fprintf(stderr,"\t\t-pvar\tProbability that a site is variable in the population [0.015]\n");
   fprintf(stderr,"\t\t-mfreq\tMinimum population frequency [0.0005]\n");
   fprintf(stderr,"\t\t-F\tFST value of 1st and 2nd split [0.4 0.1] OR inbreeding value/file in case of 1 pop [0]\n");
-  fprintf(stderr,"\t\t-model\t0=fixed errate 1=variable errate [1]\n");
+  fprintf(stderr,"\t\t-model\t0=fixed errate 1=variable errate (uniform distribution) [1]\n");
   fprintf(stderr,"\t\t-simpleRand\tboolean [1]\n");
-  fprintf(stderr,"\t\t-expansion\tboolean [o]\n");
   fprintf(stderr,"\t\t-seed\trandom number [0]\n");
   fprintf(stderr,"\t\t-base_freq\tBackground allele frequencies for A,C,G,T [0.25 0.25 0.25 0.25]\n");
   fprintf(stderr,"\t\t-expansion: boolen, vary naive method to simulate population expansion [0]\n");
