@@ -11,6 +11,6 @@ opt <- parse_args(OptionParser(option_list = option_list))
 # Read input file
 values <- exp(as.numeric(scan(opt$in_file, what="char")));
 # Write
-cat(values, sep=" ", file=opt$file_out);
+cat(values, sep=" ", file=opt$out_file);
 
 

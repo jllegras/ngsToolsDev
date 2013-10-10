@@ -74,13 +74,13 @@ if (npop==2) {
   title <- "";
 
   # Data
-  df=data.frame(cbind( Pop=c(rep(pops[1],length(pos)),rep(pops[2],length(pos))), Pos=pos, Segr.sites=c(values[,3], values[,5]), Exp.heterozygosity=c(values[,4],values[,6]), Fixed.differences=(rep(values[,7],2)) ) );
+  df=data.frame(cbind( Pop=c(rep(pops[1],length(pos)),rep(pops[2],length(pos))), Pos=pos, Segr.sites=c(values[,3], values[,5]), Exp.heterozygosity=c(values[,4],values[,6]), Fixed.differences=(rep(values[,7],2)), Pops=c(rep(paste(pops[1],"\n",pops[2]),length(pos)*2)) ) );
   df[,2:5]=sapply(df[,2:5], as.character)
   df[,2:5]=sapply(df[,2:5], as.numeric)
 
   p1=ggplot(data=df, aes(x=Pos, y=Segr.sites, color=Pop)) + geom_line() + ggtitle(title)
   p2=ggplot(data=df, aes(x=Pos, y=Exp.heterozygosity, color=Pop)) + geom_line() + ggtitle(title)
-  p3=ggplot(data=df, aes(x=Pos, y=Fixed.differences)) + geom_line() + ggtitle(title)
+  p3=ggplot(data=df, aes(x=Pos, y=Fixed.differences, color=Pops)) + geom_line() + ggtitle(title)
 
   pdf(opt$out_file);
   multiplot(p1, p2, p3, ncol=1)
