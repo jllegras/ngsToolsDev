@@ -172,6 +172,8 @@ You can plot the joint SFS on a .pdf file with this simple script:
 
     Rscript --vanilla --slave $NGSTOOLS/plot2dSFS.R testB.joint.spec testB.joint.spec.pdf pop1 pop2    
 
+Eventually, the estimated 2D-SFS can be converted into `dadi` format (Gutenkunst et al. 2009) for demographic inferences, using the R script `convert.2Dsfs.to.dadi.R`.
+
 Then we calculate method-of-moments estimator of FST, at each site, with the following command:
 
     $NGSTOOLS/bin/ngsFST -postfiles testB1.rf.sfs testB2.rf.sfs -priorfile testB.joint.spec -nind 10 8 -nsites 10000 -outfile testB.fst -islog 1    
