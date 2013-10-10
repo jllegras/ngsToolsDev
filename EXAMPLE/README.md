@@ -7,9 +7,9 @@ These are several examples on how to generate and analyse NGS data using ngsTool
 Change the path to the software according to your installation directory. For example, here's mine
 
     NGSTOOLS=/home/mfumagalli/Documents/Software/ngsTools    
-    ANGSD=/home/mfumagalli/Documents/Software/angsd0.539    
+    ANGSD=/home/mfumagalli/Documents/Software/angsd0.553
 
-Be sure to use the latest stable version of ANGSD (available at http://popgen.dk/software/download/angsd/) and ngsTools.
+Be sure to use the latest stable version of ngsTools and ANGSD (available at http://www.popgen.dk/angsd/index.php/Download_and_installation), but be aware that new versions of ANGSD my change parameters' names. We will try to keep up-to-date with new releases of ANGSD. These examples have been tested with ANGSD version 0.553 (and 0.543i for the inbreeding estimation).
   
 # Principal Component Analysis (PCA)
 
@@ -36,6 +36,12 @@ This command will generate several files for the whole population (testA), as we
 * .seq.gz: sequencing reads in ACGT format, with A always representing the ancestral state;
 * .glf.gz: genotype likelihoods in binary format; values are in double format; first 24 rows show all possible 10 genotype likelihoods in case of biallelic sites, and so on for each site; the order of genotypes is: 0=AA, 1=AC, 2=AG, 3=AT, 4=CC, 5=CG, 6=CT, 7=GG, 8=GT, 9=TT;
 
+You can inspect these files to have an idea of the information they have:
+
+    head testA.geno     
+    head testA.reads.txt     
+    cat testA.frq     
+
 For PCA we are only interested in data from the whole population (testA), so we will ignore all testA1, test2, and test3 file.
 
     rm testA1* testA2* testA3*    
@@ -46,24 +52,30 @@ We use ANGSD to compute genotype posterior probabilities. Please refer to http:/
 
     $ANGSD/angsd -sim1 testA.glf.gz -nInd 24 -doGeno 32 -doPost 1 -doMaf 2 -out testA.geno -doMajorMinor 1    
 
-which will generate these fies:
+which will generate these files:
 * testA.geno.arg: parameters used;
-* testA.geno.mafs: estimates of minor allele frequencies;
-* testA.geno.geno: genotype posterior probabilities in binary format; values are in double format; each row show likelihoods for 2 genotypes (e.g. AA AG GG) assuming a minor and a major allele;
+* testA.geno.mafs.gz: estimates of minor allele frequencies;
+* testA.geno.geno.gz: genotype posterior probabilities in binary format; values are in double format; each row show likelihoods for 2 genotypes (e.g. AA AG GG) assuming a minor and a major allele;
+
+You can now inspect the file with estimated allele frequencies:
+
+    zcat testA.geno.mafs.gz | head     
 
 In case we want to use weighting scheme on each site rather than calling SNPs, we need to calculate posterior probabilities of sample allele frequencies. These commands will generate these files in ANGSD:
 
     $ANGSD/angsd -sim1 testA.glf.gz -nInd 24 -realSFS 1 -out testA.rf    
-    $ANGSD/misc/optimSFS -binput testA.rf.sfs -nChr 48 -nThreads 10    
+    $ANGSD/misc/emOptim2 testA.rf.sfs 48 -nSites 1000 > testA.rf.sfs.ml # 48 is the number of chromosomes    
+    Rscript --vanilla --slave log2unlogSFS.R -i $NGSTOOLS/testA.rf.sfs.ml -o testA.rf.sfs.ml
     $ANGSD/misc/sfstools -sfsFile testA.rf.sfs -nChr 48 -priorFile testA.rf.sfs.ml -dumpBinary 1 > testA.rf.sfs.norm    
 
 testA.rf.sfs.norm file is in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
 
 ## Covariance matrix
 
-We use ngsCovar to estimate a covariance matrix between pairs of individuals. This can be achieved in different ways. For low coverage sequencing depth, we recommend to use `-norm 0` option which disables normalization proposed in Patterson et al. PLoS Genetics (2006).
+We use ngsCovar to estimate a covariance matrix between pairs of individuals. This can be achieved in different ways. For low coverage sequencing data, we recommend to use `-norm 0` option which disables normalization proposed in Patterson et al. PLoS Genetics (2006).
 The first way is to compute an approximation of the posterior of the covariance matrix, by weighting each site by its probability of being variable, as proposed in Fumagalli et al. Genetics (2013). Here is to command:
 
+     gunzip testA.geno.geno.gz
      $NGSTOOLS/bin/ngsCovar -probfile testA.geno.geno -outfile testA.covar1 -nind 24 -nsites 1000 -call 0 -sfsfile testA.rf.sfs.norm -norm 0     
 
 Alternatively, one can remove non-variable or low-frequency sites with the option `-minmaf`:
@@ -115,11 +127,11 @@ Please refer to the previous example for a description of each file produced.
 We use ANGSD to compute sample allele frequency posterior probabilities for each population separately. Please refer to http://popgen.dk/angsd for more details on ANGSD parameters. Here is the command line:
 
     $ANGSD/angsd -sim1 testB1.glf.gz -nInd 10 -realSFS 1 -out testB1.rf
-    $ANGSD/misc/optimSFS -binput testB1.rf.sfs -nChr 20 -nThreads 10
+    $ANGSD/misc/emOptim2 testB1.rf.sfs 20 -nSites 10000 > testB1.rf.sfs.ml
     $ANGSD/misc/sfstools -sfsFile testB1.rf.sfs -nChr 20 -priorFile testB1.rf.sfs.ml -dumpBinary 1 > testB1.rf.sfs.norm    
 
     $ANGSD/angsd -sim1 testB2.glf.gz -nInd 8 -realSFS 1 -out testB2.rf
-    $ANGSD/misc/optimSFS -binput testB2.rf.sfs -nChr 16 -nThreads 10
+    $ANGSD/misc/emOptim2 testB2.rf.sfs 16 -nSites 10000 > testB2.rf.sfs.ml
     $ANGSD/misc/sfstools -sfsFile testB2.rf.sfs -nChr 16 -priorFile testB2.rf.sfs.ml -dumpBinary 1 > testB2.rf.sfs.norm    
 
 Note that testB1.rf.sfs.norm and testB2.rf.sfs.norm files are in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.

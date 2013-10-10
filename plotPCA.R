@@ -19,8 +19,7 @@ opt <- parse_args(OptionParser(option_list = option_list))
 covar <- read.table(opt$in_file, stringsAsFact=F);
 
 # Read annot file
-annot <- read.table(opt$annot_file, sep="\t");
-colnames(annot)[2] <- "Pop"
+annot <- read.table(opt$annot_file, sep="\t", header=T);
 
 # Parse components to analyze
 comp <- as.numeric(strsplit(opt$comp, "-", fixed=TRUE)[[1]])
@@ -33,7 +32,7 @@ cat(signif(eig$val, digits=3)*100,"\n");
 # Plot
 PC <- as.data.frame(eig$vectors)
 colnames(PC) <- gsub("V", "PC", colnames(PC))
-PC$Pop <- factor(annot$Pop)
+PC$Pop <- factor(annot$CLUSTER)
 
 title <- paste("PC",comp[1]," (",signif(eig$val[comp[1]], digits=3)*100,"%)"," / PC",comp[2]," (",signif(eig$val[comp[2]], digits=3)*100,"%)",sep="",collapse="")
 
