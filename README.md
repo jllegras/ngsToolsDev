@@ -12,7 +12,7 @@ Several examples on how to use all programs explained below and run analyses are
 
 All programs receive as input files produced by software ANGSD (http://popgen.dk/angsd). In general, these files can contain genotype likelihoods, genotype posterior probabilities, sample allele frequency posterior probabilities or an estimate of the Site Frequency Spectrum (SFS).
 
-A typical pipeline can be the following. We assume to have genotype likelihoods data for one pop in 'sim1' format (e.g. generated from nsgSim) for 40 individuals. BAM/SAM files can also be used as input. We assume to use ANGSD version 0.539 or higher. Please check ANGSD web site for other accepted genotype likelihood formats.
+A typical pipeline can be the following. We assume to have genotype likelihoods data for one pop in 'sim1' format (e.g. generated from nsgSim) for 40 individuals. BAM/SAM files can also be used as input. Here, we assume to use ANGSD version 0.539. Please check ANGSD web site for other accepted genotype likelihood formats and specific parameters for new versions.
 
 First we compute genotype posterior probabilities (.geno) as well as estimates of minor allele frequencies (.maf):
 

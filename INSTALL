@@ -19,11 +19,22 @@ git pull
 make clean
 make
 
-# ANGSD can be downloaded from popgen.dk/angsd. Please check for the latest version, below an example on how to get 0.539 version.
+# ANGSD can be downloaded from popgen.dk/angsd. Please check for the latest version, below an example on how to get the 0.553 version.
+
 cd..
-wget http://popgen.dk/software/download/angsd/angsd0.539.tar.gz
-tar xfz angsd0.539.tar.gz
-cd angsd0.539
+wget http://popgen.dk/software/download/angsd/angsd0.553.tar.gz
+tar xfz angsd0.553.tar.gz
+cd angsd0.553
+make clean
+make
+cd ..
+
+# for users who want to integrate inbreeding estimates from  ngsF in ANGSD please use 0.543i ANGSD version instead (a comprehensive version of ANGSD will be released soon).
+
+cd..
+wget http://popgen.dk/software/download/angsd/angsd0.543i.tar.gz
+tar xf angsd0.543i.tar.gz
+cd angsd0.543i
 make clean
 make
 mv angsd ..
@@ -31,8 +42,4 @@ make clean
 make inbreed
 mv ../angsd .
 cd ..
-
-# !!! IMPORTANT NOTE FOR USERS THAT WANT TO INTEGRATE INBREEDING ESTIMATES FROM ngsF IN ANGSD:
-# temporarly, please use the ANGSD version available here https://sites.google.com/site/mattefumagalli/dissemination which have been fully tested for the inclusion of inbreeding estimates; soon a comprehensive version of ANGSD will be available.
-# ANGSD main programmers, Thorfinn Korneliussen and Anders Albrechtsen, are not responsible for bugs or problems with this version.
 
