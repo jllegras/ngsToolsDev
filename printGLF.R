@@ -12,13 +12,13 @@ opt <- parse_args(OptionParser(option_list = option_list))
 
 ncat=10;
 
-ff <- gzfile(opt$inf_file,"rb");
+ff <- gzfile(opt$in_file,"rb");
 
-m<-matrix(readBin(ff,"double",ncat*opt$nsites*opt$nind),ncol=ncat,byrow=TRUE)[1:opt$print,];
+m<-matrix(readBin(ff,"double",ncat*opt$nsites*opt$nind),ncol=ncat,byrow=TRUE);
 
 colnames(m)=c("AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT");
 
-m=cbind(indiv=rep(1:opt$nind, 1:opt$nsites), site=rep(1:opt$nsites, each=opt$nind), m);
+m=cbind(indiv=rep(1:opt$nind, opt$nsites), site=rep(1:opt$nsites, each=opt$nind), m);
 
 close(ff)
 

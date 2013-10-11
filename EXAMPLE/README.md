@@ -41,10 +41,16 @@ You can inspect these files to have an idea of the information they have:
     head testA.geno     
     head testA.reads.txt     
     cat testA.frq     
+    gunzip -c testA.seq.gz | less -S     
+
+We can even transform genotype likelihoods in a more readable format and inspect them:
+
+    Rscript --vanilla --slave $NGSTOOLS/printGLF.R -i testA.glf.gz -d 24 -n 1000 -o testA.glf.txt
+    less -S testA.glf.txt # press `q` to exit the screen     
 
 For PCA we are only interested in data from the whole population (testA), so we will ignore all testA1, test2, and test3 file.
 
-    rm testA1* testA2* testA3*    
+    rm testA1* testA2* testA3* testA.reads.txt testA.seq.gz    
 
 ## Posterior probabilities of genotypes and sample allele frequencies
 
@@ -70,9 +76,9 @@ In case we want to use weighting scheme on each site rather than calling SNPs, w
 
 testA.rf.sfs.norm file is in binary format; values are in double format; in case of unfolded data, each row has 49 values (2N+1 with N individuals) representing the posterior probability of having a certain derived allele frequency; in case of folded data, each row will have N+1 values.
 
-You can even look at the estimated pooled site frequency spectrum:
+You can even look at the estimated and true pooled site frequency spectrum:
 
-     Rscript --vanilla --slave -e 'pdf(file="testA.sfs.pdf"); barplot(as.numeric(scan("testA.rf.sfs.ml", what="char")), beside=T); dev.off()'     
+     Rscript --vanilla --slave -e 'pdf(file="testA.sfs.pdf"); barplot(rbind( as.numeric(scan("testA.frq", what="char")), as.numeric(scan("testA.rf.sfs.ml", what="char"))), beside=T, legend=c("True","Estimated")); dev.off()'     
 
 on the plot named `testA.sfs.pdf`.
 
@@ -124,7 +130,7 @@ Under these conditions, we simulate NGS data with this command line:
 
     $NGSTOOLS/bin/ngsSim -npop 2 -nind 10 8 -nsites 10000 -errate 0.01 -depth 4 -pvar 1 -mfreq 0.005 -F 0.2 0.2 -model 1 -outfiles testB    
 
-    rm testB.args testB.frq testB.geno testB.glf.gz testB.par testB.reads.txt testB.seq.gz
+    rm testB.args testB.frq testB.geno testB.glf.gz testB.par testB.reads.txt testB.seq.gz testB1.reads.txt testB1.seq.gz testB2.reads.txt testB2.seq.gz
 
 Please refer to the previous example for a description of each file produced.
 
@@ -232,6 +238,7 @@ Simulation settings:
 * minor options: minimum frequency in the population of 0.005, output files with prefix testD.
 
     $NGSTOOLS/bin/ngsSim -npop 1 -nind 20 -nsites 1000 -errate 0.01 -depth 4 -pvar 1 -mfreq 0.005 -F 0.3 -model 1 -outfiles testD
+    rm testD.args testD.frq testD.geno testD.par  testD.reads.txt  testD.seq.gz     
 
 We estimate inbreeding coefficients and incorporate them into the calculation of posterior probabilities. Please note that simulated files need to be converted and SNP calling is required.
 
