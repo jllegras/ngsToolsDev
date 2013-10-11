@@ -1,26 +1,27 @@
 
-
-# Usage: Rscript -i infile.stat -o outfile.eps -n name1-name2
-# Usage: Rscript -i infile.stat -o outfile.eps -n name1 # if only 1 pop
+# Usage: Rscript printGLF.R -i infile.glf.gz -n 1000 -d 20 -o outfile.txt
 
 library(optparse)
-library(ggplot2)
 
 option_list <- list(make_option(c('-i','--in_file'), action='store', type='character', default=NULL, help='Input file'),
-                    make_option(c('-n','--names'), action='store', type='character', default=1-2, help='Name(s) of population(s)'),
-                    make_option(c('-o','--out_file'), action='store', type='character', default=NULL, help='Output file')
+		make_option(c('-o','--out_file'), action='store', type='character', default=NULL, help='Output file'),
+		make_option(c('-n','--nsites'), action='store', type='numeric', default=NULL, help='Number of sites'),
+		make_option(c('-d','--nind'), action='store', type='numeric', default=NULL, help='Number of individual')
                     )
 opt <- parse_args(OptionParser(option_list = option_list))
 
+ncat=10;
 
+ff <- gzfile(opt$inf_file,"rb");
 
+m<-matrix(readBin(ff,"double",ncat*opt$nsites*opt$nind),ncol=ncat,byrow=TRUE)[1:opt$print,];
 
-readGLF <- function(file=NULL, ncat=10, nsites=10, nind=10) {
- ff <- gzfile(file,"rb")
- m<-matrix(readBin(ff,"double",ncat*nsites*nind),ncol=ncat,byrow=TRUE)
- close(ff)
- return(m)
-}
+colnames(m)=c("AA", "AC", "AG", "AT", "CC", "CG", "CT", "GG", "GT", "TT");
 
+m=cbind(indiv=rep(1:opt$nind, 1:opt$nsites), site=rep(1:opt$nsites, each=opt$nind), m);
+
+close(ff)
+
+write.table(m, file=opt$out_file, col.names=T, sep="\t", row.names=F, quote=F);
 
 
