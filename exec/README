@@ -1,6 +1,5 @@
 
-`mac` executables compiled on a i686-apple-darwin11 machine and gcc version 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)
+`linux` executables generated on a x86_64-linux-gnu machine, compilated with gcc version 4.6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5)
 
-
-
+`mac` executables generated on a i686-apple-darwin11 machine, compilated with gcc version 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2336.11.00)
 
