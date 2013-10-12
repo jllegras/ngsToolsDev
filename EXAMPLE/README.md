@@ -101,7 +101,7 @@ These commands will produce text files with a symmetric covariance matrix MxM, w
 
 ## PCA plot
 
-We can use a simple R script to perform an eigenvalue decomposition of the covariance matrix and plot the PCA results. First, let's create a dummy plink cluster file.
+We can use a simple R script to perform an eigenvalue decomposition of the covariance matrix and plot the PCA results. Please make sure the use updated versions of required R packages. First, let's create a dummy plink cluster file.
 
     Rscript --vanilla --slave -e 'write.table(cbind(seq(1,24),rep(1,24),c(rep("A",10),rep("B",8),rep("C",6))), row.names=F, col.names=c("FID","IID","CLUSTER"), file="testA.clst", quote=F)'    
 
@@ -164,7 +164,7 @@ This file has these values, for each window: start, end, number of variable site
      Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.pdf -n pop1-pop2   
      Rscript --vanilla --slave $NGSTOOLS/plotSS.R -i testB.stat -o testB.stat.pop1.pdf -n pop1
 
-R package 'grid' installed is needed.
+R packages 'grid' and 'methods' are loaded here.
 
 # FST
 
