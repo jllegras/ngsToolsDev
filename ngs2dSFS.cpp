@@ -168,14 +168,11 @@ int main (int argc, char *argv[]) {
   // write
   writematrix(spec, outpost);
   cleanup(spec);
-  
-  delete [] start.data;
-  delete [] end.data;
 
   // close file
-  fclose(outpost);
-  free(foutpost);  
- 
-  return 0;
+  fclose(outpost); 
+  free(foutpost);
+
+  //return 0;
 
 } // end main

@@ -109,7 +109,6 @@ array<int> getEnd(int nsites, int firstbase, int block_size) {
   return end;
 }
 
-
 // a nice wrapper for getting files
 FILE *getFILE(const char*fname,const char* mode) {
   int writeFile = 0;
@@ -120,9 +119,10 @@ FILE *getFILE(const char*fname,const char* mode) {
     fprintf(stderr,"\t-> File exists: %s exiting...\n",fname);
     exit(0);
   }
-  FILE *fp;
-  if(NULL==(fp=fopen(fname,mode))){
+  FILE *fp = fopen(fname, mode);
+  if(fp==NULL){
     fprintf(stderr,"\t->Error opening FILE handle for file:%s exiting\n",fname);
+    fclose(fp);
     exit(0);
   }
   return fp;
