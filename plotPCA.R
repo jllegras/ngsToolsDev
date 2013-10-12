@@ -1,4 +1,3 @@
-
 # Usage: Rscript -i infile.covar -c component1-component2 -a annotation.file -o outfile.eps
 
 library(optparse)
@@ -19,7 +18,7 @@ opt <- parse_args(OptionParser(option_list = option_list))
 covar <- read.table(opt$in_file, stringsAsFact=F);
 
 # Read annot file
-annot <- read.table(opt$annot_file, sep="\t", header=T);
+annot <- read.table(opt$annot_file, sep=" ", header=T); # note that plink cluster files are usually tab-separated instead
 
 # Parse components to analyze
 comp <- as.numeric(strsplit(opt$comp, "-", fixed=TRUE)[[1]])
