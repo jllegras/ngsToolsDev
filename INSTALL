@@ -10,15 +10,15 @@ cd ngsTools
 git pull
 make clean
 make
-# if this fails, some executables are provided in `exec` folder 
+# if this fails, some executables are provided in the `exec` folder 
 
-# in case of updates, you can get the latest version by simply:
+# in case of future updates, you can get the latest version by simply:
 git pull
 
 # if you want to participate in the repository development, please contact me and I'll give you rights to propose and/or submit changes
 
-# ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF.
-cd..
+# ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF. Please note that you need GSL library installed.
+cd ..
 git clone https://github.com/fgvieira/ngsF.git ngsF
 cd ngsF
 git pull
@@ -27,17 +27,16 @@ make
 
 # ANGSD can be downloaded from popgen.dk/angsd. Please check for the latest version, below an example on how to get the 0.553 version on a linux machine.
 
-cd..
+cd ..
 wget http://popgen.dk/software/download/angsd/angsd0.553.tar.gz
 tar xfz angsd0.553.tar.gz
 cd angsd0.553
 make clean
 make
-cd ..
 
 # for users who want to integrate inbreeding estimates from  ngsF in ANGSD please use 0.543i ANGSD version instead (a comprehensive version of ANGSD will be released soon).
+cd ..
 
-cd..
 wget http://popgen.dk/software/download/angsd/angsd0.543i.tar.gz
 tar xf angsd0.543i.tar.gz
 cd angsd0.543i
