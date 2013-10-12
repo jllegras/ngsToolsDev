@@ -170,9 +170,9 @@ R packages 'grid' and 'methods' are loaded here.
 
 We use the same data simulated and file generated for the previous analysis. In case of low coverage sequencing depth, an improvement in the estimation accuracy can be achieved by using the joint-SFS as a prior for the sample allele frequency posterior distributions, as shown in Fumagalli et al. Genetics (2013). Therefore we first estimate a joint-SFS for our pair of populations:
 
-    $NGSTOOLS/bin/ngs2dSFS -postfiles testB1.rf.sfs.norm testB2.rf.sfs.norm -outfile testB.joint.spec -relative 1 -nind 10 8 -nsites 10000 -maxlike 0    
+    $NGSTOOLS/bin/ngs2dSFS -postfiles testB1.rf.sfs.norm testB2.rf.sfs.norm -outfile testB.joint.spec -relative 1 -nind 10 8 -nsites 10000 -maxlike 1    
 
-Alternatively, as proposed in the original formulation of the method, testB1.rf.sfs and testB2.rf.sfs can be used with `-islog 1`. Another solution, for medium to high coverage data and in case of a large number of sites, would be to set `-maxlike 1`. 
+Alternatively, as proposed in the original formulation of the method, testB1.rf.sfs and testB2.rf.sfs can be used with `-islog 1`. Another solution, for medium to high coverage data and in case of a large number of sites, would be to set `-maxlike 0`. 
 You can plot the joint SFS on a .pdf file with this simple script:
 
     Rscript --vanilla --slave $NGSTOOLS/plot2dSFS.R testB.joint.spec testB.joint.spec.pdf pop1 pop2    
