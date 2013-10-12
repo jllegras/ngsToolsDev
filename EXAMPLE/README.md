@@ -237,9 +237,9 @@ Simulation settings:
 * minor options: minimum frequency in the population of 0.005, output files with prefix testD.
 
 
-     $NGSTOOLS/bin/ngsSim -npop 1 -nind 20 -nsites 1000 -errate 0.01 -depth 4 -pvar 1 -mfreq 0.005 -F 0.3 -model 1 -outfiles testD     
+    $NGSTOOLS/bin/ngsSim -npop 1 -nind 20 -nsites 1000 -errate 0.01 -depth 4 -pvar 1 -mfreq 0.005 -F 0.3 -model 1 -outfiles testD     
      
-     rm testD.args testD.frq testD.geno testD.par  testD.reads.txt  testD.seq.gz     
+    rm testD.args testD.frq testD.geno testD.par  testD.reads.txt  testD.seq.gz     
 
 We estimate inbreeding coefficients and incorporate them into the calculation of posterior probabilities. Please note that simulated files need to be converted and SNP calling is required.
 
