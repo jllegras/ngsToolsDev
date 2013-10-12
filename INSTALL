@@ -11,6 +11,8 @@ git pull
 make clean
 make
 
+# in case this fails, some executables are provided in `exec` folder 
+
 # ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF.
 cd..
 git clone https://github.com/fgvieira/ngsF.git ngsF
