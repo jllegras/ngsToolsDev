@@ -1,17 +1,21 @@
-# Source codes are available on github
+# Source codes are available only here on github
+# ngsTools can be downloaded using git utilities (see below, recommended) or by clicking on 'Download ZIP' on the right of the main page. 
 
-ngsTools can be downloaded using git utilities (see below, recommended) or by clicking on 'Download ZIP' on the right of this screen. 
-
-# for linux ubuntu (fedora use yum)
+# to install git utlities on a linux machine (ubuntu, fedora users should use yum)
 sudo apt-get install git-core gitk
 
+# clone ngsTools git repository
 git clone https://github.com/mfumagalli/ngsTools.git ngsTools
 cd ngsTools
 git pull
 make clean
 make
+# if this fails, some executables are provided in `exec` folder 
 
-# in case this fails, some executables are provided in `exec` folder 
+# in case of updates, you can get the latest version by simply:
+git pull
+
+# if you want to participate in the repository development, please contact me and I'll give you rights to propose and/or submit changes
 
 # ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF.
 cd..
@@ -21,7 +25,7 @@ git pull
 make clean
 make
 
-# ANGSD can be downloaded from popgen.dk/angsd. Please check for the latest version, below an example on how to get the 0.553 version.
+# ANGSD can be downloaded from popgen.dk/angsd. Please check for the latest version, below an example on how to get the 0.553 version on a linux machine.
 
 cd..
 wget http://popgen.dk/software/download/angsd/angsd0.553.tar.gz
