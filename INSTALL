@@ -17,7 +17,7 @@ git pull
 
 # if you want to participate in the repository development, please contact me and I'll give you rights to propose and/or submit changes
 
-# ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF. Please note that you need GSL library installed.
+# ngsF is provided as a separate program. Source code and manual are available at https://github.com/fgvieira/ngsF. Please note that you need GSL library installed (http://www.gnu.org/software/gsl/).
 cd ..
 git clone https://github.com/fgvieira/ngsF.git ngsF
 cd ngsF
