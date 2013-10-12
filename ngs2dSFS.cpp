@@ -173,8 +173,9 @@ int main (int argc, char *argv[]) {
   delete [] end.data;
 
   // close file
-  free(foutpost);
-   
+  fclose(outpost);
+  free(foutpost);  
+ 
   return 0;
 
 } // end main
