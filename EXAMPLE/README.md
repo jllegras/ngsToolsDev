@@ -219,7 +219,7 @@ We now calculate summary statistics:
 
 Note that these values are very similar, as expected, to the one retrieved using the unfolded data (testB.stat). Differences derive from a different prior used to compute posterior probabilities.
 
-Currently, it is not possible to estimate a joint-SFS from folded data. A folded joint-SFS can also be estimated by first computing posterior probabilities of sample allele frequencies assuming a uniform prior (simply provide a file with n+1 equal values as prior SFS), run ngs2dSFS, and fold the spectrum afterwards. PCA can be performed with folded data by adding `-isfold 1` in ngsCovar if we choose to weight each site by its probability of being variable. For FST estimation, a solution would be to use posterior probabilities of allele frequencies from a uniform prior, like in the following example:
+Currently, it is not possible to estimate a joint-SFS from folded data. A folded joint-SFS can also be estimated by first computing posterior probabilities of sample allele frequencies assuming a uniform prior (simply provide a file with n+1 equal values as prior SFS), run ngs2dSFS, and fold the spectrum afterwards. PCA can be performed with folded data by adding `-isfold 1` in ngsCovar if we choose to weight each site by its probability of being variable. For FST estimation, a solution would be to use posterior probabilities of allele frequencies from a uniform prior (without folding your data at the beginning), like in the following example:
 
     $NGSTOOLS/bin/ngsFST -postfiles testB1.rf.sfs testB2.rf.sfs -nind 10 8 -nsites 10000 -outfile testB.fst_fold -islog 1    
     
